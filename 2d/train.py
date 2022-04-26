@@ -18,15 +18,15 @@ except ImportError as e:
         input('Press Enter to quit...')
     raise e
 from loadDataset import loadDataset
-from makeDataset import drawBall
+from makeDataset import drawBall, RESOLUTION
 
-N_EPOCHS = 100
+N_EPOCHS = 1000
 BETA = torch.Tensor([.1])
 CHANNELS = [64, 128, 256]
 
 RECONSTRUCT_PATH = './reconstruct'
 COORD_RADIUS = 2
-RENDER_RESOLUTION = 20
+TERMINAL_RESOLUTION = 20
 
 has_cuda = torch.cuda.is_available()
 if has_cuda:
@@ -68,10 +68,11 @@ class Decoder(nn.Module):
     def __init__(self) -> None:
         super().__init__()
 
-        self.fc_0 = nn.Linear(2, 16)
-        self.fc_1 = nn.Linear(16, 32)
-        self.fc_2 = nn.Linear(32, 64)
-        self.fc_3 = nn.Linear(64, CHANNELS[-1] * 4 * 4)
+        # self.fc_0 = nn.Linear(2, 16)
+        # self.fc_1 = nn.Linear(16, 32)
+        # self.fc_2 = nn.Linear(32, 64)
+        # self.fc_3 = nn.Linear(64, CHANNELS[-1] * 4 * 4)
+        self.fc = nn.Linear(2, CHANNELS[-1] * 4 * 4)
 
         self.deconv_0 = nn.ConvTranspose2d(
             CHANNELS[2], CHANNELS[1], 
@@ -87,10 +88,11 @@ class Decoder(nn.Module):
         )
     
     def forward(self, x):
-        x = F.relu(self.fc_0(x))
-        x = F.relu(self.fc_1(x))
-        x = F.relu(self.fc_2(x))
-        x = F.relu(self.fc_3(x))
+        # x = F.relu(self.fc_0(x))
+        # x = F.relu(self.fc_1(x))
+        # x = F.relu(self.fc_2(x))
+        # x = F.relu(self.fc_3(x))
+        x = F.relu(self.fc(x))
         x = x.view((x.shape[0], CHANNELS[-1], 4,  4))
         x = F.relu(self.deconv_0(x))
         x = F.relu(self.deconv_1(x))
@@ -149,11 +151,11 @@ def render(shot, aimed, datapoints):
     def rasterize(coord):
         x, y = (
             coord / COORD_RADIUS + 1
-        ) / 2 * RENDER_RESOLUTION
+        ) / 2 * TERMINAL_RESOLUTION
         return int(x.item()), int(y.item())
     buffer = [
-        [' '] * RENDER_RESOLUTION 
-        for _ in range(RENDER_RESOLUTION)
+        [' '] * TERMINAL_RESOLUTION 
+        for _ in range(TERMINAL_RESOLUTION)
     ]
     for i in range(datapoints.shape[0]):
         x, y = rasterize(datapoints[i, :])
@@ -173,10 +175,10 @@ def evaluate(encoder, decoder, images, coordinates):
         render(z[i, :], coord, torch.Tensor())
         print()
         input('Enter...')
-    target_grid = np.ones((2, )) * (RENDER_RESOLUTION // 2)
+    target_grid = np.ones((2, )) * (TERMINAL_RESOLUTION // 2)
     while True:
         target = (
-            target_grid / RENDER_RESOLUTION - .5
+            target_grid / TERMINAL_RESOLUTION - .5
         ) * COORD_RADIUS * 2
         np_img = np.array(drawBall(*target))[:, :, 1]
         torch_img = (
@@ -192,30 +194,49 @@ def evaluate(encoder, decoder, images, coordinates):
                 target_grid[1] = 0
         elif op == b's':
             target_grid[1] += 1
-            if target_grid[1] >= RENDER_RESOLUTION:
-                target_grid[1] = RENDER_RESOLUTION - 1
+            if target_grid[1] >= TERMINAL_RESOLUTION:
+                target_grid[1] = TERMINAL_RESOLUTION - 1
         elif op == b'a':
             target_grid[0] -= 1
             if target_grid[0] < 0:
                 target_grid[0] = 0
         elif op == b'd':
             target_grid[0] += 1
-            if target_grid[0] >= RENDER_RESOLUTION:
-                target_grid[0] = RENDER_RESOLUTION - 1
+            if target_grid[0] >= TERMINAL_RESOLUTION:
+                target_grid[0] = TERMINAL_RESOLUTION - 1
         elif op == b'\x1b':
             break
 
     # evel decoder
-    reconstruct = decoder(coordinates)
+    reconstructs = decoder(coordinates)
     os.makedirs(RECONSTRUCT_PATH, exist_ok=True)
-    for i in range(images.shape[0]):
-        img = Image.fromarray(reconstruct[i, 0, :, :].numpy())
-        img.convert('L').save(path.join(
-            RECONSTRUCT_PATH, f'{i}.png', 
+    def visualize(reconstruct):
+        return Image.fromarray(
+            reconstruct.numpy() * 128
+        ).convert('L')
+    def save(img, filename):
+        img.save(path.join(
+            RECONSTRUCT_PATH, f'{filename}.png', 
         ))
+    imgs = []
+    for i in range(images.shape[0]):
+        img = visualize(reconstructs[i, 0, :, :])
+        imgs.append(img)
+        save(img, i)
     print(f'Saved reconstruction to `{RECONSTRUCT_PATH}`')
-    
-    # coord = (coordinates[0, :] + coordinates[1, :]) / 2
-    # decoder(coord.unsqueeze(0))
+
+    for i in range(images.shape[0] - 1):
+        j = i + 1
+        coord = (coordinates[i, :] + coordinates[j, :]) / 2
+        reconstructs = decoder(coord.unsqueeze(0))
+        img = visualize(reconstructs[0, 0, :, :])
+        canvas = Image.new('L', (
+            RESOLUTION, RESOLUTION * 3, 
+        ))
+        canvas.paste(imgs[i], (0, 0))
+        canvas.paste(img    , (0, RESOLUTION))
+        canvas.paste(imgs[j], (0, RESOLUTION * 2))
+        save(canvas, f'interpolate_{i}_{j}')
+    print(f'Saved interpolation to `{RECONSTRUCT_PATH}`')
 
 main()

@@ -21,7 +21,7 @@ from loadDataset import loadDataset
 from makeDataset import drawBall, RESOLUTION
 
 N_EPOCHS = 1000
-BETA = torch.Tensor([.3])
+BETA = torch.tensor(.3)
 CHANNELS = [8, 16, 32]
 
 RECONSTRUCT_PATH = './reconstruct'

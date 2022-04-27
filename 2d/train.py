@@ -21,8 +21,8 @@ from loadDataset import loadDataset
 from makeDataset import drawBall, RESOLUTION
 
 N_EPOCHS = 1000
-BETA = torch.Tensor([.1])
-CHANNELS = [64, 128, 256]
+BETA = torch.Tensor([.3])
+CHANNELS = [8, 16, 32]
 
 RECONSTRUCT_PATH = './reconstruct'
 COORD_RADIUS = 2
@@ -72,6 +72,10 @@ class Decoder(nn.Module):
         # self.fc_1 = nn.Linear(16, 32)
         # self.fc_2 = nn.Linear(32, 64)
         # self.fc_3 = nn.Linear(64, CHANNELS[-1] * 4 * 4)
+
+        # self.fc_0 = nn.Linear(2, 32)
+        # self.fc_1 = nn.Linear(32, CHANNELS[-1] * 4 * 4)
+
         self.fc = nn.Linear(2, CHANNELS[-1] * 4 * 4)
 
         self.deconv_0 = nn.ConvTranspose2d(
@@ -91,12 +95,17 @@ class Decoder(nn.Module):
         # x = F.relu(self.fc_0(x))
         # x = F.relu(self.fc_1(x))
         # x = F.relu(self.fc_2(x))
-        # x = F.relu(self.fc_3(x))
-        x = F.relu(self.fc(x))
+        # x = self.fc_3(x)
+
+        # x = F.relu(self.fc_0(x))
+        # x = self.fc_1(x)
+
+        x = self.fc(x)
+
         x = x.view((x.shape[0], CHANNELS[-1], 4,  4))
         x = F.relu(self.deconv_0(x))
         x = F.relu(self.deconv_1(x))
-        x = F.relu(self.deconv_2(x))
+        x = torch.sigmoid(self.deconv_2(x))
         return x
 
 def loadModels():
@@ -214,15 +223,13 @@ def evaluate(encoder, decoder, images, coordinates):
         return Image.fromarray(
             reconstruct.numpy() * 128
         ).convert('L')
-    def save(img, filename):
-        img.save(path.join(
-            RECONSTRUCT_PATH, f'{filename}.png', 
-        ))
     imgs = []
     for i in range(images.shape[0]):
         img = visualize(reconstructs[i, 0, :, :])
+        img.save(path.join(
+            RECONSTRUCT_PATH, f'{i}.png', 
+        ))
         imgs.append(img)
-        save(img, i)
     print(f'Saved reconstruction to `{RECONSTRUCT_PATH}`')
 
     for i in range(images.shape[0] - 1):
@@ -230,13 +237,12 @@ def evaluate(encoder, decoder, images, coordinates):
         coord = (coordinates[i, :] + coordinates[j, :]) / 2
         reconstructs = decoder(coord.unsqueeze(0))
         img = visualize(reconstructs[0, 0, :, :])
-        canvas = Image.new('L', (
-            RESOLUTION, RESOLUTION * 3, 
-        ))
-        canvas.paste(imgs[i], (0, 0))
-        canvas.paste(img    , (0, RESOLUTION))
-        canvas.paste(imgs[j], (0, RESOLUTION * 2))
-        save(canvas, f'interpolate_{i}_{j}')
+        imgs[i].save(
+            path.join(
+                RECONSTRUCT_PATH, f'interpolate_{i}_{j}.gif', 
+            ), save_all=True, append_images=[img, imgs[j]], 
+            duration=500, loop=0, 
+        )
     print(f'Saved interpolation to `{RECONSTRUCT_PATH}`')
 
 main()

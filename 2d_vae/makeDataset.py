@@ -26,9 +26,9 @@ def sampleXY():
             break
     return x, y
 
-def rasterize(x, resolution=RESOLUTION):
-    return round((x + CANVAS_RADIUS) / (
-        CANVAS_RADIUS * 2
+def rasterize(x, x_radius=CANVAS_RADIUS, resolution=RESOLUTION):
+    return round((x + x_radius) / (
+        x_radius * 2
     ) * resolution)
 
 def drawBall(x, y):

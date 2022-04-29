@@ -3,3 +3,5 @@ reconstruct*/
 *.pyc
 *.log
 checkpoints/
+*.mp4
+*.gif

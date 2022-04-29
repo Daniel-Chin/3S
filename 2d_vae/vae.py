@@ -3,7 +3,6 @@ from torch import nn
 import torch.nn.functional as F
 from makeDataset import RESOLUTION
 
-BETA = torch.tensor(0.001)
 CHANNELS = [8, 16, 16]
 # CHANNELS = [16, 32, 64, 128]
 LATENT_DIM = 2
@@ -128,13 +127,15 @@ class VAE(nn.Module):
         reconstructions = self.decode(z)
         return reconstructions, mu, log_var
     
-    def computeLoss(self, x, reconstructions, mu, log_var):
+    def computeLoss(
+        self, x, reconstructions, mu, log_var, beta, 
+    ):
         reconstruct_loss = F.mse_loss(reconstructions, x)
         kld_loss = torch.mean(-0.5 * torch.sum(
             1 + log_var - mu ** 2 - log_var.exp(), dim=1, 
         ), dim=0)
         return (
-            reconstruct_loss + BETA * kld_loss, 
+            reconstruct_loss + beta * kld_loss, 
             reconstruct_loss.detach().item(), 
             kld_loss.        detach().item(), 
         )

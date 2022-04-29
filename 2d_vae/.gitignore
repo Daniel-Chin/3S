@@ -2,3 +2,4 @@ dataset/
 reconstruct*/
 *.pyc
 *.log
+checkpoints/

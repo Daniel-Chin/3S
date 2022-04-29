@@ -26,10 +26,10 @@ def sampleXY():
             break
     return x, y
 
-def rasterize(x):
+def rasterize(x, resolution=RESOLUTION):
     return round((x + CANVAS_RADIUS) / (
         CANVAS_RADIUS * 2
-    ) * RESOLUTION)
+    ) * resolution)
 
 def drawBall(x, y):
     canvas = Image.new('RGB', (RESOLUTION, RESOLUTION))

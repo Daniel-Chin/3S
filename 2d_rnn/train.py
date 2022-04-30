@@ -1,4 +1,5 @@
 '''
+evalZ: plot rnn prediction under symmetry.
 beta warmup? 
 set beta=0 may deknot the z space? increase beta later? beta oscillation? 
 '''
@@ -126,7 +127,7 @@ def oneBatch(
     )
     z_hat_transed = torch.zeros((
         batch_size, SEQ_LEN - RNN_MIN_CONTEXT, LATENT_DIM, 
-    ))
+    )).to(DEVICE)
     rnn.zeroHidden(batch_size)
     if do_symmetry:
         trans, untrans = sampleTransforms()

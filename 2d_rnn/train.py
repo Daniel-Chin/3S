@@ -1,5 +1,6 @@
 '''
 set beta=0 may deknot the z space? increase beta later? beta oscillation? 
+Variational RNN
 '''
 from collections import namedtuple
 import torch
@@ -41,7 +42,8 @@ else:
 
 def oneEpoch(
     epoch, 
-    vae: VAE, rnn: RNN, optim, train_set, validate_set, 
+    vae: VAE, rnn: RNN, optim: torch.optim.Optimizer, 
+    train_set, validate_set, 
     lossLogger: LossLogger, 
     beta=0.001, vae_loss_coef=1, rnn_loss_coef=1, T=8, R=8, 
 ):
@@ -93,6 +95,8 @@ def oneEpoch(
         validate_kld____loss=validate_kld____loss, 
         train____z_pred_loss=epoch_z_pred_loss, 
         validate_z_pred_loss=validate_z_pred_loss, 
+        # vae___grad_norm=vae___grad_norm, 
+        # total_grad_norm=total_grad_norm, 
     )
 
 def oneBatch(
@@ -142,3 +146,10 @@ def oneBatch(
         )
     else:
         return total_loss, recon_loss, kld_loss, rnn_loss
+
+def getGradNorm(optim: torch.optim.Optimizer):
+    s = 0
+    for param in optim.param_groups[0]['params']:
+        if param.grad is not None:
+            s += param.grad.norm(2).item() ** 2
+    return s ** .5

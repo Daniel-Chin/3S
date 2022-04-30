@@ -99,17 +99,17 @@ def makeOneSet(set_size):
         print(i)
     with open('root.pickle', 'wb') as f:
         pickle.dump(root, f)
-    ax = plt.gca()
-    for _, trajectory in root:
-        for x, y in trajectory:
-            circle = Circle((x, y), BALL_RADIUS, color='g')
-            ax.add_patch(circle)
-    ax.axis('equal')
-    ax.axis((
-        -CANVAS_RADIUS, CANVAS_RADIUS, 
-        -CANVAS_RADIUS, CANVAS_RADIUS, 
-    ))
-    plt.show()
+    # ax = plt.gca()
+    # for _, trajectory in root:
+    #     for x, y in trajectory:
+    #         circle = Circle((x, y), BALL_RADIUS, color='g')
+    #         ax.add_patch(circle)
+    # ax.axis('equal')
+    # ax.axis((
+    #     -CANVAS_RADIUS, CANVAS_RADIUS, 
+    #     -CANVAS_RADIUS, CANVAS_RADIUS, 
+    # ))
+    # plt.show()
 
 if __name__ == '__main__':
     main()

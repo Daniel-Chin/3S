@@ -1,3 +1,7 @@
+'''
+set beta=0 may deknot the z space? increase beta later? beta oscillation? 
+'''
+from collections import namedtuple
 import torch
 import torch.nn.functional as F
 
@@ -18,6 +22,10 @@ from makeDataset import (
 from vae import LATENT_DIM, VAE
 from rnn import RNN
 
+Config = namedtuple('Config', [
+    'beta', 'vae_loss_coef', 'rnn_loss_coef', 'T', 'R', 
+])
+
 BATCH_SIZE = 32
 RNN_MIN_CONTEXT = 3
 
@@ -35,7 +43,7 @@ def oneEpoch(
     epoch, 
     vae: VAE, rnn: RNN, optim, train_set, validate_set, 
     lossLogger: LossLogger, 
-    beta=0.001, vae_loss_coef=1, rnn_loss_coef=1, 
+    beta=0.001, vae_loss_coef=1, rnn_loss_coef=1, T=8, R=8, 
 ):
     n_batches = TRAIN_SET_SIZE // BATCH_SIZE
     vae.train()
@@ -121,6 +129,7 @@ def oneBatch(
     rnn_loss = F.mse_loss(predictions, batch[
         :, RNN_MIN_CONTEXT:, :, :, :, 
     ])
+    # rnn_loss = F.mse_loss(z_hat, z[:, RNN_MIN_CONTEXT:, :])
     
     total_loss = (
         vae_loss * vae_loss_coef + 

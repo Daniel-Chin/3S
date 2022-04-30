@@ -1,5 +1,4 @@
 import os
-from collections import namedtuple
 from itertools import count
 import torch
 from PIL import Image
@@ -24,16 +23,12 @@ from makeDataset import (
 from loadDataset import loadDataset, TRAIN_PATH, VALIDATE_PATH
 from train import (
     oneEpoch, HAS_CUDA, DEVICE, BATCH_SIZE, oneBatch, 
-    RNN_MIN_CONTEXT, 
+    RNN_MIN_CONTEXT, Config, 
 )
 
-Config = namedtuple('Config', [
-    'beta', 'vae_loss_coef', 'rnn_loss_coef', 
-])
-
-RAND_INIT_TIMES = 5
+RAND_INIT_TIMES = 1
 EXPERIMENTS = [
-    Config(.001, 1, 1), 
+    Config(.001, 1, 1, 0, 0), 
 ]
 
 EXPERIMENTS_PATH = './experiments'

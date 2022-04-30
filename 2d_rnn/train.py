@@ -130,7 +130,7 @@ def oneBatch(
     )).to(DEVICE)
     rnn.zeroHidden(batch_size)
     if do_symmetry:
-        trans, untrans = sampleTransforms()
+        trans, untrans = sampleTransforms(DEVICE)
     else:
         trans = untrans = identity
     for t in range(RNN_MIN_CONTEXT):

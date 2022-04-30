@@ -1,5 +1,3 @@
-import os
-from os import path
 import torch
 import torch.nn.functional as F
 from PIL import Image
@@ -20,7 +18,7 @@ from makeDataset import (
     RESOLUTION, SEQ_LEN, TRAIN_SET_SIZE, VALIDATE_SET_SIZE, 
 )
 from vae import LATENT_DIM, VAE
-from rnn import HIDDEN_DIM, RNN
+from rnn import RNN
 
 N_EPOCHS = 1000
 BATCH_SIZE = 32
@@ -28,7 +26,6 @@ VAE_LOSS_COEF = 1
 RNN_LOSS_COEF = 1
 RNN_MIN_CONTEXT = 3
 
-RECONSTRUCT_PATH = './reconstruct'
 CHECKPOINTS_PATH = './checkpoints'
 
 HAS_CUDA = torch.cuda.is_available()
@@ -50,7 +47,7 @@ def loadModel():
         rnn = rnn.cuda()
     return vae, rnn
 
-def train(rand_init_i=0, beta=0.001):
+def train(rand_init_i=0, beta=0.0005):
     # this_checkpoints_path = path.join(
     #     CHECKPOINTS_PATH, f'{beta}_{rand_init_i}', 
     # )
@@ -120,59 +117,92 @@ def train(rand_init_i=0, beta=0.001):
             #     ))
     except KeyboardInterrupt:
         print('Received ^C.')
-    # reconstructValidateSet(
-    #     vae.cpu(), validate_images, 
-    # )
+    with torch.no_grad():
+        evalGIFs(
+            vae.cpu(), rnn.cpu(), 
+            validate_set[:12, :, :, :, :], 
+        )
 
-def oneBatch(vae: VAE, rnn: RNN, batch: torch.Tensor, beta):
+def oneBatch(
+    vae: VAE, rnn: RNN, batch: torch.Tensor, beta, 
+    visualize=False, batch_size = BATCH_SIZE, 
+):
     flat_batch = batch.view(
-        BATCH_SIZE * SEQ_LEN, 1, RESOLUTION, RESOLUTION, 
+        batch_size * SEQ_LEN, 1, RESOLUTION, RESOLUTION, 
     )
     reconstructions, mu, log_var = vae.forward(flat_batch)
     vae_loss, recon_loss, kld_loss = vae.computeLoss(
         flat_batch, reconstructions, mu, log_var, beta, 
     )
 
-    z: torch.Tensor = mu.view(BATCH_SIZE, SEQ_LEN, LATENT_DIM)
+    z: torch.Tensor = mu.view(batch_size, SEQ_LEN, LATENT_DIM)
     z_hat = torch.zeros((
-        BATCH_SIZE, SEQ_LEN - RNN_MIN_CONTEXT, LATENT_DIM, 
+        batch_size, SEQ_LEN - RNN_MIN_CONTEXT, LATENT_DIM, 
     ))
-    rnn.zeroHidden(BATCH_SIZE)
+    rnn.zeroHidden(batch_size)
     for t in range(RNN_MIN_CONTEXT):
         rnn.stepTime(z, t)
-    for t in range(RNN_MIN_CONTEXT, SEQ_LEN):
-        z_hat[:, t - RNN_MIN_CONTEXT, :] = rnn.projHead(
+    for t in range(SEQ_LEN - RNN_MIN_CONTEXT):
+        z_hat[:, t, :] = rnn.projHead(
             rnn.hidden, 
         )
         # that probably gonna break autograd
         # wait what it didn't
-        rnn.stepTime(z, t)
+        rnn.stepTime(z_hat, t)
     rnn_loss = F.mse_loss(z_hat, z[:, RNN_MIN_CONTEXT:, :])
     
     total_loss = (
         vae_loss * VAE_LOSS_COEF + 
         rnn_loss * RNN_LOSS_COEF
     )
-    return total_loss, recon_loss, kld_loss, rnn_loss
 
-def visualize(reconstruct):
-    return Image.fromarray(
-        reconstruct.numpy() * 128
-    ).convert('L')
+    if visualize:
+        return z_hat, reconstructions.view(
+            batch_size, SEQ_LEN, 1, RESOLUTION, RESOLUTION, 
+        )
+    else:
+        return total_loss, recon_loss, kld_loss, rnn_loss
 
-def reconstructValidateSet(vae: VAE, validate_images):
-    os.makedirs(RECONSTRUCT_PATH, exist_ok=True)
-    with torch.no_grad():
-        reconstructions, _, _ = vae.forward(validate_images)
-        for i in range(validate_images.shape[0]):
-            recon = visualize(reconstructions[i, 0, :, :])
-            truth = visualize(validate_images[i, 0, :, :])
-            truth.save(
-                path.join(RECONSTRUCT_PATH, f'{i}.gif'), 
-                save_all=True, append_images=[recon], 
-                duration=300, loop=0, 
+def torch2PIL(torchImg: torch.Tensor):
+    return Image.fromarray(torchImg.numpy() * 255).convert('L')
+
+def evalGIFs(vae: VAE, rnn: RNN, dataset: torch.Tensor):
+    n_datapoints = dataset.shape[0]
+    z_hat, reconstructions = oneBatch(
+        vae, rnn, dataset, 0, True, batch_size=n_datapoints, 
+    )
+    predictions = vae.decode(
+        z_hat.view(-1, LATENT_DIM)
+    ).view(n_datapoints, -1, 1, RESOLUTION, RESOLUTION)
+    frames = []
+    for t in range(SEQ_LEN):
+        frame = Image.new('L', (
+            RESOLUTION * n_datapoints, RESOLUTION * 3, 
+        ))
+        frames.append(frame)
+        for i in range(n_datapoints):
+            frame.paste(
+                torch2PIL(dataset[i, t, 0, :, :]), 
+                (i * RESOLUTION, 0 * RESOLUTION), 
             )
-    print(f'Saved reconstructions to `{RECONSTRUCT_PATH}`')
+            frame.paste(
+                torch2PIL(reconstructions[i, t, 0, :, :]), 
+                (i * RESOLUTION, 1 * RESOLUTION), 
+            )
+            if t >= RNN_MIN_CONTEXT:
+                frame.paste(
+                    torch2PIL(predictions[
+                        i, t - RNN_MIN_CONTEXT, 0, :, :, 
+                    ]), 
+                    (i * RESOLUTION, 2 * RESOLUTION), 
+                )
+    filename = 'pred.gif'
+    frames[0].save(
+        filename, 
+        save_all=True, append_images=frames[1:], 
+        duration=300, loop=0, 
+    )
+    print(f'Saved `{filename}`.')
 
 if __name__ == '__main__':
     train()

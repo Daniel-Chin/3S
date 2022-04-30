@@ -88,7 +88,7 @@ class VAE(nn.Module):
             nn.Tanh(), 
         )
 
-        print('# of params:', sum(
+        print('VAE # of params:', sum(
             p.numel() for p in self.parameters() 
             if p.requires_grad
         ))

@@ -10,12 +10,17 @@ class RNN(nn.Module):
 
         self.updateHidden = nn.Sequential(
             nn.Linear(HIDDEN_DIM + LATENT_DIM, HIDDEN_DIM), 
-            nn.LeakyReLU(), 
+            nn.Tanh(), 
         )
         
         self.projHead = nn.Linear(HIDDEN_DIM, LATENT_DIM)
 
         self.hidden = None
+
+        print('RNN # of params:', sum(
+            p.numel() for p in self.parameters() 
+            if p.requires_grad
+        ))
     
     def zeroHidden(self, batch_size):
         self.hidden = torch.zeros((batch_size, HIDDEN_DIM))

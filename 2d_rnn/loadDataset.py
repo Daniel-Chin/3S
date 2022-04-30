@@ -41,6 +41,11 @@ def loadDataset(dataset_path, device):
 
 def img2Tensor(img):
     np_img = np.asarray(img)
+    try:
+        np_img = np_img[:, :, 0]    
+        # On Linux, PIL returns 3 channels...
+    except IndexError: 
+        pass
     return (
         torch.from_numpy(np_img / np_img.max()).float()
     )   # I don't understand why `np_img`` isn't normalized. 

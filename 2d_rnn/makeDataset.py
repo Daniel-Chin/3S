@@ -2,8 +2,8 @@ import os
 from os import path
 import pickle
 import numpy as np
-from matplotlib import pyplot as plt
-from matplotlib.patches import Circle
+# from matplotlib import pyplot as plt
+# from matplotlib.patches import Circle
 from PIL import Image, ImageDraw
 
 TRAIN_SET_SIZE = 256

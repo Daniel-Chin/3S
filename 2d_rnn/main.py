@@ -155,7 +155,9 @@ def main():
             print('GIFs made.')
 
 def torch2PIL(torchImg: torch.Tensor):
-    return Image.fromarray(torchImg.numpy() * 255).convert('L')
+    return Image.fromarray(
+        torchImg.cpu().numpy() * 255, 
+    ).convert('L')
 
 def evalGIFs(vae: VAE, rnn: RNN, dataset: torch.Tensor):
     n_datapoints = dataset.shape[0]

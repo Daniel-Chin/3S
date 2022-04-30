@@ -6,6 +6,7 @@ from PIL import Image
 
 from makeDataset import (
     TRAIN_PATH, VALIDATE_PATH, SEQ_LEN, RESOLUTION, 
+    GIF_INTERVAL, 
 )
 
 def loadDataset(dataset_path, device):
@@ -24,12 +25,16 @@ def loadDataset(dataset_path, device):
         img = Image.open(filename)
         t = 0
         while True:
+            for _ in range(
+                img.info['duration'] // GIF_INTERVAL, 
+            ):
+                dataset[data_i, t, 0, :, :] = img2Tensor(img)
+                t += 1
             try:
                 img.seek(img.tell() + 1)
             except EOFError:
                 break
-            dataset[data_i, t, 0, :, :] = img2Tensor(img)
-            t += 1
+        assert t == SEQ_LEN
     os.chdir(prev_cwd)
     return dataset.to(device)
 

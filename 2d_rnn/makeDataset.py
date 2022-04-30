@@ -13,6 +13,7 @@ CANVAS_RADIUS = 2
 BALL_RADIUS = .3
 V_STD = .1
 RESOLUTION = 32
+GIF_INTERVAL = 200
 PATH = './dataset'
 TRAIN_PATH    = path.join(PATH, 'train')
 VALIDATE_PATH = path.join(PATH, 'validate')
@@ -83,7 +84,7 @@ def makeOneSet(set_size):
         filename = f'{i}.gif'
         frames[0].save(
             filename, save_all=True, append_images=frames[1:], 
-            duration=200, loop=0, 
+            duration=GIF_INTERVAL, loop=0, 
         )
         root.append((filename, trajectory))
         print(i)

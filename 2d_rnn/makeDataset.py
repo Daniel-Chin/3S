@@ -13,6 +13,7 @@ CANVAS_RADIUS = 2
 BALL_RADIUS = .3
 V_STD = .1
 RESOLUTION = 32
+SUPER_RES = 8
 GIF_INTERVAL = 200
 PATH = './dataset'
 TRAIN_PATH    = path.join(PATH, 'train')
@@ -44,13 +45,19 @@ def sample():
             continue
         return x, y, v_x, v_y
 
-def rasterize(x, x_radius=CANVAS_RADIUS, resolution=RESOLUTION):
+def rasterize(
+    x, x_radius=CANVAS_RADIUS, 
+    resolution = RESOLUTION * SUPER_RES, 
+):
     return round((x + x_radius) / (
         x_radius * 2
     ) * resolution)
 
 def drawBall(x, y):
-    canvas = Image.new('L', (RESOLUTION, RESOLUTION))
+    canvas = Image.new('L', (
+        RESOLUTION * SUPER_RES, 
+        RESOLUTION * SUPER_RES, 
+    ))
     draw = ImageDraw.Draw(canvas)
     draw.ellipse((
         rasterize(x - BALL_RADIUS), 
@@ -58,7 +65,9 @@ def drawBall(x, y):
         rasterize(x + BALL_RADIUS), 
         rasterize(y + BALL_RADIUS), 
     ), fill = 'white', outline ='white')
-    return canvas
+    return canvas.resize(
+        (RESOLUTION, RESOLUTION), resample=Image.ANTIALIAS, 
+    )
 
 def main():
     os.makedirs(   TRAIN_PATH, exist_ok=True)

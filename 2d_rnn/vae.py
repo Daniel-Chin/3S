@@ -124,7 +124,7 @@ class VAE(nn.Module):
         mu, log_var = self.encode(x)
         z = self.reparameterize(mu, log_var)
         reconstructions = self.decode(z)
-        return reconstructions, mu, log_var
+        return reconstructions, mu, log_var, z
     
     def computeLoss(
         self, x, reconstructions, mu, log_var, beta, 

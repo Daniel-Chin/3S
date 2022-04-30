@@ -28,7 +28,8 @@ def loadDataset(dataset_path, device):
             for _ in range(
                 img.info['duration'] // GIF_INTERVAL, 
             ):
-                dataset[data_i, t, 0, :, :] = img2Tensor(img)
+                torchImg = img2Tensor(img)
+                dataset[data_i, t, 0, :, :] = torchImg
                 t += 1
             try:
                 img.seek(img.tell() + 1)
@@ -39,14 +40,12 @@ def loadDataset(dataset_path, device):
     return dataset.to(device)
 
 def img2Tensor(img):
-    np_img = np.array(img)
+    np_img = np.asarray(img)
     return (
-        torch.from_numpy(np_img).float()
-    )
+        torch.from_numpy(np_img / np_img.max()).float()
+    )   # I don't understand why `np_img`` isn't normalized. 
 
 if __name__ == '__main__':
     dataset = loadDataset(
         TRAIN_PATH, torch.device("cpu"), 
     )
-    from console import console
-    console({**globals(), **locals()})

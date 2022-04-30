@@ -1,7 +1,15 @@
 import numpy as np
 import torch
 
+from vae import LATENT_DIM
+
+assert LATENT_DIM == 2
+
 def sampleTransforms(translate_std=1):
+    '''
+    The first dimension is the spatial coordinates. 
+    e.g. input is shape (2, 100). 
+    '''
     theta = np.random.uniform(0, 2 * np.pi)
     c = np.cos(theta)
     s = np.sin(theta)
@@ -13,6 +21,9 @@ def sampleTransforms(translate_std=1):
     def untransform(x):
         return unrotate @ (x - translate)
     return transform, untransform
+
+def identity(x):
+    return x
 
 def test(size=100):
     points = torch.randn((2, size))

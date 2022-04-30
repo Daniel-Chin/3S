@@ -1,6 +1,6 @@
 '''
+beta warmup? 
 set beta=0 may deknot the z space? increase beta later? beta oscillation? 
-Variational RNN
 '''
 from collections import namedtuple
 import torch
@@ -22,9 +22,11 @@ from makeDataset import (
 )
 from vae import LATENT_DIM, VAE
 from rnn import RNN
+from symmetryTransforms import sampleTransforms, identity
 
 Config = namedtuple('Config', [
-    'beta', 'vae_loss_coef', 'rnn_loss_coef', 'T', 'R', 
+    'beta', 'vae_loss_coef', 'rnn_loss_coef', 'do_symmetry', 
+    'variational_rnn', 
 ])
 
 BATCH_SIZE = 32
@@ -45,7 +47,8 @@ def oneEpoch(
     vae: VAE, rnn: RNN, optim: torch.optim.Optimizer, 
     train_set, validate_set, 
     lossLogger: LossLogger, 
-    beta=0.001, vae_loss_coef=1, rnn_loss_coef=1, T=8, R=8, 
+    beta=0.001, vae_loss_coef=1, rnn_loss_coef=1, 
+    do_symmetry=False, variational_rnn=False, 
 ):
     n_batches = TRAIN_SET_SIZE // BATCH_SIZE
     vae.train()
@@ -66,7 +69,8 @@ def oneEpoch(
             total_loss, recon_loss, kld_loss, rnn_loss, 
         ) = oneBatch(
             vae, rnn, batch, beta, 
-            vae_loss_coef, rnn_loss_coef, 
+            vae_loss_coef, rnn_loss_coef, do_symmetry, 
+            variational_rnn, 
         )
         
         optim.zero_grad()
@@ -85,7 +89,8 @@ def oneEpoch(
             validate_kld____loss, validate_z_pred_loss, 
         ) = oneBatch(
             vae, rnn, validate_set, beta, 
-            vae_loss_coef, rnn_loss_coef, 
+            vae_loss_coef, rnn_loss_coef, do_symmetry, 
+            variational_rnn, 
         )
     lossLogger.eat(
         epoch, 
@@ -101,32 +106,43 @@ def oneEpoch(
 
 def oneBatch(
     vae: VAE, rnn: RNN, batch: torch.Tensor, beta, 
-    vae_loss_coef, rnn_loss_coef, 
+    vae_loss_coef, rnn_loss_coef, do_symmetry, variational_rnn, 
     visualize=False, batch_size = BATCH_SIZE, 
 ):
     flat_batch = batch.view(
         batch_size * SEQ_LEN, 1, RESOLUTION, RESOLUTION, 
     )
-    reconstructions, mu, log_var = vae.forward(flat_batch)
+    reconstructions, mu, log_var, z_flat = vae.forward(
+        flat_batch, 
+    )
     vae_loss, recon_loss, kld_loss = vae.computeLoss(
         flat_batch, reconstructions, mu, log_var, beta, 
     )
 
-    z: torch.Tensor = mu.view(batch_size, SEQ_LEN, LATENT_DIM)
-    z_hat = torch.zeros((
+    if not variational_rnn:
+        z_flat = mu
+    z: torch.Tensor = z_flat.view(
+        batch_size, SEQ_LEN, LATENT_DIM, 
+    )
+    z_hat_transed = torch.zeros((
         batch_size, SEQ_LEN - RNN_MIN_CONTEXT, LATENT_DIM, 
     ))
     rnn.zeroHidden(batch_size)
+    if do_symmetry:
+        trans, untrans = sampleTransforms()
+    else:
+        trans = untrans = identity
     for t in range(RNN_MIN_CONTEXT):
-        rnn.stepTime(z, t)
+        rnn.stepTime(z, t, trans)
     for t in range(SEQ_LEN - RNN_MIN_CONTEXT):
-        z_hat[:, t, :] = rnn.projHead(
+        z_hat_transed[:, t, :] = rnn.projHead(
             rnn.hidden, 
         )
-        # that probably gonna break autograd
-        # wait what it didn't
-        rnn.stepTime(z_hat, t)
-    predictions = vae.decode(z_hat.view(-1, LATENT_DIM)).view(
+        rnn.stepTime(z_hat_transed, t, identity)
+    flat_z_hat = untrans(z_hat_transed.view(
+        -1, LATENT_DIM, 
+    ).T).T
+    predictions = vae.decode(flat_z_hat).view(
         batch_size, SEQ_LEN - RNN_MIN_CONTEXT, 
         1, RESOLUTION, RESOLUTION, 
     )

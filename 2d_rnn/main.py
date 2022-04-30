@@ -1,7 +1,7 @@
 import os
 from itertools import count
 import torch
-from PIL import Image
+from PIL import Image, ImageDraw
 
 try:
     from myTorch import LossLogger
@@ -26,12 +26,30 @@ from train import (
     RNN_MIN_CONTEXT, Config, 
 )
 
-RAND_INIT_TIMES = 1
+RAND_INIT_TIMES = 5
 EXPERIMENTS = [
-    Config(.001, 1, 1, 0, 0), 
+    ('AE', Config(
+        0, 1, 0, do_symmetry=False, variational_rnn=False, 
+    )), 
+    ('VAE', Config(
+        0.001, 1, 0, do_symmetry=False, variational_rnn=False, 
+    )), 
+    ('VAE+RNN', Config(
+        0.001, 1, 1, do_symmetry=False, variational_rnn=False, 
+    )), 
+    ('VAE+VRNN', Config(
+        0.001, 1, 1, do_symmetry=False, variational_rnn=True, 
+    )), 
+    ('VAE+RNN+symm', Config(
+        0.001, 1, 1, do_symmetry=True, variational_rnn=False, 
+    )), 
+    ('VAE+VRNN+symm', Config(
+        0.001, 1, 1, do_symmetry=True, variational_rnn=True, 
+    )), 
 ]
 
 EXPERIMENTS_PATH = './experiments'
+EPOCH_INTERVAL = 2
 
 def loadModel():
     # future: load model from disk
@@ -93,7 +111,7 @@ class Trainer:
                 self.train_set, self.validate_set, 
                 self.lossLogger, *self.config, 
             )
-            if epoch % 1 == 0:
+            if epoch % EPOCH_INTERVAL == 0:
                 torch.save(
                     self.vae.state_dict(), f'{epoch}_vae.pt', 
                 )
@@ -107,7 +125,7 @@ def main():
     assert TRAIN_SET_SIZE % BATCH_SIZE == 0
     assert VALIDATE_SET_SIZE == BATCH_SIZE
     trainers = []
-    for config in EXPERIMENTS:
+    for _, config in EXPERIMENTS:
         for rand_init_i in range(RAND_INIT_TIMES):
             vae, rnn = loadModel()
             optim = torch.optim.Adam(
@@ -144,7 +162,7 @@ def evalGIFs(vae: VAE, rnn: RNN, dataset: torch.Tensor):
     vae.eval()
     rnn.eval()
     predictions, reconstructions = oneBatch(
-        vae, rnn, dataset, 0, 0, 0, 
+        vae, rnn, dataset, 0, 0, 0, False, False, 
         True, batch_size=n_datapoints, 
     )
     frames = []
@@ -153,6 +171,7 @@ def evalGIFs(vae: VAE, rnn: RNN, dataset: torch.Tensor):
             RESOLUTION * n_datapoints, RESOLUTION * 3, 
         ))
         frames.append(frame)
+        imDraw = ImageDraw.Draw(frame)
         for i in range(n_datapoints):
             frame.paste(
                 torch2PIL(dataset[i, t, 0, :, :]), 
@@ -169,6 +188,16 @@ def evalGIFs(vae: VAE, rnn: RNN, dataset: torch.Tensor):
                     ]), 
                     (i * RESOLUTION, 2 * RESOLUTION), 
                 )
+            else:
+                imDraw.line((
+                    (i + .2) * RESOLUTION, 2.2 * RESOLUTION, 
+                    (i + .8) * RESOLUTION, 2.8 * RESOLUTION, 
+                ), fill='white')
+                imDraw.line((
+                    (i + .2) * RESOLUTION, 2.8 * RESOLUTION, 
+                    (i + .8) * RESOLUTION, 2.2 * RESOLUTION, 
+                ), fill='white')
+
     filename = 'pred.gif'
     frames[0].save(
         filename, 
@@ -177,4 +206,5 @@ def evalGIFs(vae: VAE, rnn: RNN, dataset: torch.Tensor):
     )
     print(f'Saved `{filename}`.')
 
-main()
+if __name__ == '__main__':
+    main()

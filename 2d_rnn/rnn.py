@@ -22,8 +22,10 @@ class RNN(nn.Module):
             if p.requires_grad
         ))
     
-    def zeroHidden(self, batch_size):
-        self.hidden = torch.zeros((batch_size, HIDDEN_DIM))
+    def zeroHidden(self, batch_size, device):
+        self.hidden = torch.zeros((
+            batch_size, HIDDEN_DIM, 
+        )).to(device)
     
     def stepTime(self, z: torch.Tensor, time: int, trans):
         '''

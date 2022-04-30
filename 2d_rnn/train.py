@@ -128,7 +128,7 @@ def oneBatch(
     z_hat_transed = torch.zeros((
         batch_size, SEQ_LEN - RNN_MIN_CONTEXT, LATENT_DIM, 
     )).to(DEVICE)
-    rnn.zeroHidden(batch_size)
+    rnn.zeroHidden(batch_size, DEVICE)
     if do_symmetry:
         trans, untrans = sampleTransforms(DEVICE)
     else:

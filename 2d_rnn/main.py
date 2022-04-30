@@ -148,8 +148,8 @@ def main():
                 for trainer in trainers:
                     with trainer:
                         evalGIFs(
-                            trainer.vae.cpu(), 
-                            trainer.rnn.cpu(), 
+                            trainer.vae, 
+                            trainer.rnn, 
                             validate_set[:24, :, :, :, :], 
                         )
             print('GIFs made.')

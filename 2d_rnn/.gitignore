@@ -1,7 +1,6 @@
 dataset/
-reconstruct*/
 *.pyc
 *.log
-checkpoints/
+experiments/
 *.mp4
 *.gif

@@ -7,7 +7,7 @@ from matplotlib.patches import Circle
 from PIL import Image, ImageDraw
 
 TRAIN_SET_SIZE = 256
-VALIDATE_SET_SIZE = 64
+VALIDATE_SET_SIZE = 32
 SEQ_LEN = 10
 CANVAS_RADIUS = 2
 BALL_RADIUS = .3

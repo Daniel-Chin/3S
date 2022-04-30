@@ -95,7 +95,7 @@ class VAE(nn.Module):
 
     def encode(self, x):
         '''
-        `x` is (batch_size, 3, height, width)
+        `x` is (batch_size, IMAGE_CHANNELS, height, width)
         '''
         t: torch.Tensor = self.encoder(x)
         t = t.flatten(1)

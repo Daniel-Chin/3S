@@ -46,10 +46,13 @@ EXPERIMENTS = [
     ('VAE+VRNN+symm', Config(
         0.001, 1, 1, do_symmetry=True, variational_rnn=True, 
     )), 
+    ('AE+RNN+symm', Config(
+        0, 1, 1, do_symmetry=True, variational_rnn=False, 
+    )), 
 ]
 
 EXPERIMENTS_PATH = './experiments'
-EPOCH_INTERVAL = 2
+EPOCH_INTERVAL = 3
 
 def loadModel():
     # future: load model from disk

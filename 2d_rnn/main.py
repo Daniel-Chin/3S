@@ -26,7 +26,7 @@ from train import (
     RNN_MIN_CONTEXT, Config, 
 )
 
-RAND_INIT_TIMES = 5
+RAND_INIT_TIMES = 7
 EXPERIMENTS = [
     ('AE', Config(
         0, 1, 0, do_symmetry=False, variational_rnn=False, 
@@ -52,7 +52,7 @@ EXPERIMENTS = [
 ]
 
 EXPERIMENTS_PATH = './experiments'
-EPOCH_INTERVAL = 3
+EPOCH_INTERVAL = 7
 
 def loadModel():
     # future: load model from disk

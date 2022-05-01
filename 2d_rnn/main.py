@@ -27,24 +27,24 @@ from train import (
     RNN_MIN_CONTEXT, Config, 
 )
 
-RAND_INIT_TIMES = 7
+RAND_INIT_TIMES = 4
 EXPERIMENTS = [
-    ('AE', Config(
-        0, 1, 0, do_symmetry=False, variational_rnn=False, 
-        deep_spread=False, 
-    )), 
-    ('VAE', Config(
-        0.001, 1, 0, do_symmetry=False, variational_rnn=False, 
-        deep_spread=False, 
-    )), 
-    ('VAE+RNN', Config(
-        0.001, 1, 1, do_symmetry=False, variational_rnn=False, 
-        deep_spread=False, 
-    )), 
-    ('VAE+VRNN', Config(
-        0.001, 1, 1, do_symmetry=False, variational_rnn=True, 
-        deep_spread=False, 
-    )), 
+    # ('AE', Config(
+    #     0, 1, 0, do_symmetry=False, variational_rnn=False, 
+    #     deep_spread=False, 
+    # )), 
+    # ('VAE', Config(
+    #     0.001, 1, 0, do_symmetry=False, variational_rnn=False, 
+    #     deep_spread=False, 
+    # )), 
+    # ('VAE+RNN', Config(
+    #     0.001, 1, 1, do_symmetry=False, variational_rnn=False, 
+    #     deep_spread=False, 
+    # )), 
+    # ('VAE+VRNN', Config(
+    #     0.001, 1, 1, do_symmetry=False, variational_rnn=True, 
+    #     deep_spread=False, 
+    # )), 
     ('VAE+RNN+symm', Config(
         0.001, 1, 1, do_symmetry=True, variational_rnn=False, 
         deep_spread=False, 
@@ -56,6 +56,19 @@ EXPERIMENTS = [
     ('AE+RNN+symm', Config(
         0, 1, 1, do_symmetry=True, variational_rnn=False, 
         deep_spread=False, 
+    )), 
+
+    ('VAE+RNN+symm', Config(
+        0.001, 1, 1, do_symmetry=True, variational_rnn=False, 
+        deep_spread=True, 
+    )), 
+    ('VAE+VRNN+symm', Config(
+        0.001, 1, 1, do_symmetry=True, variational_rnn=True, 
+        deep_spread=True, 
+    )), 
+    ('AE+RNN+symm', Config(
+        0, 1, 1, do_symmetry=True, variational_rnn=False, 
+        deep_spread=True, 
     )), 
 ]
 

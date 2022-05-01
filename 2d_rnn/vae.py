@@ -3,7 +3,7 @@ from torch import nn
 import torch.nn.functional as F
 from makeDataset import RESOLUTION
 
-CHANNELS = [8, 16, 16]
+CHANNELS = [8, 16, 32]
 LATENT_DIM = 2
 IMAGE_CHANNELS = 1
 
@@ -47,11 +47,11 @@ class VAE(nn.Module):
         self.fcBeforeDecode = nn.Sequential(
             nn.Linear(
                 LATENT_DIM, 
-            #     8, 
-            # ), 
-            # nn.LeakyReLU(), 
-            # nn.Linear(
-            #     8, 
+                8, 
+            ), 
+            nn.LeakyReLU(), 
+            nn.Linear(
+                8, 
                 self.conv_neck_dim, 
             ), 
         )

@@ -95,7 +95,7 @@ def oneEpoch(
             variational_rnn, 
         )
     lossLogger.eat(
-        epoch, 
+        epoch, False, 
         train____recon__loss=epoch_recon__loss, 
         validate_recon__loss=validate_recon__loss, 
         train____kld____loss=epoch_kld____loss, 

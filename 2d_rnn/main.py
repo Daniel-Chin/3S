@@ -1,4 +1,5 @@
 import os
+import shutil
 from itertools import count
 import torch
 from PIL import Image, ImageDraw
@@ -123,6 +124,7 @@ class Trainer:
                 )
 
 def main():
+    shutil.rmtree(EXPERIMENTS_PATH)
     train_set    = loadDataset(   TRAIN_PATH, DEVICE)
     validate_set = loadDataset(VALIDATE_PATH, DEVICE)
     assert TRAIN_SET_SIZE % BATCH_SIZE == 0

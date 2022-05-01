@@ -31,33 +31,40 @@ RAND_INIT_TIMES = 7
 EXPERIMENTS = [
     ('AE', Config(
         0, 1, 0, do_symmetry=False, variational_rnn=False, 
+        deep_spread=False, 
     )), 
     ('VAE', Config(
         0.001, 1, 0, do_symmetry=False, variational_rnn=False, 
+        deep_spread=False, 
     )), 
     ('VAE+RNN', Config(
         0.001, 1, 1, do_symmetry=False, variational_rnn=False, 
+        deep_spread=False, 
     )), 
     ('VAE+VRNN', Config(
         0.001, 1, 1, do_symmetry=False, variational_rnn=True, 
+        deep_spread=False, 
     )), 
     ('VAE+RNN+symm', Config(
         0.001, 1, 1, do_symmetry=True, variational_rnn=False, 
+        deep_spread=False, 
     )), 
     ('VAE+VRNN+symm', Config(
         0.001, 1, 1, do_symmetry=True, variational_rnn=True, 
+        deep_spread=False, 
     )), 
     ('AE+RNN+symm', Config(
         0, 1, 1, do_symmetry=True, variational_rnn=False, 
+        deep_spread=False, 
     )), 
 ]
 
 EXPERIMENTS_PATH = './experiments'
 EPOCH_INTERVAL = 7
 
-def loadModel():
+def loadModel(deep_spread):
     # future: load model from disk
-    vae = VAE()
+    vae = VAE(deep_spread)
     rnn = RNN()
     if HAS_CUDA:
         vae = vae.cuda()
@@ -132,7 +139,7 @@ def main():
     trainers = []
     for _, config in EXPERIMENTS:
         for rand_init_i in range(RAND_INIT_TIMES):
-            vae, rnn = loadModel()
+            vae, rnn = loadModel(config.deep_spread)
             optim = torch.optim.Adam(
                 [
                     *vae.parameters(), *rnn.parameters(), 

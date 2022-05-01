@@ -35,7 +35,6 @@ def main():
 def numerateEpochs():
     eval_data, _ = genEvalData()
     frames = []
-    vae = VAE()
     for epoch in count(0, EPOCH_INTERVAL):
         print(epoch)
         frame = Image.new('RGB', (
@@ -55,6 +54,7 @@ def numerateEpochs():
                 exp_i + .5, HEADING_ROW_HEIGHT * .5, 
             )
             for rand_init_i in range(RAND_INIT_TIMES):
+                vae = VAE(config.deep_spread)
                 try:
                     vae.load_state_dict(torch.load(path.join(
                         renderExperimentPath(

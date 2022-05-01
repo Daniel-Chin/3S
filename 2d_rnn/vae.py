@@ -3,7 +3,7 @@ from torch import nn
 import torch.nn.functional as F
 from makeDataset import RESOLUTION
 
-CHANNELS = [8, 16, 32]
+CHANNELS = [8, 16, 16]
 LATENT_DIM = 2
 IMAGE_CHANNELS = 1
 
@@ -14,7 +14,7 @@ class VAE(nn.Module):
     Huge thanks to AntixK. 
     See https://github.com/AntixK/PyTorch-VAE
     '''
-    def __init__(self) -> None:
+    def __init__(self, deep_spread) -> None:
         super().__init__()
 
         modules = []
@@ -44,17 +44,23 @@ class VAE(nn.Module):
             self.conv_neck_dim, LATENT_DIM, 
         )
 
-        self.fcBeforeDecode = nn.Sequential(
-            nn.Linear(
+        if deep_spread:
+            self.fcBeforeDecode = nn.Sequential(
+                nn.Linear(
+                    LATENT_DIM, 
+                    8, 
+                ), 
+                nn.LeakyReLU(), 
+                nn.Linear(
+                    8, 
+                    self.conv_neck_dim, 
+                ), 
+            )
+        else:
+            self.fcBeforeDecode = nn.Linear(
                 LATENT_DIM, 
-                8, 
-            ), 
-            nn.LeakyReLU(), 
-            nn.Linear(
-                8, 
                 self.conv_neck_dim, 
-            ), 
-        )
+            )
         modules = []
         for c0, c1 in zip(
             CHANNELS[  :0:-1], 

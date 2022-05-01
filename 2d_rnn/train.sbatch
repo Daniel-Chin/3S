@@ -7,7 +7,7 @@
 #SBATCH --mem=6GB
 #SBATCH --gres=gpu:1
 #SBATCH --job-name=2d-rnn
-#SBATCH --output=slurm.out
+#SBATCH --output=slurm_train.out
 
 module purge
 

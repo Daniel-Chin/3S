@@ -46,6 +46,9 @@ def numerateEpochs():
         ))
         frames.append(frame)
         imDraw = ImageDraw.Draw(frame)
+        textCell(
+            imDraw, f'{epoch=}', 1, HEADING_ROW_HEIGHT * .2, 
+        )
         for exp_i, (name, config) in enumerate(EXPERIMENTS):
             textCell(
                 imDraw, name, 

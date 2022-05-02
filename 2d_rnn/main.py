@@ -27,58 +27,71 @@ from train import (
     RNN_MIN_CONTEXT, Config, 
 )
 
-RAND_INIT_TIMES = 4
+RAND_INIT_TIMES = 3
 EXPERIMENTS = [
     # ('AE', Config(
     #     0, 1, 0, do_symmetry=False, variational_rnn=False, 
-    #     deep_spread=False, 
+    #     rnn_width=16, deep_spread=False, 
     # )), 
     # ('VAE', Config(
     #     0.001, 1, 0, do_symmetry=False, variational_rnn=False, 
-    #     deep_spread=False, 
+    #     rnn_width=16, deep_spread=False, 
     # )), 
     # ('VAE+RNN', Config(
     #     0.001, 1, 1, do_symmetry=False, variational_rnn=False, 
-    #     deep_spread=False, 
+    #     rnn_width=16, deep_spread=False, 
     # )), 
     # ('VAE+VRNN', Config(
     #     0.001, 1, 1, do_symmetry=False, variational_rnn=True, 
-    #     deep_spread=False, 
+    #     rnn_width=16, deep_spread=False, 
     # )), 
-    ('VAE+RNN+symm', Config(
+    ('VAE+RNN+symm 8', Config(
         0.001, 1, 1, do_symmetry=True, variational_rnn=False, 
-        deep_spread=False, 
+        rnn_width= 8, deep_spread=False, 
     )), 
-    ('VAE+VRNN+symm', Config(
+    ('VAE+VRNN+symm 8', Config(
         0.001, 1, 1, do_symmetry=True, variational_rnn=True, 
-        deep_spread=False, 
+        rnn_width= 8, deep_spread=False, 
     )), 
-    ('AE+RNN+symm', Config(
+    ('AE+RNN+symm 8', Config(
         0, 1, 1, do_symmetry=True, variational_rnn=False, 
-        deep_spread=False, 
+        rnn_width= 8, deep_spread=False, 
     )), 
 
-    ('VAE+RNN+symm', Config(
+    ('VAE+RNN+symm 16', Config(
         0.001, 1, 1, do_symmetry=True, variational_rnn=False, 
-        deep_spread=True, 
+        rnn_width=16, deep_spread=False, 
     )), 
-    ('VAE+VRNN+symm', Config(
+    ('VAE+VRNN+symm 16', Config(
         0.001, 1, 1, do_symmetry=True, variational_rnn=True, 
-        deep_spread=True, 
+        rnn_width=16, deep_spread=False, 
     )), 
-    ('AE+RNN+symm', Config(
+    ('AE+RNN+symm 16', Config(
         0, 1, 1, do_symmetry=True, variational_rnn=False, 
-        deep_spread=True, 
+        rnn_width=16, deep_spread=False, 
+    )), 
+
+    ('VAE+RNN+symm 32', Config(
+        0.001, 1, 1, do_symmetry=True, variational_rnn=False, 
+        rnn_width= 32, deep_spread=False, 
+    )), 
+    ('VAE+VRNN+symm 32', Config(
+        0.001, 1, 1, do_symmetry=True, variational_rnn=True, 
+        rnn_width= 32, deep_spread=False, 
+    )), 
+    ('AE+RNN+symm 32', Config(
+        0, 1, 1, do_symmetry=True, variational_rnn=False, 
+        rnn_width= 32, deep_spread=False, 
     )), 
 ]
 
 EXPERIMENTS_PATH = './experiments'
 EPOCH_INTERVAL = 7
 
-def loadModel(deep_spread):
+def loadModel(config: Config):
     # future: load model from disk
-    vae = VAE(deep_spread)
-    rnn = RNN()
+    vae = VAE(config.deep_spread)
+    rnn = RNN(config.rnn_width)
     if HAS_CUDA:
         vae = vae.cuda()
         rnn = rnn.cuda()
@@ -152,7 +165,7 @@ def main():
     trainers = []
     for _, config in EXPERIMENTS:
         for rand_init_i in range(RAND_INIT_TIMES):
-            vae, rnn = loadModel(config.deep_spread)
+            vae, rnn = loadModel(config)
             optim = torch.optim.Adam(
                 [
                     *vae.parameters(), *rnn.parameters(), 

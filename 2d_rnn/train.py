@@ -27,7 +27,7 @@ from symmetryTransforms import sampleTransforms, identity
 
 Config = namedtuple('Config', [
     'beta', 'vae_loss_coef', 'rnn_loss_coef', 'do_symmetry', 
-    'variational_rnn', 'deep_spread', 
+    'variational_rnn', 'rnn_width', 'deep_spread', 
 ])
 
 BATCH_SIZE = 32
@@ -50,7 +50,7 @@ def oneEpoch(
     lossLogger: LossLogger, 
     beta=0.001, vae_loss_coef=1, rnn_loss_coef=1, 
     do_symmetry=False, variational_rnn=False, 
-    deep_spread=None, 
+    rnn_width=None, deep_spread=None, 
 ):
     n_batches = TRAIN_SET_SIZE // BATCH_SIZE
     vae.train()

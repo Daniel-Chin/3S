@@ -1,0 +1,7 @@
+evalZ.mp4:
+    the left three columns:
+        a shallow beforeDecoder. (in - out)
+    the right three columns:
+        a deep beforeDecoder. (in - 8 dims - out)
+conclusion:
+    no use. just shallow. 

@@ -152,10 +152,10 @@ def main():
     for epoch in count():
         for trainer in trainers:
             trainer: Trainer
-            print(trainer.config)
+            # print(trainer.config)
             trainer.oneEpoch(epoch)
-        if epoch % 20 == 0:
-            print('making GIFs.')
+        if epoch % 40 == 0:
+            # print('making GIFs.')
             with torch.no_grad():
                 for trainer in trainers:
                     with trainer:
@@ -164,7 +164,7 @@ def main():
                             trainer.rnn, 
                             validate_set[:24, :, :, :, :], 
                         )
-            print('GIFs made.')
+            # print('GIFs made.')
 
 def torch2PIL(torchImg: torch.Tensor):
     return Image.fromarray(
@@ -218,7 +218,7 @@ def evalGIFs(vae: VAE, rnn: RNN, dataset: torch.Tensor):
         save_all=True, append_images=frames[1:], 
         duration=300, loop=0, 
     )
-    print(f'Saved `{filename}`.')
+    # print(f'Saved `{filename}`.')
 
 if __name__ == '__main__':
     main()

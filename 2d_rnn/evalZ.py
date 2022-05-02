@@ -2,6 +2,7 @@ from os import path
 from itertools import count
 
 from PIL import Image, ImageDraw, ImageFont
+import cv2
 import torch
 
 from makeDataset import (
@@ -25,52 +26,57 @@ n_curve_vertices = N_CURVE_SEGMENTS + 1
 FONT = ImageFont.truetype("verdana.ttf", 24)
 
 def main():
-    frames = numerateEpochs()
-    frames[0].save(
-        'evalZ.gif', save_all=True, append_images=frames[1:], 
-        duration=200, loop=0, 
-    )
-    print('written to GIF.')
-
-def numerateEpochs():
     eval_data, _ = genEvalData()
-    frames = []
-    for epoch in count(0, EPOCH_INTERVAL):
-        print(epoch)
-        frame = Image.new('RGB', (
-            CELL_RESOLUTION * (len(EXPERIMENTS)), 
-            round(CELL_RESOLUTION * (
-                HEADING_ROW_HEIGHT + RAND_INIT_TIMES
-            )), 
-        ))
-        frames.append(frame)
-        imDraw = ImageDraw.Draw(frame)
-        textCell(
-            imDraw, f'{epoch=}', 1, HEADING_ROW_HEIGHT * .2, 
-        )
-        for exp_i, (name, config) in enumerate(EXPERIMENTS):
-            textCell(
-                imDraw, name, 
-                exp_i + .5, HEADING_ROW_HEIGHT * .5, 
+    frame_width_height = (
+        CELL_RESOLUTION * (len(EXPERIMENTS)), 
+        round(CELL_RESOLUTION * (
+            HEADING_ROW_HEIGHT + RAND_INIT_TIMES
+        )), 
+    )
+    vidOut = cv2.VideoWriter(
+        'evalZ.mp4', cv2.VideoWriter_fourcc(*'MP4V'), 
+        5, frame_width_height, 
+    )
+    try:
+        for epoch in count(0, EPOCH_INTERVAL):
+            evalOneEpoch(
+                epoch, eval_data, vidOut, frame_width_height, 
             )
-            for rand_init_i in range(RAND_INIT_TIMES):
-                vae = VAE(config.deep_spread)
-                try:
-                    vae.load_state_dict(torch.load(path.join(
-                        renderExperimentPath(
-                            rand_init_i, config, 
-                        ), f'{epoch}_vae.pt', 
-                    )))
-                except FileNotFoundError:
-                    print('epoch', epoch, 'not found.')
-                    return frames[:-1]
-                vae.eval()
-                with torch.no_grad():
-                    z, _ = vae.encode(eval_data)
-                    drawCell(
-                        imDraw, z, exp_i, 
-                        rand_init_i + HEADING_ROW_HEIGHT, 
-                    )
+    except StopIteration:
+        print('total epoch', epoch)
+    vidOut.release()
+    print('written to MP4.')
+
+def evalOneEpoch(epoch, eval_data, vidOut, frame_width_height):
+    frame = Image.new('RGB', frame_width_height)
+    imDraw = ImageDraw.Draw(frame)
+    textCell(
+        imDraw, f'{epoch=}', 1, HEADING_ROW_HEIGHT * .2, 
+    )
+    for exp_i, (name, config) in enumerate(EXPERIMENTS):
+        textCell(
+            imDraw, name, 
+            exp_i + .5, HEADING_ROW_HEIGHT * .5, 
+        )
+        for rand_init_i in range(RAND_INIT_TIMES):
+            vae = VAE(config.deep_spread)
+            try:
+                vae.load_state_dict(torch.load(path.join(
+                    renderExperimentPath(
+                        rand_init_i, config, 
+                    ), f'{epoch}_vae.pt', 
+                )))
+            except FileNotFoundError:
+                print('epoch', epoch, 'not found.')
+                raise StopIteration
+            vae.eval()
+            with torch.no_grad():
+                z, _ = vae.encode(eval_data)
+                drawCell(
+                    imDraw, z, exp_i, 
+                    rand_init_i + HEADING_ROW_HEIGHT, 
+                )
+    vidOut.write(frame)
 
 def textCell(imDraw, text, col_i, row_i):
     imDraw.text((

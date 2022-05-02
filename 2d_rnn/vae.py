@@ -94,10 +94,10 @@ class VAE(nn.Module):
             nn.Tanh(), 
         )
 
-        print('VAE # of params:', sum(
-            p.numel() for p in self.parameters() 
-            if p.requires_grad
-        ))
+        # print('VAE # of params:', sum(
+        #     p.numel() for p in self.parameters() 
+        #     if p.requires_grad
+        # ))
 
     def encode(self, x):
         '''

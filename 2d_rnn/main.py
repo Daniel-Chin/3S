@@ -27,7 +27,7 @@ from train import (
     RNN_MIN_CONTEXT, Config, 
 )
 
-RAND_INIT_TIMES = 3
+RAND_INIT_TIMES = 4
 EXPERIMENTS = [
     # ('AE', Config(
     #     0, 1, 0, do_symmetry=False, variational_rnn=False, 
@@ -45,18 +45,6 @@ EXPERIMENTS = [
     #     0.001, 1, 1, do_symmetry=False, variational_rnn=True, 
     #     rnn_width=16, deep_spread=False, 
     # )), 
-    ('VAE+RNN+symm 8', Config(
-        0.001, 1, 1, do_symmetry=True, variational_rnn=False, 
-        rnn_width= 8, deep_spread=False, 
-    )), 
-    ('VAE+VRNN+symm 8', Config(
-        0.001, 1, 1, do_symmetry=True, variational_rnn=True, 
-        rnn_width= 8, deep_spread=False, 
-    )), 
-    ('AE+RNN+symm 8', Config(
-        0, 1, 1, do_symmetry=True, variational_rnn=False, 
-        rnn_width= 8, deep_spread=False, 
-    )), 
 
     ('VAE+RNN+symm 16', Config(
         0.001, 1, 1, do_symmetry=True, variational_rnn=False, 
@@ -82,6 +70,19 @@ EXPERIMENTS = [
     ('AE+RNN+symm 32', Config(
         0, 1, 1, do_symmetry=True, variational_rnn=False, 
         rnn_width= 32, deep_spread=False, 
+    )), 
+
+    ('VAE+RNN+symm 64', Config(
+        0.001, 1, 1, do_symmetry=True, variational_rnn=False, 
+        rnn_width= 64, deep_spread=False, 
+    )), 
+    ('VAE+VRNN+symm 64', Config(
+        0.001, 1, 1, do_symmetry=True, variational_rnn=True, 
+        rnn_width= 64, deep_spread=False, 
+    )), 
+    ('AE+RNN+symm 64', Config(
+        0, 1, 1, do_symmetry=True, variational_rnn=False, 
+        rnn_width= 64, deep_spread=False, 
     )), 
 ]
 

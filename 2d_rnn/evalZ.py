@@ -1,6 +1,7 @@
 from os import path
 from itertools import count
 
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import cv2
 import torch
@@ -34,7 +35,7 @@ def main():
         )), 
     )
     vidOut = cv2.VideoWriter(
-        'evalZ.mp4', cv2.VideoWriter_fourcc(*'MP4V'), 
+        'evalZ.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 
         5, frame_width_height, 
     )
     try:
@@ -76,7 +77,9 @@ def evalOneEpoch(epoch, eval_data, vidOut, frame_width_height):
                     imDraw, z, exp_i, 
                     rand_init_i + HEADING_ROW_HEIGHT, 
                 )
-    vidOut.write(frame)
+    vidOut.write(cv2.cvtColor(
+        np.asarray(frame), cv2.COLOR_BGR2RGB, 
+    ))
 
 def textCell(imDraw, text, col_i, row_i):
     imDraw.text((

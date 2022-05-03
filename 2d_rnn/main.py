@@ -121,7 +121,7 @@ def main():
                 rand_init_i, config, 
             ))
     profiler = StreamProfiler(
-        DO_PROFILE=True, filename='profiler.log', 
+        DO_PROFILE=False, filename='profiler.log', 
     )
     for epoch in count():
         for trainer in trainers:

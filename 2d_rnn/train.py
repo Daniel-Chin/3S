@@ -48,10 +48,11 @@ def oneEpoch(
     vae: VAE, rnn: RNN, optim: torch.optim.Optimizer, 
     train_set, validate_set, 
     lossLogger: LossLogger, 
-    beta=0.001, vae_loss_coef=1, rnn_loss_coef=1, 
+    beta, vae_loss_coef=1, rnn_loss_coef=1, 
     do_symmetry=False, variational_rnn=False, 
     rnn_width=None, deep_spread=None, 
 ):
+    beta = beta(epoch)
     n_batches = TRAIN_SET_SIZE // BATCH_SIZE
     vae.train()
     rnn.train()

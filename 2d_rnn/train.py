@@ -9,6 +9,7 @@ import torch.nn.functional as F
 
 try:
     from myTorch import LossLogger
+    from streamProfiler import StreamProfiler
 except ImportError as e:
     module_name = str(e).split('No module named ', 1)[1].strip().strip('"\'')
     if module_name in (
@@ -44,7 +45,7 @@ else:
     print("We DON'T have CUDA.")
 
 def oneEpoch(
-    epoch, 
+    profiler: StreamProfiler, epoch, 
     vae: VAE, rnn: RNN, optim: torch.optim.Optimizer, 
     train_set, validate_set, 
     lossLogger: LossLogger, 
@@ -52,6 +53,7 @@ def oneEpoch(
     do_symmetry=False, variational_rnn=False, 
     rnn_width=None, deep_spread=None, 
 ):
+    profiler.gonna('pre')
     beta = beta(epoch)
     n_batches = TRAIN_SET_SIZE // BATCH_SIZE
     vae.train()
@@ -60,6 +62,7 @@ def oneEpoch(
     epoch_kld____loss = 0
     epoch_z_pred_loss = 0
     for batch_pos in range(0, TRAIN_SET_SIZE, BATCH_SIZE):
+        profiler.gonna('b_pre')
         batch = train_set[
             batch_pos : batch_pos + BATCH_SIZE, 
             :, :, :, :, 
@@ -68,6 +71,7 @@ def oneEpoch(
             batch_pos + BATCH_SIZE
         ) % TRAIN_SET_SIZE
 
+        profiler.gonna('1b')
         (
             total_loss, recon_loss, kld_loss, rnn_loss, 
         ) = oneBatch(
@@ -76,6 +80,7 @@ def oneEpoch(
             variational_rnn, 
         )
         
+        profiler.gonna('bp')
         optim.zero_grad()
         total_loss.backward()
         optim.step()
@@ -84,6 +89,7 @@ def oneEpoch(
         epoch_kld____loss +=   kld_loss / n_batches
         epoch_z_pred_loss +=   rnn_loss / n_batches
 
+    profiler.gonna('ev')
     vae.eval()
     rnn.eval()
     with torch.no_grad():
@@ -106,6 +112,7 @@ def oneEpoch(
         # vae___grad_norm=vae___grad_norm, 
         # total_grad_norm=total_grad_norm, 
     )
+    profiler.display()
 
 def oneBatch(
     vae: VAE, rnn: RNN, batch: torch.Tensor, beta, 

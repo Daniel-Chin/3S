@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw
 
 try:
     from myTorch import LossLogger
+    from streamProfiler import StreamProfiler
 except ImportError as e:
     module_name = str(e).split('No module named ', 1)[1].strip().strip('"\'')
     if module_name in (
@@ -84,9 +85,10 @@ class Trainer:
         self.entered = False
         return False
     
-    def oneEpoch(self, epoch):
+    def oneEpoch(self, epoch, profiler):
         with self:
             oneEpoch(
+                profiler, 
                 epoch, self.vae, self.rnn, self.optim, 
                 self.train_set, self.validate_set, 
                 self.lossLogger, *self.config, 
@@ -118,11 +120,14 @@ def main():
                 vae, rnn, optim, train_set, validate_set, 
                 rand_init_i, config, 
             ))
+    profiler = StreamProfiler(
+        DO_PROFILE=True, filename='profiler.log', 
+    )
     for epoch in count():
         for trainer in trainers:
             trainer: Trainer
             # print(trainer.config)
-            trainer.oneEpoch(epoch)
+            trainer.oneEpoch(epoch, profiler)
         if epoch % 40 == 0:
             # print('making GIFs.')
             with torch.no_grad():

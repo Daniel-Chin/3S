@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --time=3:00:00
 #SBATCH --mem=6GB
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:0
 #SBATCH --job-name=2d-rnn
 #SBATCH --output=slurm_train.out
 

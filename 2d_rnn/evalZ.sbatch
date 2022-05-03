@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --time=1:00:00
 #SBATCH --mem=2GB
-#SBATCH --gres=gpu:0
+#SBATCH --gres=gpu:1
 #SBATCH --job-name=eval-z
 #SBATCH --output=slurm_eval_z.out
 

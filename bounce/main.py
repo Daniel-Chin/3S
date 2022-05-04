@@ -18,12 +18,9 @@ except ImportError as e:
         input('Press Enter to quit...')
     raise e
 
-from shared import TRAIN_SET_SIZE, VALIDATE_SET_SIZE
+from shared import *
 from vae import VAE
 from rnn import RNN
-from render_dataset import (
-    SEQ_LEN, RESOLUTION, 
-)
 from loadDataset import loadDataset, TRAIN_PATH, VALIDATE_PATH
 from train import (
     oneEpoch, HAS_CUDA, DEVICE, BATCH_SIZE, oneBatch, 

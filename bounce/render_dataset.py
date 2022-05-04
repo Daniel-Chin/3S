@@ -7,9 +7,7 @@ from OpenGL.GLUT import *
 import cv2
 from PIL import Image
 from physics import *
-
-TRAIN_PATH    = './dataset/train'
-VALIDATE_PATH = './dataset/validate'
+from shared import *
 
 PATH = TRAIN_PATH
 # PATH = VALIDATE_PATH
@@ -18,11 +16,8 @@ PATH = TRAIN_PATH
 
 WIN_W = 320
 WIN_H = 320
-RESOLUTION = 32
-RESOLUTION = 32
 SPF = .2
 DT = .15
-SEQ_LEN = 20
 DRAW_GIRD = True
 
 MODE_LOCATE = 'locate'

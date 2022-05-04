@@ -19,10 +19,7 @@ except ImportError as e:
         print(f'https://github.com/Daniel-Chin/Python_Lib')
         input('Press Enter to quit...')
     raise e
-from shared import TRAIN_SET_SIZE, IMG_N_CHANNELS
-from render_dataset import (
-    RESOLUTION, SEQ_LEN, 
-)
+from shared import *
 from vae import LATENT_DIM, VAE
 from rnn import RNN
 from symmetryTransforms import sampleTransforms, identity

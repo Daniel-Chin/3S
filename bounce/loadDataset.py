@@ -4,10 +4,7 @@ import numpy as np
 import torch
 from PIL import Image
 
-from shared import IMG_N_CHANNELS
-from render_dataset import (
-    TRAIN_PATH, VALIDATE_PATH, SEQ_LEN, RESOLUTION, 
-)
+from shared import *
 
 def loadDataset(dataset_path, device):
     prev_cwd = os.getcwd()

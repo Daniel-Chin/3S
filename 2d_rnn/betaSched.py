@@ -13,9 +13,9 @@ class Constant:
 class WarmUp:
     def __call__(self, epoch):
         if epoch < 500:
-            return 0.003 * (epoch / 500)
+            return 0.002 * (epoch / 500)
         else:
-            return 0.003
+            return 0.002
     
     def __repr__(self):
         return 'warm_up'
@@ -23,9 +23,9 @@ class WarmUp:
 class Osc:
     def __call__(self, epoch):
         if epoch < 500:
-            return 0.003 * (epoch / 500)
+            return 0.002 * (epoch / 500)
         else:
-            return 0.003 + sin((epoch - 500) * .03) * 0.002
+            return 0.002 + sin((epoch - 500) * .03) * 0.002
     
     def __repr__(self):
         return 'osc'

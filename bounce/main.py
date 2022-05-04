@@ -106,8 +106,12 @@ def main():
         shutil.rmtree(EXPERIMENTS_PATH)
     except FileNotFoundError:
         pass
-    train_set    = loadDataset(   TRAIN_PATH, DEVICE)
-    validate_set = loadDataset(VALIDATE_PATH, DEVICE)
+    train_set    = loadDataset(
+        TRAIN_PATH,       TRAIN_SET_SIZE, DEVICE, 
+    )
+    validate_set = loadDataset(
+        VALIDATE_PATH, VALIDATE_SET_SIZE, DEVICE, 
+    )
     assert TRAIN_SET_SIZE % BATCH_SIZE == 0
     assert VALIDATE_SET_SIZE == BATCH_SIZE
     trainers = []

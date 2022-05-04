@@ -2,8 +2,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from shared import IMG_N_CHANNELS
-from render_dataset import RESOLUTION
+from shared import *
 
 CHANNELS = [8, 16, 16]
 LATENT_DIM = 3

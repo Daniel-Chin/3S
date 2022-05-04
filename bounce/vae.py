@@ -26,7 +26,7 @@ class VAE(nn.Module):
                         last_c, c,
                         kernel_size=3, stride=2, padding=1
                     ),
-                    nn.BatchNorm2d(c),
+                    # nn.BatchNorm2d(c),
                     nn.LeakyReLU(),
                 )
             )
@@ -73,7 +73,7 @@ class VAE(nn.Module):
                         kernel_size=3, stride=2, padding=1,
                         output_padding=1, 
                     ),
-                    nn.BatchNorm2d(c1), 
+                    # nn.BatchNorm2d(c1), 
                     nn.LeakyReLU(), 
                 )
             )
@@ -85,7 +85,7 @@ class VAE(nn.Module):
                 kernel_size=3, stride=2, padding=1,
                 output_padding=1, 
             ),
-            nn.BatchNorm2d(CHANNELS[0]),
+            # nn.BatchNorm2d(CHANNELS[0]),
             nn.LeakyReLU(),
             nn.Conv2d(
                 CHANNELS[0], out_channels=IMG_N_CHANNELS,

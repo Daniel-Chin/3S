@@ -53,11 +53,11 @@ EXPERIMENTS = [
     )), 
 
     ('VAE osc', Config(
-        Osc(0.0018, 500, 0.0018, 150), 1, 0, do_symmetry=False, variational_rnn=False, 
+        Osc(0.0017, 500, 0.0017, 300), 1, 0, do_symmetry=False, variational_rnn=False, 
         rnn_width=16, deep_spread=False, 
     )), 
     ('VAE+VR+s osc', Config(
-        Osc(0.0025, 500, 0.0025, 150), 1, 1, do_symmetry=True, variational_rnn=True, 
+        Osc(0.0023, 500, 0.0023, 300), 1, 1, do_symmetry=True, variational_rnn=True, 
         rnn_width=16, deep_spread=False, 
     )), 
 ]

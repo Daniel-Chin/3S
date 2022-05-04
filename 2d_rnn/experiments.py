@@ -3,22 +3,22 @@ from betaSched import Constant, WarmUp, Osc
 
 RAND_INIT_TIMES = 2
 EXPERIMENTS = [
-    ('AE', Config(
-        Constant(0), 1, 0, do_symmetry=False, variational_rnn=False, 
-        rnn_width=16, deep_spread=False, 
-    )), 
-    ('VAE', Config(
-        Constant(0.001), 1, 0, do_symmetry=False, variational_rnn=False, 
-        rnn_width=16, deep_spread=False, 
-    )), 
-    ('VAE+RNN', Config(
-        Constant(0.001), 1, 1, do_symmetry=False, variational_rnn=False, 
-        rnn_width=16, deep_spread=False, 
-    )), 
-    ('VAE+VRNN', Config(
-        Constant(0.001), 1, 1, do_symmetry=False, variational_rnn=True, 
-        rnn_width=16, deep_spread=False, 
-    )), 
+    # ('AE', Config(
+    #     Constant(0), 1, 0, do_symmetry=False, variational_rnn=False, 
+    #     rnn_width=16, deep_spread=False, 
+    # )), 
+    # ('VAE', Config(
+    #     Constant(0.001), 1, 0, do_symmetry=False, variational_rnn=False, 
+    #     rnn_width=16, deep_spread=False, 
+    # )), 
+    # ('VAE+RNN', Config(
+    #     Constant(0.001), 1, 1, do_symmetry=False, variational_rnn=False, 
+    #     rnn_width=16, deep_spread=False, 
+    # )), 
+    # ('VAE+VRNN', Config(
+    #     Constant(0.001), 1, 1, do_symmetry=False, variational_rnn=True, 
+    #     rnn_width=16, deep_spread=False, 
+    # )), 
     ('AE+RNN+symm', Config(
         Constant(0), 1, 1, do_symmetry=True, variational_rnn=False, 
         rnn_width=16, deep_spread=False, 
@@ -33,31 +33,31 @@ EXPERIMENTS = [
     )), 
 ]
 
-EXPERIMENTS = [
-    ('VAE', Config(
-        Constant(0.001), 1, 0, do_symmetry=False, variational_rnn=False, 
-        rnn_width=16, deep_spread=False, 
-    )), 
-    ('VAE+VR+s', Config(
-        Constant(0.001), 1, 1, do_symmetry=True, variational_rnn=True, 
-        rnn_width=16, deep_spread=False, 
-    )), 
+# EXPERIMENTS = [
+#     ('VAE', Config(
+#         Constant(0.001), 1, 0, do_symmetry=False, variational_rnn=False, 
+#         rnn_width=16, deep_spread=False, 
+#     )), 
+#     ('VAE+VR+s', Config(
+#         Constant(0.001), 1, 1, do_symmetry=True, variational_rnn=True, 
+#         rnn_width=16, deep_spread=False, 
+#     )), 
 
-    ('VAE warm', Config(
-        WarmUp(), 1, 0, do_symmetry=False, variational_rnn=False, 
-        rnn_width=16, deep_spread=False, 
-    )), 
-    ('VAE+VR+s warm', Config(
-        WarmUp(), 1, 1, do_symmetry=True, variational_rnn=True, 
-        rnn_width=16, deep_spread=False, 
-    )), 
+#     ('VAE warm', Config(
+#         WarmUp(), 1, 0, do_symmetry=False, variational_rnn=False, 
+#         rnn_width=16, deep_spread=False, 
+#     )), 
+#     ('VAE+VR+s warm', Config(
+#         WarmUp(), 1, 1, do_symmetry=True, variational_rnn=True, 
+#         rnn_width=16, deep_spread=False, 
+#     )), 
 
-    ('VAE osc', Config(
-        Osc(0.0017, 500, 0.0017, 300), 1, 0, do_symmetry=False, variational_rnn=False, 
-        rnn_width=16, deep_spread=False, 
-    )), 
-    ('VAE+VR+s osc', Config(
-        Osc(0.0023, 500, 0.0023, 300), 1, 1, do_symmetry=True, variational_rnn=True, 
-        rnn_width=16, deep_spread=False, 
-    )), 
-]
+#     ('VAE osc', Config(
+#         Osc(0.0017, 500, 0.0017, 300), 1, 0, do_symmetry=False, variational_rnn=False, 
+#         rnn_width=16, deep_spread=False, 
+#     )), 
+#     ('VAE+VR+s osc', Config(
+#         Osc(0.0023, 500, 0.0023, 300), 1, 1, do_symmetry=True, variational_rnn=True, 
+#         rnn_width=16, deep_spread=False, 
+#     )), 
+# ]

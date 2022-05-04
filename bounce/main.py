@@ -2,6 +2,7 @@ import os
 import shutil
 from itertools import count
 import torch
+import numpy as np
 from PIL import Image, ImageDraw
 
 try:
@@ -17,10 +18,11 @@ except ImportError as e:
         input('Press Enter to quit...')
     raise e
 
+from shared import TRAIN_SET_SIZE, VALIDATE_SET_SIZE
 from vae import VAE
 from rnn import RNN
-from makeDataset import (
-    TRAIN_SET_SIZE, VALIDATE_SET_SIZE, SEQ_LEN, RESOLUTION, 
+from render_dataset import (
+    SEQ_LEN, RESOLUTION, 
 )
 from loadDataset import loadDataset, TRAIN_PATH, VALIDATE_PATH
 from train import (
@@ -30,7 +32,8 @@ from train import (
 from experiments import RAND_INIT_TIMES, EXPERIMENTS
 
 EXPERIMENTS_PATH = './experiments'
-EPOCH_INTERVAL = 100
+# EPOCH_INTERVAL = 100
+EPOCH_INTERVAL = 20
 
 def loadModel(config: Config):
     # future: load model from disk
@@ -102,7 +105,10 @@ class Trainer:
                 )
 
 def main():
-    shutil.rmtree(EXPERIMENTS_PATH)
+    try:
+        shutil.rmtree(EXPERIMENTS_PATH)
+    except FileNotFoundError:
+        pass
     train_set    = loadDataset(   TRAIN_PATH, DEVICE)
     validate_set = loadDataset(VALIDATE_PATH, DEVICE)
     assert TRAIN_SET_SIZE % BATCH_SIZE == 0
@@ -142,9 +148,9 @@ def main():
             # print('GIFs made.')
 
 def torch2PIL(torchImg: torch.Tensor):
-    return Image.fromarray(
-        torchImg.cpu().numpy() * 255, 
-    ).convert('L')
+    return Image.fromarray((
+        torchImg.cpu().clamp(0, 1).permute(1, 2, 0) * 255
+    ).round().numpy().astype(np.uint8), 'RGB')
 
 def evalGIFs(epoch, vae: VAE, rnn: RNN, dataset: torch.Tensor):
     n_datapoints = dataset.shape[0]
@@ -156,24 +162,24 @@ def evalGIFs(epoch, vae: VAE, rnn: RNN, dataset: torch.Tensor):
     )
     frames = []
     for t in range(SEQ_LEN):
-        frame = Image.new('L', (
+        frame = Image.new('RGB', (
             RESOLUTION * n_datapoints, RESOLUTION * 3, 
         ))
         frames.append(frame)
         imDraw = ImageDraw.Draw(frame)
         for i in range(n_datapoints):
             frame.paste(
-                torch2PIL(dataset[i, t, 0, :, :]), 
+                torch2PIL(dataset[i, t, :, :, :]), 
                 (i * RESOLUTION, 0 * RESOLUTION), 
             )
             frame.paste(
-                torch2PIL(reconstructions[i, t, 0, :, :]), 
+                torch2PIL(reconstructions[i, t, :, :, :]), 
                 (i * RESOLUTION, 1 * RESOLUTION), 
             )
             if t >= RNN_MIN_CONTEXT:
                 frame.paste(
                     torch2PIL(predictions[
-                        i, t - RNN_MIN_CONTEXT, 0, :, :, 
+                        i, t - RNN_MIN_CONTEXT, :, :, :, 
                     ]), 
                     (i * RESOLUTION, 2 * RESOLUTION), 
                 )

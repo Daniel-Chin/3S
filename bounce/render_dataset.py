@@ -1,4 +1,3 @@
-from os import path
 import time
 from typing import List
 import numpy as np
@@ -9,17 +8,21 @@ import cv2
 from PIL import Image
 from physics import *
 
-PATH = './dataset'
-TRAIN_PATH = path.join(PATH, 'train')
+TRAIN_PATH    = './dataset/train'
+VALIDATE_PATH = './dataset/validate'
+
+PATH = TRAIN_PATH
+# PATH = VALIDATE_PATH
+
 # GIF_INTERVAL = 200
 
 WIN_W = 320
 WIN_H = 320
-IMG_W = 32
-IMG_H = 32
+RESOLUTION = 32
+RESOLUTION = 32
 SPF = .2
 DT = .15
-TRAJ_LEN = 20
+SEQ_LEN = 20
 DRAW_GIRD = True
 
 MODE_LOCATE = 'locate'
@@ -46,7 +49,7 @@ class BallViewer:
         self.reset()
     
     def reset(self):
-        self.trajectory = oneLegalRun(DT, TRAJ_LEN)
+        self.trajectory = oneLegalRun(DT, SEQ_LEN)
         self.stage = 0
         self.frames = []
 
@@ -56,7 +59,7 @@ class BallViewer:
                 locate_with_ball()
                 return
             
-            if self.stage >= TRAJ_LEN:
+            if self.stage >= SEQ_LEN:
                 if RUNNING_MODE is MODE_MAKE_IMG:
                     self.saveVideo()
                 self.reset()
@@ -217,7 +220,7 @@ def screenShot():
     arr = np.reshape(arr, (WIN_H, WIN_W, 3))
     # 因为opengl和OpenCV在Y轴上是颠倒的，所以要进行垂直翻转，可以查看cv2.flip函数
     cv2.flip(arr, 0, arr)
-    resized = cv2.resize(arr, (IMG_W, IMG_H), interpolation=cv2.INTER_AREA)
+    resized = cv2.resize(arr, (RESOLUTION, RESOLUTION), interpolation=cv2.INTER_AREA)
     return Image.fromarray(resized)
 
 def reshape(width, height):
@@ -227,8 +230,8 @@ def reshape(width, height):
 
 def main():
     global ballViewer
-    os.makedirs(TRAIN_PATH, exist_ok=True)
-    os.chdir(TRAIN_PATH)
+    os.makedirs(PATH, exist_ok=True)
+    os.chdir(PATH)
     init()
     ballViewer = BallViewer()
     glutMainLoop()  # 进入glut主循环

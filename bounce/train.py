@@ -19,8 +19,9 @@ except ImportError as e:
         print(f'https://github.com/Daniel-Chin/Python_Lib')
         input('Press Enter to quit...')
     raise e
-from makeDataset import (
-    RESOLUTION, SEQ_LEN, TRAIN_SET_SIZE, 
+from shared import TRAIN_SET_SIZE, IMG_N_CHANNELS
+from render_dataset import (
+    RESOLUTION, SEQ_LEN, 
 )
 from vae import LATENT_DIM, VAE
 from rnn import RNN
@@ -102,7 +103,7 @@ def oneEpoch(
             variational_rnn, 
         )
     lossLogger.eat(
-        epoch, False, 
+        epoch, True, 
         train____recon__loss=epoch_recon__loss, 
         validate_recon__loss=validate_recon__loss, 
         train____kld____loss=epoch_kld____loss, 
@@ -120,7 +121,7 @@ def oneBatch(
     visualize=False, batch_size = BATCH_SIZE, 
 ):
     flat_batch = batch.view(
-        batch_size * SEQ_LEN, 1, RESOLUTION, RESOLUTION, 
+        batch_size * SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
     )
     reconstructions, mu, log_var, z_flat = vae.forward(
         flat_batch, 
@@ -154,7 +155,7 @@ def oneBatch(
     ).T).T
     predictions = vae.decode(flat_z_hat).view(
         batch_size, SEQ_LEN - RNN_MIN_CONTEXT, 
-        1, RESOLUTION, RESOLUTION, 
+        IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
     )
     rnn_loss = F.mse_loss(predictions, batch[
         :, RNN_MIN_CONTEXT:, :, :, :, 
@@ -168,7 +169,7 @@ def oneBatch(
 
     if visualize:
         return predictions, reconstructions.view(
-            batch_size, SEQ_LEN, 1, RESOLUTION, RESOLUTION, 
+            batch_size, SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
         )
     else:
         return total_loss, recon_loss, kld_loss, rnn_loss

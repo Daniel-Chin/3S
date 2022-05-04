@@ -1,11 +1,12 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
-from makeDataset import RESOLUTION
+
+from shared import IMG_N_CHANNELS
+from render_dataset import RESOLUTION
 
 CHANNELS = [8, 16, 16]
-LATENT_DIM = 2
-IMAGE_CHANNELS = 1
+LATENT_DIM = 3
 
 CONV_NECK_LEN = RESOLUTION // 2 ** len(CHANNELS)
 
@@ -18,7 +19,7 @@ class VAE(nn.Module):
         super().__init__()
 
         modules = []
-        last_c = IMAGE_CHANNELS
+        last_c = IMG_N_CHANNELS
         for c in CHANNELS:
             modules.append(
                 nn.Sequential(
@@ -88,7 +89,7 @@ class VAE(nn.Module):
             nn.BatchNorm2d(CHANNELS[0]),
             nn.LeakyReLU(),
             nn.Conv2d(
-                CHANNELS[0], out_channels=IMAGE_CHANNELS,
+                CHANNELS[0], out_channels=IMG_N_CHANNELS,
                 kernel_size=3, padding=1,
             ),
             nn.Tanh(), 

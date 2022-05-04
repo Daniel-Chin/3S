@@ -1,0 +1,1 @@
+IMG_N_CHANNELS = 3

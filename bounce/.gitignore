@@ -1,0 +1,7 @@
+dataset/
+*.pyc
+*.log
+experiments/
+*.mp4
+*.gif
+*.ttf

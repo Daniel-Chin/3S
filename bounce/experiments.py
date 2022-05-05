@@ -22,20 +22,20 @@ EXPERIMENTS = [
 ]
 
 EXPERIMENTS = [
-    ('VAE05', Config(
-        Constant(0.00005), 1, 0, do_symmetry=False, variational_rnn=False, 
+    ('VAE', Config(
+        Constant(2e-5), 1, 0, do_symmetry=False, variational_rnn=False, 
         rnn_width=32, deep_spread=False, 
     )), 
-    ('VAE1', Config(
-        Constant(0.0001), 1, 0, do_symmetry=False, variational_rnn=False, 
+    ('VAE', Config(
+        Constant(1e-5), 1, 0, do_symmetry=False, variational_rnn=False, 
         rnn_width=32, deep_spread=False, 
     )), 
-    ('VAE2', Config(
-        Constant(0.0002), 1, 0, do_symmetry=False, variational_rnn=False, 
+    ('VAE', Config(
+        Constant(3e-6), 1, 0, do_symmetry=False, variational_rnn=False, 
         rnn_width=32, deep_spread=False, 
     )), 
-    ('VAE5', Config(
-        Constant(0.0005), 1, 0, do_symmetry=False, variational_rnn=False, 
+    ('VAE', Config(
+        Constant(1e-6), 1, 0, do_symmetry=False, variational_rnn=False, 
         rnn_width=32, deep_spread=False, 
     )), 
 ]

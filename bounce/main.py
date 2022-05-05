@@ -29,8 +29,7 @@ from train import (
 from experiments import RAND_INIT_TIMES, EXPERIMENTS
 
 EXPERIMENTS_PATH = './experiments'
-# EPOCH_INTERVAL = 100
-EPOCH_INTERVAL = 20
+EPOCH_INTERVAL = 100
 
 def loadModel(config: Config):
     # future: load model from disk

@@ -15,6 +15,7 @@ class VAE(nn.Module):
         self, deep_spread, channels=[8, 16, 16], 
     ) -> None:
         super().__init__()
+        self.channels = channels
         self.conv_neck_len = RESOLUTION // 2 ** len(channels)
 
         modules = []
@@ -115,7 +116,8 @@ class VAE(nn.Module):
         '''
         t = self.fcBeforeDecode(z)
         t = t.view(
-            -1, self.channels[-1], self.conv_neck_len ** 2, 
+            -1, self.channels[-1], 
+            self.conv_neck_len, self.conv_neck_len, 
         )
         t = self.decoder(t)
         t = self.finalLayer(t)

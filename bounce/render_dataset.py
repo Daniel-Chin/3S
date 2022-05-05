@@ -18,7 +18,7 @@ WIN_W = 320
 WIN_H = 320
 SPF = .2
 DT = .15
-DRAW_GIRD = True
+DRAW_GIRD = False
 
 MODE_LOCATE = 'locate'
 MODE_OBV_ONLY = 'obv_only'

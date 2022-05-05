@@ -13,7 +13,7 @@ def loadDataset(dataset_path, size, device):
     # n_datapoints = max([int(x) for x in list_dir]) + 1
     # assert n_datapoints == len(list_dir)
     dataset = torch.zeros((
-        n_datapoints, 
+        size, 
         SEQ_LEN, 
         IMG_N_CHANNELS, 
         RESOLUTION, 

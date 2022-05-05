@@ -27,6 +27,7 @@ from symmetryTransforms import sampleTransforms, identity
 Config = namedtuple('Config', [
     'beta', 'vae_loss_coef', 'rnn_loss_coef', 'do_symmetry', 
     'variational_rnn', 'rnn_width', 'deep_spread', 
+    'vae_channels', 
 ])
 
 BATCH_SIZE = 64
@@ -49,7 +50,7 @@ def oneEpoch(
     lossLogger: LossLogger, 
     beta, vae_loss_coef=1, rnn_loss_coef=1, 
     do_symmetry=False, variational_rnn=False, 
-    rnn_width=None, deep_spread=None, 
+    rnn_width=None, deep_spread=None, vae_channels=None, 
 ):
     profiler.gonna('pre')
     beta = beta(epoch)

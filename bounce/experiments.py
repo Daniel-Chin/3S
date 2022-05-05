@@ -23,11 +23,23 @@ EXPERIMENTS = [
 
 EXPERIMENTS = [
     ('VAE', Config(
-        Constant(0), 1, 0, do_symmetry=False, variational_rnn=False, 
-        rnn_width=32, deep_spread=False, 
+        Constant(1e-9), 1, 0, do_symmetry=False, 
+        variational_rnn=False, rnn_width=32, 
+        deep_spread=False, vae_channels=[8, 16, 16], 
     )), 
     ('VAE', Config(
-        Constant(1e-8), 1, 0, do_symmetry=False, variational_rnn=False, 
-        rnn_width=32, deep_spread=False, 
+        Constant(1e-9), 1, 0, do_symmetry=False, 
+        variational_rnn=False, rnn_width=32, 
+        deep_spread=False, vae_channels=[8, 16, 16, 16], 
+    )), 
+    ('VAE', Config(
+        Constant(1e-9), 1, 0, do_symmetry=False, 
+        variational_rnn=False, rnn_width=32, 
+        deep_spread=False, vae_channels=[8, 16, 32], 
+    )), 
+    ('VAE', Config(
+        Constant(1e-9), 1, 0, do_symmetry=False, 
+        variational_rnn=False, rnn_width=32, 
+        deep_spread=False, vae_channels=[16, 32, 64], 
     )), 
 ]

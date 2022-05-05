@@ -33,7 +33,7 @@ EPOCH_INTERVAL = 100
 
 def loadModel(config: Config):
     # future: load model from disk
-    vae = VAE(config.deep_spread)
+    vae = VAE(config.deep_spread, config.vae_channels)
     rnn = RNN(config.rnn_width)
     if HAS_CUDA:
         vae = vae.cuda()

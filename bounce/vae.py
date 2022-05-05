@@ -4,36 +4,36 @@ import torch.nn.functional as F
 
 from shared import *
 
-CHANNELS = [8, 16, 16]
 LATENT_DIM = 3
-
-CONV_NECK_LEN = RESOLUTION // 2 ** len(CHANNELS)
 
 class VAE(nn.Module):
     '''
     Huge thanks to AntixK. 
     See https://github.com/AntixK/PyTorch-VAE
     '''
-    def __init__(self, deep_spread) -> None:
+    def __init__(
+        self, deep_spread, channels=[8, 16, 16], 
+    ) -> None:
         super().__init__()
+        self.conv_neck_len = RESOLUTION // 2 ** len(channels)
 
         modules = []
         last_c = IMG_N_CHANNELS
-        for c in CHANNELS:
+        for c in channels:
             modules.append(
                 nn.Sequential(
                     nn.Conv2d(
                         last_c, c,
                         kernel_size=3, stride=2, padding=1
                     ),
-                    nn.BatchNorm2d(c),
+                    # nn.BatchNorm2d(c),
                     nn.LeakyReLU(),
                 )
             )
             last_c = c
         
         self.conv_neck_dim = (
-            CHANNELS[-1] * CONV_NECK_LEN * CONV_NECK_LEN
+            channels[-1] * self.conv_neck_len ** 2
         )
 
         self.encoder = nn.Sequential(*modules)
@@ -63,8 +63,8 @@ class VAE(nn.Module):
             )
         modules = []
         for c0, c1 in zip(
-            CHANNELS[  :0:-1], 
-            CHANNELS[-2: :-1], 
+            channels[  :0:-1], 
+            channels[-2: :-1], 
         ):
             modules.append(
                 nn.Sequential(
@@ -73,22 +73,22 @@ class VAE(nn.Module):
                         kernel_size=3, stride=2, padding=1,
                         output_padding=1, 
                     ),
-                    nn.BatchNorm2d(c1), 
+                    # nn.BatchNorm2d(c1), 
                     nn.LeakyReLU(), 
                 )
             )
         self.decoder = nn.Sequential(*modules)
         self.finalLayer = nn.Sequential(
             nn.ConvTranspose2d(
-                CHANNELS[0],
-                CHANNELS[0],
+                channels[0],
+                channels[0],
                 kernel_size=3, stride=2, padding=1,
                 output_padding=1, 
             ),
-            nn.BatchNorm2d(CHANNELS[0]),
+            # nn.BatchNorm2d(CHANNELS[0]),
             nn.LeakyReLU(),
             nn.Conv2d(
-                CHANNELS[0], out_channels=IMG_N_CHANNELS,
+                channels[0], out_channels=IMG_N_CHANNELS,
                 kernel_size=3, padding=1,
             ),
             nn.Tanh(), 
@@ -115,7 +115,7 @@ class VAE(nn.Module):
         '''
         t = self.fcBeforeDecode(z)
         t = t.view(
-            -1, CHANNELS[-1], CONV_NECK_LEN, CONV_NECK_LEN, 
+            -1, self.channels[-1], self.conv_neck_len ** 2, 
         )
         t = self.decoder(t)
         t = self.finalLayer(t)

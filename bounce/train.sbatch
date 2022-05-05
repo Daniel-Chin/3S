@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=1:00:00
+#SBATCH --time=0:30:00
 #SBATCH --mem=6GB
 #SBATCH --gres=gpu:1
 #SBATCH --job-name=bounce

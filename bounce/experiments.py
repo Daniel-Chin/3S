@@ -22,6 +22,10 @@ EXPERIMENTS = [
 ]
 
 EXPERIMENTS = [
+    ('VAE05', Config(
+        Constant(0.00005), 1, 0, do_symmetry=False, variational_rnn=False, 
+        rnn_width=32, deep_spread=False, 
+    )), 
     ('VAE1', Config(
         Constant(0.0001), 1, 0, do_symmetry=False, variational_rnn=False, 
         rnn_width=32, deep_spread=False, 

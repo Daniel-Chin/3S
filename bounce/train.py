@@ -3,7 +3,6 @@ evalZ: plot rnn prediction under symmetry.
 beta warmup? 
 set beta=0 may deknot the z space? increase beta later? beta oscillation? 
 '''
-from collections import namedtuple
 import torch
 import torch.nn.functional as F
 
@@ -23,12 +22,6 @@ from shared import *
 from vae import LATENT_DIM, VAE
 from rnn import RNN
 from symmetryTransforms import sampleTransforms, identity
-
-Config = namedtuple('Config', [
-    'beta', 'vae_loss_coef', 'rnn_loss_coef', 'do_symmetry', 
-    'variational_rnn', 'rnn_width', 'deep_spread', 
-    'vae_channels', 
-])
 
 BATCH_SIZE = 64
 RNN_MIN_CONTEXT = 3

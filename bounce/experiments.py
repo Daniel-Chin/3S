@@ -1,7 +1,7 @@
 from train import Config
 from betaSched import Constant, WarmUp, Osc
 
-RAND_INIT_TIMES = 2
+RAND_INIT_TIMES = 5
 EXPERIMENTS = [
     ('VAE+RNN', Config(
         Constant(1e-5), 1, 1, do_symmetry=False, 

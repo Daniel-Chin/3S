@@ -27,27 +27,9 @@ from train import (
     RNN_MIN_CONTEXT, Config, 
 )
 from experiments import RAND_INIT_TIMES, EXPERIMENTS
+from loadModels import loadModels
 
-EXPERIMENTS_PATH = './experiments'
 EPOCH_INTERVAL = 100
-
-def loadModel(config: Config):
-    # future: load model from disk
-    vae = VAE(config.deep_spread, config.vae_channels)
-    rnn = RNN(config.rnn_width)
-    if HAS_CUDA:
-        vae = vae.cuda()
-        rnn = rnn.cuda()
-    return vae, rnn
-
-def renderExperimentPath(
-    rand_init_i, config: Config, 
-):
-    return os.path.join(
-        EXPERIMENTS_PATH, f'''{(
-            rand_init_i, *config, 
-        )}'''
-    )
 
 class Trainer:
     def __init__(
@@ -116,7 +98,7 @@ def main():
     trainers = []
     for _, config in EXPERIMENTS:
         for rand_init_i in range(RAND_INIT_TIMES):
-            vae, rnn = loadModel(config)
+            vae, rnn = loadModels(config)
             optim = torch.optim.Adam(
                 [
                     *vae.parameters(), *rnn.parameters(), 
@@ -146,11 +128,6 @@ def main():
                             validate_set[:24, :, :, :, :], 
                         )
             # print('GIFs made.')
-
-def torch2PIL(torchImg: torch.Tensor):
-    return Image.fromarray((
-        torchImg.cpu().clamp(0, 1).permute(1, 2, 0) * 255
-    ).round().numpy().astype(np.uint8), 'RGB')
 
 def evalGIFs(epoch, vae: VAE, rnn: RNN, dataset: torch.Tensor):
     n_datapoints = dataset.shape[0]

@@ -29,7 +29,7 @@ from train import (
 from experiments import RAND_INIT_TIMES, EXPERIMENTS
 from loadModels import loadModels
 
-EPOCH_INTERVAL = 100
+EPOCH_INTERVAL = 1000
 
 class Trainer:
     def __init__(

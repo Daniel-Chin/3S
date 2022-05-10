@@ -35,7 +35,26 @@ def identity(x):
 def test(size=100):
     points = torch.randn((3, size))
     trans, untrans = sampleTransforms(torch.device("cpu"))
-    print((points - untrans(trans(points))).norm(2))
+    poof = trans(points)
+    print('trans untrans', (points - untrans(poof)).norm(2))
+    print('altitude change', (points[2, :] - poof[2, :]).norm(2))
+    from matplotlib import pyplot as plt
+    from random import random
+    n_points = 10
+    for _ in range(8):
+        theta = random() * 2 * np.pi
+        k = np.tan(theta)
+        b = (random() - .5) * 2
+        X = torch.linspace(-2, 2, n_points)
+        Y = k * X + b
+        points = torch.zeros((3, n_points))
+        points[0, :] = X
+        points[1, :] = Y
+        poof = trans(points)
+        plt.scatter(X, Y, c='b')
+        plt.scatter(poof[0, :], poof[1, :], c='r')
+        plt.axis('equal')
+        plt.show()
 
 if __name__ == '__main__':
     test()

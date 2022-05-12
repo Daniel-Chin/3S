@@ -12,10 +12,11 @@ class VAE(nn.Module):
     See https://github.com/AntixK/PyTorch-VAE
     '''
     def __init__(
-        self, deep_spread, channels=[8, 16, 16], 
+        self, config: Config, 
     ) -> None:
         super().__init__()
-        self.channels = channels
+        deep_spread = config.deep_spread
+        self.channels = channels = config.vae_channels
         self.conv_neck_len = RESOLUTION // 2 ** len(channels)
 
         modules = []
@@ -122,15 +123,10 @@ class VAE(nn.Module):
         t = self.decoder(t)
         t = self.finalLayer(t)
         return t
-    
-    def reparameterize(self, mu, log_var):
-        std = torch.exp(0.5 * log_var)
-        eps = torch.randn_like(std)
-        return eps * std + mu
-    
+        
     def forward(self, x):
         mu, log_var = self.encode(x)
-        z = self.reparameterize(mu, log_var)
+        z = reparameterize(mu, log_var)
         reconstructions = self.decode(z)
         return reconstructions, mu, log_var, z
     

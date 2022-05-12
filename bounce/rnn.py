@@ -1,11 +1,13 @@
 import torch
 from torch import nn
+from shared import *
 from vae import LATENT_DIM
 
 class RNN(nn.Module):
-    def __init__(self, hidden_dim=16) -> None:
+    def __init__(self, config: Config) -> None:
         super().__init__()
-        self.hidden_dim = hidden_dim
+        self.hidden_dim = hidden_dim = config.rnn_width
+        self.vvrnn = config.vvrnn
 
         self.updateHidden = nn.Sequential(
             nn.Linear(hidden_dim + LATENT_DIM, hidden_dim), 
@@ -13,6 +15,8 @@ class RNN(nn.Module):
         )
         
         self.projHead = nn.Linear(hidden_dim, LATENT_DIM)
+        if self.vvrnn:
+            self.logVarHead = nn.Linear(hidden_dim, LATENT_DIM)
 
         self.hidden = None
 

@@ -14,7 +14,7 @@ TRAIN_SET_SIZE, VALIDATE_SET_SIZE = 256, 64
 Config = namedtuple('Config', [
     'beta', 'vae_loss_coef', 'rnn_loss_coef', 'do_symmetry', 
     'variational_rnn', 'rnn_width', 'deep_spread', 
-    'vae_channels', 
+    'vae_channels', 'vvrnn', 
 ])
 
 def torch2PIL(torchImg: torch.Tensor):
@@ -32,3 +32,8 @@ def renderExperimentPath(
             rand_init_i, *config, 
         )}'''
     )
+
+def reparameterize(mu, log_var):
+    std = torch.exp(0.5 * log_var)
+    eps = torch.randn_like(std)
+    return eps * std + mu

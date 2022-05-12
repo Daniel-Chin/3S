@@ -5,8 +5,8 @@ from train import HAS_CUDA
 
 def loadModels(config: Config):
     # future: load model from disk
-    vae = VAE(config.deep_spread, config.vae_channels)
-    rnn = RNN(config.rnn_width)
+    vae = VAE(config)
+    rnn = RNN(config)
     if HAS_CUDA:
         vae = vae.cuda()
         rnn = rnn.cuda()

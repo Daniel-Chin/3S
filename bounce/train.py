@@ -43,7 +43,7 @@ def oneEpoch(
     lossLogger: LossLogger, 
     beta, vae_loss_coef, rnn_loss_coef, do_symmetry, 
     variational_rnn, rnn_width, deep_spread, vae_channels, 
-    vvrnn, 
+    vvrnn, vvrnn_static, 
 ):
     profiler.gonna('pre')
     beta = beta(epoch)
@@ -71,7 +71,7 @@ def oneEpoch(
         ) = oneBatch(
             vae, rnn, batch, beta, 
             vae_loss_coef, rnn_loss_coef, do_symmetry, 
-            variational_rnn, vvrnn, 
+            variational_rnn, vvrnn, vvrnn_static, 
         )
         
         profiler.gonna('bp')
@@ -95,7 +95,7 @@ def oneEpoch(
         ) = oneBatch(
             vae, rnn, validate_set, beta, 
             vae_loss_coef, rnn_loss_coef, do_symmetry, 
-            variational_rnn, vvrnn, 
+            variational_rnn, vvrnn, vvrnn_static, 
         )
     lossLogger.eat(
         epoch, True, 
@@ -115,7 +115,7 @@ def oneEpoch(
 def oneBatch(
     vae: VAE, rnn: RNN, batch: torch.Tensor, beta, 
     vae_loss_coef, rnn_loss_coef, do_symmetry, 
-    variational_rnn, vvrnn, 
+    variational_rnn, vvrnn, vvrnn_static, 
     visualize=False, batch_size = BATCH_SIZE, 
 ):
     flat_batch = batch.view(
@@ -136,9 +136,9 @@ def oneBatch(
     z_hat_transed = torch.zeros((
         batch_size, SEQ_LEN - RNN_MIN_CONTEXT, LATENT_DIM, 
     )).to(DEVICE)
-    log_var = torch.zeros((
+    log_var = torch.ones((
         batch_size, SEQ_LEN - RNN_MIN_CONTEXT, LATENT_DIM, 
-    )).to(DEVICE)
+    )).to(DEVICE) * vvrnn_static
     rnn.zeroHidden(batch_size, DEVICE)
     if do_symmetry:
         trans, untrans = sampleTransforms(DEVICE)

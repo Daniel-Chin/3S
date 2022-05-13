@@ -135,6 +135,7 @@ def evalGIFs(epoch, vae: VAE, rnn: RNN, dataset: torch.Tensor):
     rnn.eval()
     predictions, reconstructions = oneBatch(
         vae, rnn, dataset, 0, 0, 0, False, False, False, 
+        -20, 
         visualize=True, batch_size=n_datapoints, 
     )
     frames = []

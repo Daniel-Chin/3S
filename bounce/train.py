@@ -155,8 +155,7 @@ def oneBatch(
         -1, LATENT_DIM, 
     ).T).T
     flat_log_var = log_var.view(-1, LATENT_DIM)
-    if vvrnn:
-        flat_z_hat = reparameterize(flat_z_hat, flat_log_var)
+    flat_z_hat = reparameterize(flat_z_hat, flat_log_var)
     predictions = vae.decode(flat_z_hat).view(
         batch_size, SEQ_LEN - RNN_MIN_CONTEXT, 
         IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 

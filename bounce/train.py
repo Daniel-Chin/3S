@@ -24,7 +24,6 @@ from rnn import RNN
 from symmetryTransforms import sampleTransforms, identity
 
 BATCH_SIZE = 64
-RNN_MIN_CONTEXT = 3
 
 HAS_CUDA = torch.cuda.is_available()
 CUDA = torch.device("cuda:0")
@@ -43,7 +42,7 @@ def oneEpoch(
     lossLogger: LossLogger, 
     beta, vae_loss_coef, rnn_loss_coef, do_symmetry, 
     variational_rnn, rnn_width, deep_spread, vae_channels, 
-    vvrnn, vvrnn_static, 
+    vvrnn, vvrnn_static, rnn_min_context, 
 ):
     profiler.gonna('pre')
     beta = beta(epoch)
@@ -72,6 +71,7 @@ def oneEpoch(
             vae, rnn, batch, beta, 
             vae_loss_coef, rnn_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
+            rnn_min_context, 
         )
         
         profiler.gonna('bp')
@@ -96,6 +96,7 @@ def oneEpoch(
             vae, rnn, validate_set, beta, 
             vae_loss_coef, rnn_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
+            rnn_min_context, 
         )
     lossLogger.eat(
         epoch, True, 
@@ -115,7 +116,7 @@ def oneEpoch(
 def oneBatch(
     vae: VAE, rnn: RNN, batch: torch.Tensor, beta, 
     vae_loss_coef, rnn_loss_coef, do_symmetry, 
-    variational_rnn, vvrnn, vvrnn_static, 
+    variational_rnn, vvrnn, vvrnn_static, rnn_min_context, 
     visualize=False, batch_size = BATCH_SIZE, 
 ):
     flat_batch = batch.view(
@@ -134,19 +135,19 @@ def oneBatch(
         batch_size, SEQ_LEN, LATENT_DIM, 
     )
     z_hat_transed = torch.zeros((
-        batch_size, SEQ_LEN - RNN_MIN_CONTEXT, LATENT_DIM, 
+        batch_size, SEQ_LEN - rnn_min_context, LATENT_DIM, 
     )).to(DEVICE)
     log_var = torch.ones((
-        batch_size, SEQ_LEN - RNN_MIN_CONTEXT, LATENT_DIM, 
+        batch_size, SEQ_LEN - rnn_min_context, LATENT_DIM, 
     )).to(DEVICE) * vvrnn_static
     rnn.zeroHidden(batch_size, DEVICE)
     if do_symmetry:
         trans, untrans = sampleTransforms(DEVICE)
     else:
         trans = untrans = identity
-    for t in range(RNN_MIN_CONTEXT):
+    for t in range(rnn_min_context):
         rnn.stepTime(z, t, trans)
-    for t in range(SEQ_LEN - RNN_MIN_CONTEXT):
+    for t in range(SEQ_LEN - rnn_min_context):
         z_hat_transed[:, t, :] = rnn.  projHead(rnn.hidden)
         if vvrnn:
             log_var  [:, t, :] = rnn.logVarHead(rnn.hidden)
@@ -157,11 +158,11 @@ def oneBatch(
     flat_log_var = log_var.view(-1, LATENT_DIM)
     flat_z_hat = reparameterize(flat_z_hat, flat_log_var)
     predictions = vae.decode(flat_z_hat).view(
-        batch_size, SEQ_LEN - RNN_MIN_CONTEXT, 
+        batch_size, SEQ_LEN - rnn_min_context, 
         IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
     )
     rnn_loss = F.mse_loss(predictions, batch[
-        :, RNN_MIN_CONTEXT:, :, :, :, 
+        :, rnn_min_context:, :, :, :, 
     ])
     # rnn_loss = F.mse_loss(z_hat, z[:, RNN_MIN_CONTEXT:, :])
     

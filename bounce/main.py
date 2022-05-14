@@ -126,16 +126,20 @@ def main():
                             trainer.vae, 
                             trainer.rnn, 
                             validate_set[:24, :, :, :, :], 
+                            trainer.config.rnn_min_context, 
                         )
             # print('GIFs made.')
 
-def evalGIFs(epoch, vae: VAE, rnn: RNN, dataset: torch.Tensor):
+def evalGIFs(
+    epoch, vae: VAE, rnn: RNN, dataset: torch.Tensor, 
+    rnn_min_context, 
+):
     n_datapoints = dataset.shape[0]
     vae.eval()
     rnn.eval()
     predictions, reconstructions = oneBatch(
         vae, rnn, dataset, 0, 0, 0, False, False, False, 
-        -20, 
+        -20, rnn_min_context, 
         visualize=True, batch_size=n_datapoints, 
     )
     frames = []

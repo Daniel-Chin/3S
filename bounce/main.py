@@ -24,7 +24,7 @@ from rnn import RNN
 from loadDataset import loadDataset, TRAIN_PATH, VALIDATE_PATH
 from train import (
     oneEpoch, HAS_CUDA, DEVICE, BATCH_SIZE, oneBatch, 
-    RNN_MIN_CONTEXT, Config, 
+    Config, 
 )
 from experiments import RAND_INIT_TIMES, EXPERIMENTS
 from loadModels import loadModels
@@ -158,10 +158,10 @@ def evalGIFs(
                 torch2PIL(reconstructions[i, t, :, :, :]), 
                 (i * RESOLUTION, 1 * RESOLUTION), 
             )
-            if t >= RNN_MIN_CONTEXT:
+            if t >= rnn_min_context:
                 frame.paste(
                     torch2PIL(predictions[
-                        i, t - RNN_MIN_CONTEXT, :, :, :, 
+                        i, t - rnn_min_context, :, :, :, 
                     ]), 
                     (i * RESOLUTION, 2 * RESOLUTION), 
                 )

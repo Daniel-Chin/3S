@@ -29,15 +29,48 @@ RAND_INIT_TIMES = 2
 #     )), 
 # ]
 
+# EXPERIMENTS = [
+#     ('3', Config(
+#         Constant(1e-5), 1, 1, do_symmetry=True, 
+#         variational_rnn=True, rnn_width=32, 
+#         deep_spread=False, vae_channels=[16, 32, 64], 
+#         vvrnn=False, vvrnn_static=-20, rnn_min_context=3, 
+#     )), 
+#     ('5', Config(
+#         Constant(1e-5), 1, 1, do_symmetry=True, 
+#         variational_rnn=True, rnn_width=32, 
+#         deep_spread=False, vae_channels=[16, 32, 64], 
+#         vvrnn=False, vvrnn_static=-20, rnn_min_context=5, 
+#     )), 
+# ]
+
 EXPERIMENTS = [
-    ('3', Config(
+    ('.4:1.6', Config(
+        Constant(1e-5), .4, 1.6, do_symmetry=True, 
+        variational_rnn=True, rnn_width=32, 
+        deep_spread=False, vae_channels=[16, 32, 64], 
+        vvrnn=False, vvrnn_static=-20, rnn_min_context=5, 
+    )), 
+    ('.6:1.4', Config(
+        Constant(1e-5), .6, 1.4, do_symmetry=True, 
+        variational_rnn=True, rnn_width=32, 
+        deep_spread=False, vae_channels=[16, 32, 64], 
+        vvrnn=False, vvrnn_static=-20, rnn_min_context=5, 
+    )), 
+    ('1:1', Config(
         Constant(1e-5), 1, 1, do_symmetry=True, 
         variational_rnn=True, rnn_width=32, 
         deep_spread=False, vae_channels=[16, 32, 64], 
-        vvrnn=False, vvrnn_static=-20, rnn_min_context=3, 
+        vvrnn=False, vvrnn_static=-20, rnn_min_context=5, 
     )), 
-    ('5', Config(
-        Constant(1e-5), 1, 1, do_symmetry=True, 
+    ('1.4:.6', Config(
+        Constant(1e-5), 1.4, .6, do_symmetry=True, 
+        variational_rnn=True, rnn_width=32, 
+        deep_spread=False, vae_channels=[16, 32, 64], 
+        vvrnn=False, vvrnn_static=-20, rnn_min_context=5, 
+    )), 
+    ('1.6:.4', Config(
+        Constant(1e-5), 1.6, .4, do_symmetry=True, 
         variational_rnn=True, rnn_width=32, 
         deep_spread=False, vae_channels=[16, 32, 64], 
         vvrnn=False, vvrnn_static=-20, rnn_min_context=5, 

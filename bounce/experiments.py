@@ -46,7 +46,7 @@ RAND_INIT_TIMES = 2
 
 EXPERIMENTS = [
     ('0.1:1.9', Config(
-        Constant(1e-5), 0, 2, do_symmetry=True, 
+        Constant(1e-5), 0.1, 1.9, do_symmetry=True, 
         variational_rnn=True, rnn_width=32, 
         deep_spread=False, vae_channels=[16, 32, 64], 
         vvrnn=False, vvrnn_static=-20, rnn_min_context=5, 

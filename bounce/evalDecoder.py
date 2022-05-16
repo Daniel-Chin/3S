@@ -11,7 +11,7 @@ from vae import LATENT_DIM, VAE
 from loadModels import loadModels
 from train import DEVICE
 
-EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/vrnn'
+EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/no_self_recun'
 
 RADIUS = 2
 TICK_INTERVAL = 0.05

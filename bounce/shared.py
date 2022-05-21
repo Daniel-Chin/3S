@@ -52,6 +52,10 @@ class Config:
         for k in self.keys:
             params.append(f'{k}={self.__getattribute__(k) }')
         return f'Config({", ".join(params)})'
+    
+    def __iter__(self):
+        for k in self.keys:
+            yield self.__getattribute__(k)
 
 def torch2PIL(torchImg: torch.Tensor):
     return Image.fromarray((

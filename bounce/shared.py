@@ -14,16 +14,16 @@ TRAIN_SET_SIZE, VALIDATE_SET_SIZE = 256, 64
 
 class Config:
     keys = [
-        'beta', 'vae_loss_coef', 'rnn_loss_coef', 
+        'beta', 'vae_loss_coef', 'img_pred_loss_coef', 
         'do_symmetry', 'variational_rnn', 'rnn_width', 
         'deep_spread', 'vae_channels', 'vvrnn', 'vvrnn_static', 
-        'rnn_min_context', 
+        'rnn_min_context', 'z_pred_loss_coef', 
     ]
     defaults=[
         Constant(1e-5), 1, 1, 
         True, True, 32, 
         False, [16, 32, 64], False, -5, 
-        7, 
+        7, 1, 
     ]
     def __init__(self, *a, **kw):
         for k, v in zip(self.keys, self.defaults):

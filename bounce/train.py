@@ -40,9 +40,9 @@ def oneEpoch(
     vae: VAE, rnn: RNN, optim: torch.optim.Optimizer, 
     train_set, validate_set, 
     lossLogger: LossLogger, 
-    beta, vae_loss_coef, rnn_loss_coef, do_symmetry, 
+    beta, vae_loss_coef, img_pred_loss_coef, do_symmetry, 
     variational_rnn, rnn_width, deep_spread, vae_channels, 
-    vvrnn, vvrnn_static, rnn_min_context, 
+    vvrnn, vvrnn_static, rnn_min_context, z_pred_loss_coef, 
 ):
     profiler.gonna('pre')
     beta = beta(epoch)
@@ -69,9 +69,9 @@ def oneEpoch(
             rnn_stdnorm, 
         ) = oneBatch(
             vae, rnn, batch, beta, 
-            vae_loss_coef, rnn_loss_coef, do_symmetry, 
+            vae_loss_coef, img_pred_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
-            rnn_min_context, 
+            rnn_min_context, z_pred_loss_coef, 
         )
         
         profiler.gonna('bp')
@@ -94,9 +94,9 @@ def oneEpoch(
             validate_rnn_std_norm, 
         ) = oneBatch(
             vae, rnn, validate_set, beta, 
-            vae_loss_coef, rnn_loss_coef, do_symmetry, 
+            vae_loss_coef, img_pred_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
-            rnn_min_context, 
+            rnn_min_context, z_pred_loss_coef, 
         )
     lossLogger.eat(
         epoch, True, 
@@ -115,8 +115,9 @@ def oneEpoch(
 
 def oneBatch(
     vae: VAE, rnn: RNN, batch: torch.Tensor, beta, 
-    vae_loss_coef, rnn_loss_coef, do_symmetry, 
+    vae_loss_coef, img_pred_loss_coef, do_symmetry, 
     variational_rnn, vvrnn, vvrnn_static, rnn_min_context, 
+    z_pred_loss_coef, 
     visualize=False, batch_size = BATCH_SIZE, 
 ):
     flat_batch = batch.view(
@@ -156,19 +157,26 @@ def oneBatch(
         -1, LATENT_DIM, 
     ).T).T
     flat_log_var = log_var.view(-1, LATENT_DIM)
-    flat_z_hat = reparameterize(flat_z_hat, flat_log_var)
-    predictions = vae.decode(flat_z_hat).view(
+    r_flat_z_hat = reparameterize(flat_z_hat, flat_log_var)
+    predictions = vae.decode(r_flat_z_hat).view(
         batch_size, SEQ_LEN - rnn_min_context, 
         IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
     )
-    rnn_loss = F.mse_loss(predictions, batch[
+    img_pred_loss = F.mse_loss(predictions, batch[
         :, rnn_min_context:, :, :, :, 
     ])
-    # rnn_loss = F.mse_loss(z_hat, z[:, RNN_MIN_CONTEXT:, :])
+
+    z_hat = flat_z_hat.view(
+        batch_size, SEQ_LEN - rnn_min_context, LATENT_DIM, 
+    )
+    z_pred_loss = F.mse_loss(
+        z_hat, z[:, rnn_min_context:, :], 
+    )
     
     total_loss = (
         vae_loss * vae_loss_coef + 
-        rnn_loss * rnn_loss_coef
+        img_pred_loss * img_pred_loss_coef + 
+        z_pred_loss   * z_pred_loss_coef
     )
 
     if visualize:
@@ -177,7 +185,7 @@ def oneBatch(
         )
     else:
         return (
-            total_loss, recon_loss, kld_loss, rnn_loss, 
+            total_loss, recon_loss, kld_loss, img_pred_loss, 
             torch.exp(0.5 * log_var).norm(2) / batch_size, 
         )
 

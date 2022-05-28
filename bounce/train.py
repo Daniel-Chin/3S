@@ -21,7 +21,9 @@ except ImportError as e:
 from shared import *
 from vae import LATENT_DIM, VAE
 from rnn import RNN
-from symmetryTransforms import sampleTransforms, identity
+from symmetryTransforms import (
+    sampleTranslate, sampleRotate, sampleTR, identity, 
+)
 
 BATCH_SIZE = 64
 
@@ -43,6 +45,7 @@ def oneEpoch(
     beta, vae_loss_coef, img_pred_loss_coef, do_symmetry, 
     variational_rnn, rnn_width, deep_spread, vae_channels, 
     vvrnn, vvrnn_static, rnn_min_context, z_pred_loss_coef, 
+    T, R, TR, I, 
 ):
     profiler.gonna('pre')
     beta = beta(epoch)
@@ -51,6 +54,7 @@ def oneEpoch(
     rnn.train()
     epoch_recon__loss = 0
     epoch_kld____loss = 0
+    epoch_img_pred_loss = 0
     epoch_z_pred_loss = 0
     epoch_rnn_stdnorm = 0
     for batch_pos in range(0, TRAIN_SET_SIZE, BATCH_SIZE):
@@ -65,13 +69,15 @@ def oneEpoch(
 
         profiler.gonna('1b')
         (
-            total_loss, recon_loss, kld_loss, rnn_loss, 
+            total_loss, recon_loss, kld_loss, 
+            img_pred_loss, z_pred_loss, 
             rnn_stdnorm, 
         ) = oneBatch(
             vae, rnn, batch, beta, 
             vae_loss_coef, img_pred_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
             rnn_min_context, z_pred_loss_coef, 
+            T, R, TR, I, 
         )
         
         profiler.gonna('bp')
@@ -81,7 +87,8 @@ def oneEpoch(
 
         epoch_recon__loss += recon_loss / n_batches
         epoch_kld____loss +=   kld_loss / n_batches
-        epoch_z_pred_loss +=   rnn_loss / n_batches
+        epoch_img_pred_loss += img_pred_loss / n_batches
+        epoch_z_pred_loss += z_pred_loss / n_batches
         epoch_rnn_stdnorm += rnn_stdnorm / n_batches
 
     profiler.gonna('ev')
@@ -90,13 +97,15 @@ def oneEpoch(
     with torch.no_grad():
         (
             _, validate_recon__loss, 
-            validate_kld____loss, validate_z_pred_loss, 
+            validate_kld____loss, 
+            validate_img_pred_loss, validate_z_pred_loss, 
             validate_rnn_std_norm, 
         ) = oneBatch(
             vae, rnn, validate_set, beta, 
             vae_loss_coef, img_pred_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
             rnn_min_context, z_pred_loss_coef, 
+            T, R, TR, I, 
         )
     lossLogger.eat(
         epoch, True, 
@@ -104,6 +113,8 @@ def oneEpoch(
         validate_recon__loss=validate_recon__loss, 
         train____kld____loss=epoch_kld____loss, 
         validate_kld____loss=validate_kld____loss, 
+        train____img_pred_loss=epoch_img_pred_loss, 
+        validate_img_pred_loss=validate_img_pred_loss, 
         train____z_pred_loss=epoch_z_pred_loss, 
         validate_z_pred_loss=validate_z_pred_loss, 
         train____rnn_std_norm=epoch_rnn_stdnorm, 
@@ -117,7 +128,7 @@ def oneBatch(
     vae: VAE, rnn: RNN, batch: torch.Tensor, beta, 
     vae_loss_coef, img_pred_loss_coef, do_symmetry, 
     variational_rnn, vvrnn, vvrnn_static, rnn_min_context, 
-    z_pred_loss_coef, 
+    z_pred_loss_coef, T, R, TR, I, 
     visualize=False, batch_size = BATCH_SIZE, 
 ):
     flat_batch = batch.view(
@@ -135,6 +146,60 @@ def oneBatch(
     z: torch.Tensor = z_flat.view(
         batch_size, SEQ_LEN, LATENT_DIM, 
     )
+
+    transs = []
+    for _ in range(I):
+        transs.append((identity, identity))
+    for _ in range(T):
+        transs.append(sampleTranslate(DEVICE))
+    for _ in range(R):
+        transs.append(sampleRotate(DEVICE))
+    for _ in range(TR):
+        transs.append(sampleTR(DEVICE))
+    batch_img_pred_loss = torch.Tensor(0)
+    batch_z_pred_loss = torch.Tensor(0)
+    for trans, untrans in transs:
+        img_pred_loss, z_pred_loss, predictions = oneTrans(
+            vae, rnn, batch, 
+            vvrnn, vvrnn_static, rnn_min_context, 
+            batch_size, 
+            z, trans, untrans, 
+        )
+        batch_img_pred_loss += img_pred_loss
+        batch_z_pred_loss += z_pred_loss
+    
+    # `predictions` is that of the last trans. 
+
+    total_loss = (
+        vae_loss * vae_loss_coef + 
+        batch_img_pred_loss * img_pred_loss_coef + 
+        batch_z_pred_loss   * z_pred_loss_coef
+    )
+
+    if visualize:
+        return predictions, reconstructions.view(
+            batch_size, SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
+        )
+    else:
+        return (
+            total_loss, recon_loss, kld_loss, 
+            batch_img_pred_loss, batch_z_pred_loss, 
+            torch.exp(0.5 * log_var).norm(2) / batch_size, 
+        )
+
+def getGradNorm(optim: torch.optim.Optimizer):
+    s = 0
+    for param in optim.param_groups[0]['params']:
+        if param.grad is not None:
+            s += param.grad.norm(2).item() ** 2
+    return s ** .5
+
+def oneTrans(
+    vae: VAE, rnn: RNN, batch: torch.Tensor, 
+    vvrnn, vvrnn_static, rnn_min_context, 
+    batch_size, 
+    z, trans, untrans, 
+):
     z_hat_transed = torch.zeros((
         batch_size, SEQ_LEN - rnn_min_context, LATENT_DIM, 
     )).to(DEVICE)
@@ -142,10 +207,6 @@ def oneBatch(
         batch_size, SEQ_LEN - rnn_min_context, LATENT_DIM, 
     )).to(DEVICE) * vvrnn_static
     rnn.zeroHidden(batch_size, DEVICE)
-    if do_symmetry:
-        trans, untrans = sampleTransforms(DEVICE)
-    else:
-        trans = untrans = identity
     for t in range(rnn_min_context):
         rnn.stepTime(z, t, trans)
     for t in range(SEQ_LEN - rnn_min_context):
@@ -172,26 +233,5 @@ def oneBatch(
     z_pred_loss = F.mse_loss(
         z_hat, z[:, rnn_min_context:, :], 
     )
-    
-    total_loss = (
-        vae_loss * vae_loss_coef + 
-        img_pred_loss * img_pred_loss_coef + 
-        z_pred_loss   * z_pred_loss_coef
-    )
 
-    if visualize:
-        return predictions, reconstructions.view(
-            batch_size, SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
-        )
-    else:
-        return (
-            total_loss, recon_loss, kld_loss, img_pred_loss, 
-            torch.exp(0.5 * log_var).norm(2) / batch_size, 
-        )
-
-def getGradNorm(optim: torch.optim.Optimizer):
-    s = 0
-    for param in optim.param_groups[0]['params']:
-        if param.grad is not None:
-            s += param.grad.norm(2).item() ** 2
-    return s ** .5
+    return img_pred_loss, z_pred_loss, predictions

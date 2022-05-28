@@ -18,12 +18,13 @@ class Config:
         'do_symmetry', 'variational_rnn', 'rnn_width', 
         'deep_spread', 'vae_channels', 'vvrnn', 'vvrnn_static', 
         'rnn_min_context', 'z_pred_loss_coef', 
+        'T', 'R', 'TR', 'I', 
     ]
     defaults=[
         Constant(1e-5), 1, 1, 
         True, True, 32, 
         False, [16, 32, 64], False, -5, 
-        7, 1, 
+        7, 0, 0, 0, 1, 0, 
     ]
     def __init__(self, *a, **kw):
         for k, v in zip(self.keys, self.defaults):
@@ -40,6 +41,9 @@ class Config:
             if key_i == self.prefix_len:
                 self.prefix_len += 1
             self.__setattr__(k, v)
+        
+        do_symmetry = self.T + self.R + self.TR > 0
+        assert self.do_symmetry == do_symmetry
     
     def getPrefix(self):
         return [

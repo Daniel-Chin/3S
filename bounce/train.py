@@ -83,6 +83,7 @@ def oneEpoch(
         profiler.gonna('bp')
         optim.zero_grad()
         total_loss.backward()
+        grad_norm = getGradNorm(optim)
         optim.step()
 
         epoch_recon__loss += recon_loss / n_batches
@@ -119,8 +120,7 @@ def oneEpoch(
         validate_z_pred_loss=validate_z_pred_loss, 
         train____rnn_std_norm=epoch_rnn_stdnorm, 
         validate_rnn_std_norm=validate_rnn_std_norm, 
-        # vae___grad_norm=vae___grad_norm, 
-        # total_grad_norm=total_grad_norm, 
+        grad_norm=grad_norm, 
     )
     profiler.display()
 

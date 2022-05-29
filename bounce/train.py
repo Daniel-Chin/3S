@@ -118,8 +118,8 @@ def oneEpoch(
         validate_img_pred_loss=validate_img_pred_loss, 
         train____z_pred_loss=epoch_z_pred_loss, 
         validate_z_pred_loss=validate_z_pred_loss, 
-        train____rnn_std_norm=epoch_rnn_stdnorm, 
-        validate_rnn_std_norm=validate_rnn_std_norm, 
+        # train____rnn_std_norm=epoch_rnn_stdnorm, 
+        # validate_rnn_std_norm=validate_rnn_std_norm, 
         grad_norm=grad_norm, 
     )
     profiler.display()

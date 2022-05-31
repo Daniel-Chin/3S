@@ -156,8 +156,8 @@ def oneBatch(
         transs.append(sampleRotate(DEVICE))
     for _ in range(TR):
         transs.append(sampleTR(DEVICE))
-    batch_img_pred_loss = torch.tensor(0.0)
-    batch_z_pred_loss = torch.tensor(0.0)
+    batch_img_pred_loss = torch.tensor(0.0).to(DEVICE)
+    batch_z_pred_loss   = torch.tensor(0.0).to(DEVICE)
     for trans, untrans in transs:
         img_pred_loss, z_pred_loss, predictions = oneTrans(
             vae, rnn, batch, 

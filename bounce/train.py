@@ -84,6 +84,7 @@ def oneEpoch(
         optim.zero_grad()
         total_loss.backward()
         grad_norm = getGradNorm(optim)
+        torch.nn.utils.clip_grad_norm_(getParams(optim), 2)
         optim.step()
 
         epoch_recon__loss += recon_loss / n_batches
@@ -187,11 +188,16 @@ def oneBatch(
             torch.exp(0.5 * log_var).norm(2) / batch_size, 
         )
 
-def getGradNorm(optim: torch.optim.Optimizer):
-    s = 0
+def getParams(optim: torch.optim.Optimizer):
+    s = []
     for param in optim.param_groups[0]['params']:
         if param.grad is not None:
-            s += param.grad.norm(2).item() ** 2
+            s.append(param)
+
+def getGradNorm(optim: torch.optim.Optimizer):
+    s = 0
+    for param in getParams(optim):
+        s += param.grad.norm(2).item() ** 2
     return s ** .5
 
 def oneTrans(

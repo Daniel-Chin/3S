@@ -102,7 +102,7 @@ def main():
             optim = torch.optim.Adam(
                 [
                     *vae.parameters(), *rnn.parameters(), 
-                ], lr=.001, 
+                ], lr=config.lr, 
             )
             trainers.append(Trainer(
                 vae, rnn, optim, train_set, validate_set, 

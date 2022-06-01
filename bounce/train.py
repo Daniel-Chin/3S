@@ -45,7 +45,7 @@ def oneEpoch(
     beta, vae_loss_coef, img_pred_loss_coef, do_symmetry, 
     variational_rnn, rnn_width, deep_spread, vae_channels, 
     vvrnn, vvrnn_static, rnn_min_context, z_pred_loss_coef, 
-    T, R, TR, I, 
+    T, R, TR, I, lr, 
 ):
     profiler.gonna('pre')
     beta = beta(epoch)

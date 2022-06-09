@@ -24,7 +24,7 @@ class Config:
         Constant(1e-5), 1, 1, 
         True, True, 32, 
         False, [16, 32, 64], False, -5, 
-        7, 0, 0, 0, 1, 0, 0.001, 
+        7, 0.005, 0, 0, 1, 0, 0.001, 
     ]
     def __init__(self, *a, **kw):
         for k, v in zip(self.keys, self.defaults):

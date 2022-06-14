@@ -10,7 +10,7 @@
 #SBATCH --job-name=bounce
 #SBATCH --output=slurm_train.out
 #SBATCH --error=slurm_train.err
-#SBATCH --partition=debug
+#SBATCH --partition=aquila
 
 module purge
 module load miniconda

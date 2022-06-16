@@ -6,3 +6,4 @@ experiments/
 *.gif
 *.ttf
 results/
+gpu_name.txt

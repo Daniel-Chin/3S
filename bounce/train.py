@@ -173,6 +173,8 @@ def oneBatch(
         )
         batch_img_pred_loss += img_pred_loss
         batch_z_pred_loss += z_pred_loss
+    batch_img_pred_loss /= len(transs)
+    batch_z_pred_loss   /= len(transs)
     
     # `predictions` is that of the last trans. 
 

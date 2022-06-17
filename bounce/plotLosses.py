@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 from shared import *
 
-EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/lr_2'
+EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/TRI'
 
 AVERAGE_OVER = 100
 

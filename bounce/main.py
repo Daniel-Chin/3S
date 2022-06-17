@@ -8,6 +8,7 @@ from PIL import Image, ImageDraw
 try:
     from myTorch import LossLogger
     from streamProfiler import StreamProfiler
+    from roundRobinSched import roundRobinSched
 except ImportError as e:
     module_name = str(e).split('No module named ', 1)[1].strip().strip('"\'')
     if module_name in (
@@ -54,6 +55,8 @@ class Trainer:
         with self:
             self.lossLogger = LossLogger('losses.log')
         self.lossLogger.clearFile()
+
+        self.epoch = 0
     
     def __enter__(self):
         assert not self.entered
@@ -66,21 +69,24 @@ class Trainer:
         self.entered = False
         return False
     
-    def oneEpoch(self, epoch, profiler):
+    def oneEpoch(self, profiler):
         with self:
             oneEpoch(
                 profiler, 
-                epoch, self.vae, self.rnn, self.optim, 
+                self.epoch, self.vae, self.rnn, self.optim, 
                 self.train_set, self.validate_set, 
                 self.lossLogger, *self.config, 
             )
-            if epoch % EPOCH_INTERVAL == 0:
+            if self.epoch % EPOCH_INTERVAL == 0:
                 torch.save(
-                    self.vae.state_dict(), f'{epoch}_vae.pt', 
+                    self.vae.state_dict(), 
+                    f'{self.epoch}_vae.pt', 
                 )
                 torch.save(
-                    self.rnn.state_dict(), f'{epoch}_rnn.pt', 
+                    self.rnn.state_dict(), 
+                    f'{self.epoch}_rnn.pt', 
                 )
+            self.epoch += 1
 
 def main():
     try:
@@ -111,24 +117,20 @@ def main():
     profiler = StreamProfiler(
         DO_PROFILE=False, filename='profiler.log', 
     )
-    for epoch in count():
-        for trainer in trainers:
-            trainer: Trainer
-            # print(trainer.config)
-            trainer.oneEpoch(epoch, profiler)
-        if epoch % EPOCH_INTERVAL == 0:
-            # print('making GIFs.')
+    for i in roundRobinSched(len(trainers)):
+        trainer: Trainer = trainers[i]
+        # print(trainer.config)
+        trainer.oneEpoch(profiler)
+        if trainer.epoch % EPOCH_INTERVAL == 0:
             with torch.no_grad():
-                for trainer in trainers:
-                    with trainer:
-                        evalGIFs(
-                            epoch, 
-                            trainer.vae, 
-                            trainer.rnn, 
-                            validate_set[:24, :, :, :, :], 
-                            trainer.config.rnn_min_context, 
-                        )
-            # print('GIFs made.')
+                with trainer:
+                    evalGIFs(
+                        trainer.epoch, 
+                        trainer.vae, 
+                        trainer.rnn, 
+                        validate_set[:24, :, :, :, :], 
+                        trainer.config.rnn_min_context, 
+                    )
 
 def evalGIFs(
     epoch, vae: VAE, rnn: RNN, dataset: torch.Tensor, 

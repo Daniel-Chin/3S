@@ -9,6 +9,7 @@ from shared import *
 EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/TRI_2'
 
 AVERAGE_OVER = 100
+START = 0
 
 def getExp():
     spec = importlib.util.spec_from_file_location(
@@ -63,6 +64,6 @@ def extract(exp_path):
                 group_size += 1
                 if group_size == AVERAGE_OVER:
                     pop()
-    return epochs, losses
+    return epochs[START:], losses[START:]
 
 main()

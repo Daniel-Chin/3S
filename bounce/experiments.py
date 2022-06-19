@@ -1,7 +1,7 @@
 from train import Config
 from betaSched import Constant, WarmUp, Osc
 
-RAND_INIT_TIMES = 4
+RAND_INIT_TIMES = 1
 
 EXPERIMENTS = [
     ('TR', Config(

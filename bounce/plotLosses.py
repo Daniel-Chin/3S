@@ -1,3 +1,4 @@
+import enum
 import os
 from os import path
 import importlib.util
@@ -6,10 +7,29 @@ from matplotlib import pyplot as plt
 
 from shared import *
 
-EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/TRI_2'
+EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/TRI_3'
 
 AVERAGE_OVER = 100
-START = 10
+START = 0
+ALL_TYPES_OR_SINGLE = 1
+
+validate_recon__loss = 'validate_recon__loss'
+validate_kld____loss = 'validate_kld____loss'
+validate_img_pred_loss = 'validate_img_pred_loss'
+validate_z_pred_loss = 'validate_z_pred_loss'
+MAP = [
+    None, 
+    None, 
+    validate_recon__loss, 
+    None, 
+    validate_kld____loss, 
+    None, 
+    validate_img_pred_loss, 
+    None, 
+    validate_z_pred_loss, 
+    None, 
+]
+MAP_LEN = len(MAP)
 
 def getExp():
     spec = importlib.util.spec_from_file_location(
@@ -22,48 +42,88 @@ def getExp():
 def main():
     os.chdir(EXP_PATH)
     experiments = getExp()
-    for i, (exp_name, config) in enumerate(
+    for exp_i, (exp_name, config) in enumerate(
         experiments.EXPERIMENTS, 
     ):
         print(exp_name)
         print(config)
         for rand_init_i in range(experiments.RAND_INIT_TIMES):
+            if ALL_TYPES_OR_SINGLE == 0:
+                if not (rand_init_i == 0 and exp_i == 0):
+                    break
             print('rand init', rand_init_i)
             exp_path = renderExperimentPath(rand_init_i, config)
-            epochs, losses = extract(exp_path)
-            plt.plot(
-                epochs, losses, c='rgbky'[i], label=exp_name, 
-            )
+            extract(exp_path, exp_name, exp_i)
     plt.legend()
     plt.show()
 
-PREFIX = '  validate_recon__loss = '
-PREFIX_LEN = len(PREFIX)
-def extract(exp_path):
-    losses = []
-    epochs = []
-    group_sum = 0
-    group_size = 0
-    def pop():
-        nonlocal group_sum, group_size
-        losses.append(group_sum / group_size)
-        epochs.append(len(losses) * AVERAGE_OVER)
+class LossAcc:
+    def __init__(self, losses) -> None:
+        self.group_sum = 0
+        self.group_size = 0
+        self.losses = losses
+    
+    def eat(self, x):
+        self.group_sum += x
+        self.group_size += 1
+        if self.group_size == AVERAGE_OVER:
+            self.pop()
+
+    def pop(self):
+        self.losses.append(self.group_sum / self.group_size)
         print(
-            'epoch', epochs[-1], 
+            'epoch', len(self.losses) * AVERAGE_OVER, 
             end='\r', flush=True, 
         )
-        group_sum = 0
-        group_size = 0
+        self.group_sum = 0
+        self.group_size = 0
+
+def extract(exp_path, exp_name, exp_i):
+    if ALL_TYPES_OR_SINGLE == 0:
+        loss_types = [
+            validate_recon__loss, 
+            validate_kld____loss, 
+            validate_img_pred_loss, 
+            validate_z_pred_loss, 
+        ]
+    else:
+        loss_types = [
+            validate_recon__loss, 
+        ]
+    epochs = []
+    lossAccs = {x: LossAcc([]) for x in loss_types}
     with open(path.join(exp_path, 'losses.log')) as f:
         for i, line in enumerate(f):
-            if i % 10 == 2:
-                if not line.startswith(PREFIX):
+            line_type = MAP[i % MAP_LEN]
+            if line_type is None:
+                continue
+            try:
+                lossAcc = lossAccs[line_type]
+            except KeyError:
+                continue
+            else:
+                prefix = '  %s = ' % line_type
+                prefix_len = len(prefix)
+                if not line.startswith(prefix):
                     from console import console
                     console({**globals(), **locals()})
-                group_sum += float(line[PREFIX_LEN:])
-                group_size += 1
-                if group_size == AVERAGE_OVER:
-                    pop()
-    return epochs[START:], losses[START:]
+                lossAcc.eat(float(line[prefix_len:]))
+    epochs = [i * AVERAGE_OVER for i, _ in enumerate(
+        next(iter(lossAccs.values())).losses, 
+    )]
+    for loss_i, (loss_type, lossAcc) in enumerate(
+        lossAccs.items(), 
+    ):
+        if ALL_TYPES_OR_SINGLE == 1:
+            label = exp_name
+            i = exp_i
+        else:
+            assert loss_type.startswith('validate_')
+            label = loss_type[len('validate_'):]
+            i = loss_i
+        plt.plot(
+            epochs[START:], lossAcc.losses[START:], 
+            c='rgbky'[i], label=label, 
+        )
 
 main()

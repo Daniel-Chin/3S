@@ -7,11 +7,11 @@ from matplotlib import pyplot as plt
 
 from shared import *
 
-EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/TRI_3'
+EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/TRI_4'
 
 AVERAGE_OVER = 100
 START = 0
-ALL_TYPES_OR_SINGLE = 1
+ALL_TYPES_OR_SINGLE = 0
 
 validate_recon__loss = 'validate_recon__loss'
 validate_kld____loss = 'validate_kld____loss'
@@ -49,7 +49,7 @@ def main():
         print(config)
         for rand_init_i in range(experiments.RAND_INIT_TIMES):
             if ALL_TYPES_OR_SINGLE == 0:
-                if not (rand_init_i == 0 and exp_i == 0):
+                if not (rand_init_i == 0 and exp_i in (0, )):
                     break
             print('rand init', rand_init_i)
             exp_path = renderExperimentPath(rand_init_i, config)

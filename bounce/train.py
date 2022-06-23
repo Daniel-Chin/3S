@@ -51,7 +51,7 @@ def oneEpoch(
     beta, vae_loss_coef, img_pred_loss_coef, do_symmetry, 
     variational_rnn, rnn_width, deep_spread, vae_channels, 
     vvrnn, vvrnn_static, rnn_min_context, z_pred_loss_coef, 
-    T, R, TR, I, lr, 
+    T, R, TR, I, lr, grad_clip, 
 ):
     profiler.gonna('pre')
     beta = beta(epoch)
@@ -90,7 +90,9 @@ def oneEpoch(
         optim.zero_grad()
         total_loss.backward()
         grad_norm = getGradNorm(optim)
-        torch.nn.utils.clip_grad_norm_(getParams(optim), 1)
+        torch.nn.utils.clip_grad_norm_(
+            getParams(optim), grad_clip, 
+        )
         optim.step()
 
         epoch_recon__loss += recon_loss / n_batches

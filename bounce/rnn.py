@@ -8,6 +8,7 @@ class RNN(nn.Module):
         super().__init__()
         self.hidden_dim = hidden_dim = config.rnn_width
         self.vvrnn = config.vvrnn
+        self.do_residual = config.residual
 
         self.updateHidden = nn.Sequential(
             nn.Linear(hidden_dim + LATENT_DIM, hidden_dim), 
@@ -19,7 +20,7 @@ class RNN(nn.Module):
             self.logVarHead = nn.Linear(hidden_dim, LATENT_DIM)
 
         self.hidden = None
-
+        
         print('RNN # of params:', sum(
             p.numel() for p in self.parameters() 
             if p.requires_grad
@@ -34,8 +35,12 @@ class RNN(nn.Module):
         '''
         `z` is (BATCH_SIZE, SEQ_LEN, LATENT_DIM). 
         '''
-        self.hidden = self.updateHidden(
+        output = self.updateHidden(
             torch.cat((self.hidden, trans(
                 z[:, time, :].T, 
             ).T), dim=1)
         )
+        if self.do_residual:
+            self.hidden = self.hidden + output
+        else:
+            self.hidden = output

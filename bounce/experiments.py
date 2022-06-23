@@ -29,3 +29,5 @@ EXPERIMENTS = [
         T=4, R=4, TR=0, I=1, lr=0.001, 
     )), 
 ]
+
+# next: residual

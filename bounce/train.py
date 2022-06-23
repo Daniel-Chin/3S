@@ -3,6 +3,7 @@ evalZ: plot rnn prediction under symmetry.
 beta warmup? 
 set beta=0 may deknot the z space? increase beta later? beta oscillation? 
 '''
+import random
 import torch
 import torch.nn.functional as F
 
@@ -153,35 +154,33 @@ def oneBatch(
         batch_size, SEQ_LEN, LATENT_DIM, 
     )
 
-    transs = []
-    for _ in range(I):
-        transs.append((identity, identity))
-    for _ in range(T):
-        transs.append(sampleTranslate(DEVICE))
-    for _ in range(R):
-        transs.append(sampleRotate(DEVICE))
-    for _ in range(TR):
-        transs.append(sampleTR(DEVICE))
-    batch_img_pred_loss = torch.tensor(0.0).to(DEVICE)
-    batch_z_pred_loss   = torch.tensor(0.0).to(DEVICE)
-    for trans, untrans in transs:
-        img_pred_loss, z_pred_loss, predictions = oneTrans(
-            vae, rnn, batch, 
-            vvrnn, vvrnn_static, rnn_min_context, 
-            batch_size, 
-            z, trans, untrans, 
-        )
-        batch_img_pred_loss += img_pred_loss
-        batch_z_pred_loss += z_pred_loss
-    batch_img_pred_loss /= len(transs)
-    batch_z_pred_loss   /= len(transs)
+    t = random.choice(
+        ['I' ] * I + 
+        ['T' ] * T + 
+        ['R' ] * R + 
+        ['TR'] * TR
+    )
+    if t == 'I':
+        trans, untrans = identity, identity
+    elif t == 'T':
+        trans, untrans = sampleTranslate(DEVICE)
+    elif t == 'R':
+        trans, untrans = sampleRotate(DEVICE)
+    elif t == 'TR':
+        trans, untrans = sampleTR(DEVICE)
+    img_pred_loss, z_pred_loss, predictions = oneTrans(
+        vae, rnn, batch, 
+        vvrnn, vvrnn_static, rnn_min_context, 
+        batch_size, 
+        z, trans, untrans, 
+    )
     
     # `predictions` is that of the last trans. 
 
     total_loss = (
         vae_loss * vae_loss_coef + 
-        batch_img_pred_loss * img_pred_loss_coef + 
-        batch_z_pred_loss   * z_pred_loss_coef
+        img_pred_loss * img_pred_loss_coef + 
+        z_pred_loss   * z_pred_loss_coef
     )
 
     if visualize:
@@ -191,7 +190,7 @@ def oneBatch(
     else:
         return (
             total_loss, recon_loss, kld_loss, 
-            batch_img_pred_loss, batch_z_pred_loss, 
+            img_pred_loss, z_pred_loss, 
             torch.exp(0.5 * log_var).norm(2) / batch_size, 
         )
 

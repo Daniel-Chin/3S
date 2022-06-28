@@ -30,7 +30,7 @@ EXPERIMENTS = [
     )), 
 ]
 
-# next: residual
+# next: residual connections
 
 EXPERIMENTS = [
     ('1', Config(

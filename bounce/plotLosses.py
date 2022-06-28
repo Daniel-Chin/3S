@@ -7,19 +7,20 @@ from matplotlib import pyplot as plt
 
 from shared import *
 
-EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/TRI_4'
+EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/grad_clip'
 
 AVERAGE_OVER = 100
-START = 0
-ALL_TYPES_OR_SINGLE = 0
+START = 20
+ALL_TYPES_OR_SINGLE = 1
 
+train____recon__loss = 'train____recon__loss'
 validate_recon__loss = 'validate_recon__loss'
 validate_kld____loss = 'validate_kld____loss'
 validate_img_pred_loss = 'validate_img_pred_loss'
 validate_z_pred_loss = 'validate_z_pred_loss'
 MAP = [
     None, 
-    None, 
+    train____recon__loss, 
     validate_recon__loss, 
     None, 
     validate_kld____loss, 
@@ -89,6 +90,8 @@ def extract(exp_path, exp_name, exp_i):
     else:
         loss_types = [
             validate_recon__loss, 
+            # train____recon__loss, 
+            # validate_kld____loss, 
         ]
     epochs = []
     lossAccs = {x: LossAcc([]) for x in loss_types}

@@ -31,6 +31,7 @@ EXPERIMENTS = [
 ]
 
 # next: residual connections
+# grad_clip = .03
 
 EXPERIMENTS = [
     ('1', Config(

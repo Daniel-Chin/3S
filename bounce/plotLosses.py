@@ -10,7 +10,8 @@ from shared import *
 EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/grad_clip'
 
 AVERAGE_OVER = 100
-START = 20
+START = 100
+END = None
 ALL_TYPES_OR_SINGLE = 1
 
 train____recon__loss = 'train____recon__loss'
@@ -89,8 +90,8 @@ def extract(exp_path, exp_name, exp_i):
         ]
     else:
         loss_types = [
-            validate_recon__loss, 
-            # train____recon__loss, 
+            # validate_recon__loss, 
+            train____recon__loss, 
             # validate_kld____loss, 
         ]
     epochs = []
@@ -111,7 +112,7 @@ def extract(exp_path, exp_name, exp_i):
                     from console import console
                     console({**globals(), **locals()})
                 lossAcc.eat(float(line[prefix_len:]))
-    epochs = [i * AVERAGE_OVER for i, _ in enumerate(
+    epochs = [(i + 1) * AVERAGE_OVER for i, _ in enumerate(
         next(iter(lossAccs.values())).losses, 
     )]
     for loss_i, (loss_type, lossAcc) in enumerate(
@@ -125,7 +126,7 @@ def extract(exp_path, exp_name, exp_i):
             label = loss_type[len('validate_'):]
             i = loss_i
         plt.plot(
-            epochs[START:], lossAcc.losses[START:], 
+            epochs[START:END], lossAcc.losses[START:END], 
             c='rgbky'[i], label=label, 
         )
 

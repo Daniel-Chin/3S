@@ -7,16 +7,17 @@ from matplotlib import pyplot as plt
 
 from shared import *
 
-EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/grad_clip'
+EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/residual_2'
 
 AVERAGE_OVER = 100
-START = 100
+START = 20
 END = None
 ALL_TYPES_OR_SINGLE = 1
 
 train____recon__loss = 'train____recon__loss'
 validate_recon__loss = 'validate_recon__loss'
 validate_kld____loss = 'validate_kld____loss'
+train____img_pred_loss = 'train____img_pred_loss'
 validate_img_pred_loss = 'validate_img_pred_loss'
 validate_z_pred_loss = 'validate_z_pred_loss'
 MAP = [
@@ -25,7 +26,7 @@ MAP = [
     validate_recon__loss, 
     None, 
     validate_kld____loss, 
-    None, 
+    train____img_pred_loss, 
     validate_img_pred_loss, 
     None, 
     validate_z_pred_loss, 
@@ -85,14 +86,17 @@ def extract(exp_path, exp_name, exp_i):
         loss_types = [
             validate_recon__loss, 
             validate_kld____loss, 
+            train____img_pred_loss, 
             validate_img_pred_loss, 
             validate_z_pred_loss, 
         ]
     else:
         loss_types = [
             # validate_recon__loss, 
-            train____recon__loss, 
+            # train____recon__loss, 
             # validate_kld____loss, 
+            # validate_img_pred_loss, 
+            train____img_pred_loss, 
         ]
     epochs = []
     lossAccs = {x: LossAcc([]) for x in loss_types}

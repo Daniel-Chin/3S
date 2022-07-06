@@ -124,17 +124,22 @@ def main():
         if trainer.epoch % EPOCH_INTERVAL == 0:
             with torch.no_grad():
                 with trainer:
-                    evalGIFs(
-                        trainer.epoch, 
-                        trainer.vae, 
-                        trainer.rnn, 
-                        validate_set[:24, :, :, :, :], 
-                        trainer.config.rnn_min_context, 
-                    )
+                    for label, data_set in [
+                        ('train', train_set), 
+                        ('validate', validate_set), 
+                    ]:
+                        evalGIFs(
+                            trainer.epoch, 
+                            trainer.vae, 
+                            trainer.rnn, 
+                            data_set[:24, :, :, :, :], 
+                            trainer.config.rnn_min_context, 
+                            label,
+                        )
 
 def evalGIFs(
     epoch, vae: VAE, rnn: RNN, dataset: torch.Tensor, 
-    rnn_min_context, 
+    rnn_min_context, label, 
 ):
     n_datapoints = dataset.shape[0]
     vae.eval()
@@ -177,7 +182,7 @@ def evalGIFs(
                     (i + .8) * RESOLUTION, 2.2 * RESOLUTION, 
                 ), fill='white')
 
-    filename = f'pred_{epoch}.gif'
+    filename = f'pred_{label}_{epoch}.gif'
     frames[0].save(
         filename, 
         save_all=True, append_images=frames[1:], 

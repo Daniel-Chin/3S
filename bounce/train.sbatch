@@ -4,7 +4,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=48:00:00
+#SBATCH --time=22:30:00
 #SBATCH --mem=6GB
 #SBATCH --gres=gpu:2080Ti:1
 #SBATCH --job-name=bounce

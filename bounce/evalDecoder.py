@@ -11,7 +11,8 @@ from vae import LATENT_DIM, VAE
 from loadModels import loadModels
 from train import DEVICE
 
-EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/TRI_6'
+EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/rnn_complexity'
+LOCK_EPOCH = None
 
 RADIUS = 2
 TICK_INTERVAL = 0.05
@@ -28,18 +29,22 @@ def getModels(rand_init_i, config):
     vae, rnn = loadModels(config)
     
     exp_path = renderExperimentPath(rand_init_i, config)
-    max_epoch = 0
-    for filename in os.listdir(exp_path):
-        try:
-            epoch = int(filename.split('_vae.pt', 1)[0])
-        except ValueError:
-            continue
-        else:
-            max_epoch = max(max_epoch, epoch)
-    print('taking epoch', max_epoch)
+    if LOCK_EPOCH is None:
+        max_epoch = 0
+        for filename in os.listdir(exp_path):
+            try:
+                epoch = int(filename.split('_vae.pt', 1)[0])
+            except ValueError:
+                continue
+            else:
+                max_epoch = max(max_epoch, epoch)
+        epoch = max_epoch
+    else:
+        epoch = LOCK_EPOCH
+    print('taking epoch', epoch)
     for name, thing in (('vae', vae), ('rnn', rnn)):
         thing.load_state_dict(torch.load(path.join(
-            exp_path, f'{max_epoch}_{name}.pt', 
+            exp_path, f'{epoch}_{name}.pt', 
         ), map_location=DEVICE))
     return vae, rnn
 

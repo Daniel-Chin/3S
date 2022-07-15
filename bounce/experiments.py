@@ -1,7 +1,7 @@
 from train import Config
 from betaSched import Constant, WarmUp, Osc
 
-RAND_INIT_TIMES = 3
+RAND_INIT_TIMES = 2
 
 EXPERIMENTS = [
     ('TR', Config(
@@ -34,9 +34,9 @@ EXPERIMENTS = [
 ]
 
 EXPERIMENTS = [
-    ('giant', Config(
+    ('dali', Config(
         Constant(1e-5), 1, 1, do_symmetry=True, 
-        variational_rnn=True, rnn_width=256, 
+        variational_rnn=True, rnn_width=512, 
         deep_spread=False, vae_channels=[128, 256, 256], 
         vvrnn=False, vvrnn_static=-25, rnn_min_context=4, 
         z_pred_loss_coef=.005, 

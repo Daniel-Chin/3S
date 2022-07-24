@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 
 from shared import *
 
-EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/dali_2'
+EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/dali_3'
 
 AVERAGE_OVER = 300
 START = 20
@@ -95,8 +95,8 @@ def extract(exp_path, exp_name, exp_i):
             # validate_recon__loss, 
             # train____recon__loss, 
             # validate_kld____loss, 
-            # validate_img_pred_loss, 
-            train____img_pred_loss, 
+            validate_img_pred_loss, 
+            # train____img_pred_loss, 
         ]
     epochs = []
     lossAccs = {x: LossAcc([]) for x in loss_types}

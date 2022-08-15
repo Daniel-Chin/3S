@@ -11,7 +11,7 @@ from vae import LATENT_DIM, VAE
 from loadModels import loadModels
 from train import DEVICE
 
-EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/rnn_complexity'
+EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/xuanjie'
 LOCK_EPOCH = None
 
 RADIUS = 2

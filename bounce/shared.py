@@ -1,6 +1,7 @@
 from argparse import ArgumentError
 import os
 import torch
+import torch.nn.functional as F
 import numpy as np
 from PIL import Image
 from betaSched import Constant
@@ -19,12 +20,14 @@ class Config:
         'deep_spread', 'vae_channels', 'vvrnn', 'vvrnn_static', 
         'rnn_min_context', 'z_pred_loss_coef', 
         'T', 'R', 'TR', 'I', 'lr', 'residual', 'grad_clip', 
+        'BCE_not_MSE', 
     ]
     defaults=[
         Constant(1e-5), 1, 1, 
         True, True, 32, 
         False, [16, 32, 64], False, -5, 
         7, 0.005, 0, 0, 1, 0, 0.001, True, 1, 
+        False, 
     ]
     def __init__(self, *a, **kw):
         for k, v in zip(self.keys, self.defaults):
@@ -44,6 +47,11 @@ class Config:
         
         do_symmetry = self.T + self.R + self.TR > 0
         assert self.do_symmetry == do_symmetry
+
+        if self.BCE_not_MSE:
+            self.imgCriterion = torch.nn.BCELoss()
+        else:
+            self.imgCriterion = F.mse_loss
     
     def getPrefix(self):
         return [

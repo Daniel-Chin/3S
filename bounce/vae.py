@@ -17,6 +17,7 @@ class VAE(nn.Module):
         super().__init__()
         deep_spread = config.deep_spread
         self.channels = channels = config.vae_channels
+        self.imgCriterion = config.imgCriterion
         self.conv_neck_len = RESOLUTION // 2 ** len(channels)
 
         modules = []
@@ -93,7 +94,7 @@ class VAE(nn.Module):
                 channels[0], out_channels=IMG_N_CHANNELS,
                 kernel_size=3, padding=1,
             ),
-            nn.Tanh(), 
+            nn.Sigmoid(), 
         )
 
         # print('VAE # of params:', sum(
@@ -133,7 +134,7 @@ class VAE(nn.Module):
     def computeLoss(
         self, x, reconstructions, mu, log_var, beta, 
     ):
-        reconstruct_loss = F.mse_loss(reconstructions, x)
+        reconstruct_loss = self.imgCriterion(reconstructions, x)
         kld_loss = torch.mean(-0.5 * torch.sum(
             1 + log_var - mu ** 2 - log_var.exp(), dim=1, 
         ), dim=0)

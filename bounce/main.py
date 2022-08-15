@@ -75,7 +75,7 @@ class Trainer:
                 profiler, 
                 self.epoch, self.vae, self.rnn, self.optim, 
                 self.train_set, self.validate_set, 
-                self.lossLogger, *self.config, 
+                self.lossLogger, self.config, *self.config, 
             )
             if self.epoch % EPOCH_INTERVAL == 0:
                 torch.save(
@@ -146,7 +146,7 @@ def evalGIFs(
     rnn.eval()
     predictions, reconstructions = oneBatch(
         vae, rnn, dataset, 0, 0, 0, False, False, False, 
-        -20, rnn_min_context, 0, 0, 0, 1, 0, 
+        -20, rnn_min_context, 0, 0, 0, 1, 0, False, 
         visualize=True, batch_size=n_datapoints, 
     )
     frames = []

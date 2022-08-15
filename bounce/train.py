@@ -48,12 +48,14 @@ def oneEpoch(
     vae: VAE, rnn: RNN, optim: torch.optim.Optimizer, 
     train_set, validate_set, 
     lossLogger: LossLogger, 
+    config: Config, 
     beta, vae_loss_coef, img_pred_loss_coef, do_symmetry, 
     variational_rnn, rnn_width, deep_spread, vae_channels, 
     vvrnn, vvrnn_static, rnn_min_context, z_pred_loss_coef, 
-    T, R, TR, I, lr, do_residual, grad_clip, 
+    T, R, TR, I, lr, do_residual, grad_clip, BCE_not_MSE, 
 ):
     profiler.gonna('pre')
+    imgCriterion = config.imgCriterion
     beta = beta(epoch)
     n_batches = TRAIN_SET_SIZE // BATCH_SIZE
     vae.train()
@@ -83,7 +85,7 @@ def oneEpoch(
             vae_loss_coef, img_pred_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
             rnn_min_context, z_pred_loss_coef, 
-            T, R, TR, I, 
+            T, R, TR, I, imgCriterion, 
         )
         
         profiler.gonna('bp')
@@ -115,7 +117,7 @@ def oneEpoch(
             vae_loss_coef, img_pred_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
             rnn_min_context, z_pred_loss_coef, 
-            T, R, TR, I, 
+            T, R, TR, I, imgCriterion, 
         )
     lossLogger.eat(
         epoch, True, 
@@ -137,7 +139,7 @@ def oneBatch(
     vae: VAE, rnn: RNN, batch: torch.Tensor, beta, 
     vae_loss_coef, img_pred_loss_coef, do_symmetry, 
     variational_rnn, vvrnn, vvrnn_static, rnn_min_context, 
-    z_pred_loss_coef, T, R, TR, I, 
+    z_pred_loss_coef, T, R, TR, I, imgCriterion, 
     visualize=False, batch_size = BATCH_SIZE, 
 ):
     flat_batch = batch.view(
@@ -172,7 +174,7 @@ def oneBatch(
         trans, untrans = sampleTR(DEVICE)
     img_pred_loss, z_pred_loss, predictions = oneTrans(
         vae, rnn, batch, 
-        vvrnn, vvrnn_static, rnn_min_context, 
+        vvrnn, vvrnn_static, rnn_min_context, imgCriterion, 
         batch_size, 
         z, trans, untrans, 
     )
@@ -211,7 +213,7 @@ def getGradNorm(optim: torch.optim.Optimizer):
 
 def oneTrans(
     vae: VAE, rnn: RNN, batch: torch.Tensor, 
-    vvrnn, vvrnn_static, rnn_min_context, 
+    vvrnn, vvrnn_static, rnn_min_context, imgCriterion, 
     batch_size, 
     z, trans, untrans, 
 ):
@@ -238,7 +240,7 @@ def oneTrans(
         batch_size, SEQ_LEN - rnn_min_context, 
         IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
     )
-    img_pred_loss = F.mse_loss(predictions, batch[
+    img_pred_loss = imgCriterion(predictions, batch[
         :, rnn_min_context:, :, :, :, 
     ])
 

@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 
 from shared import *
 
-EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/dali_3'
+EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/sigmoid'
 
 AVERAGE_OVER = 300
 START = 20

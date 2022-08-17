@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -102,7 +104,7 @@ class VAE(nn.Module):
         #     if p.requires_grad
         # ))
 
-    def encode(self, x):
+    def encode(self, x) -> Tuple[torch.Tensor, torch.Tensor]:
         '''
         `x` is (batch_size, IMAGE_CHANNELS, height, width)
         '''

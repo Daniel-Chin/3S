@@ -20,14 +20,14 @@ class Config:
         'deep_spread', 'vae_channels', 'vvrnn', 'vvrnn_static', 
         'rnn_min_context', 'z_pred_loss_coef', 
         'T', 'R', 'TR', 'I', 'lr', 'residual', 'grad_clip', 
-        'BCE_not_MSE', 
+        'BCE_not_MSE', 'teacher_forcing_duration', 
     ]
     defaults=[
         Constant(1e-5), 1, 1, 
         True, True, 32, 
         False, [16, 32, 64], False, -5, 
         7, 0.005, 0, 0, 1, 0, 0.001, True, 1, 
-        False, 
+        False, 0, 
     ]
     def __init__(self, *a, **kw):
         for k, v in zip(self.keys, self.defaults):

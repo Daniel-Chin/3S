@@ -44,7 +44,7 @@ else:
     print("We DON'T have CUDA.")
 
 def oneEpoch(
-    profiler: StreamProfiler, epoch, 
+    profiler: StreamProfiler, epoch: int, 
     vae: VAE, rnn: RNN, optim: torch.optim.Optimizer, 
     train_set, validate_set, 
     lossLogger: LossLogger, 
@@ -53,6 +53,7 @@ def oneEpoch(
     variational_rnn, rnn_width, deep_spread, vae_channels, 
     vvrnn, vvrnn_static, rnn_min_context, z_pred_loss_coef, 
     T, R, TR, I, lr, do_residual, grad_clip, BCE_not_MSE, 
+    teacher_forcing_duration, 
 ):
     profiler.gonna('pre')
     imgCriterion = config.imgCriterion
@@ -74,6 +75,12 @@ def oneEpoch(
         batch_pos = (
             batch_pos + BATCH_SIZE
         ) % TRAIN_SET_SIZE
+        try:
+            teacher_forcing_rate = 1 - min(
+                1, epoch / teacher_forcing_duration, 
+            )
+        except ZeroDivisionError:
+            teacher_forcing_rate = 0
 
         profiler.gonna('1b')
         (
@@ -85,7 +92,7 @@ def oneEpoch(
             vae_loss_coef, img_pred_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
             rnn_min_context, z_pred_loss_coef, 
-            T, R, TR, I, imgCriterion, 
+            T, R, TR, I, imgCriterion, teacher_forcing_rate, 
         )
         
         profiler.gonna('bp')
@@ -117,7 +124,7 @@ def oneEpoch(
             vae_loss_coef, img_pred_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
             rnn_min_context, z_pred_loss_coef, 
-            T, R, TR, I, imgCriterion, 
+            T, R, TR, I, imgCriterion, teacher_forcing_rate=0, 
         )
     lossLogger.eat(
         epoch, True, 
@@ -140,6 +147,7 @@ def oneBatch(
     vae_loss_coef, img_pred_loss_coef, do_symmetry, 
     variational_rnn, vvrnn, vvrnn_static, rnn_min_context, 
     z_pred_loss_coef, T, R, TR, I, imgCriterion, 
+    teacher_forcing_rate, 
     visualize=False, batch_size = BATCH_SIZE, 
 ):
     flat_batch = batch.view(
@@ -175,6 +183,7 @@ def oneBatch(
     img_pred_loss, z_pred_loss, predictions = oneTrans(
         vae, rnn, batch, 
         vvrnn, vvrnn_static, rnn_min_context, imgCriterion, 
+        teacher_forcing_rate, 
         batch_size, 
         z, trans, untrans, 
     )
@@ -214,6 +223,7 @@ def getGradNorm(optim: torch.optim.Optimizer):
 def oneTrans(
     vae: VAE, rnn: RNN, batch: torch.Tensor, 
     vvrnn, vvrnn_static, rnn_min_context, imgCriterion, 
+    teacher_forcing_rate, 
     batch_size, 
     z, trans, untrans, 
 ):
@@ -230,7 +240,10 @@ def oneTrans(
         z_hat_transed[:, t, :] = rnn.  projHead(rnn.hidden)
         if vvrnn:
             log_var  [:, t, :] = rnn.logVarHead(rnn.hidden)
-        rnn.stepTime(z_hat_transed, t, identity)
+        if random.random() < teacher_forcing_rate:
+            rnn.stepTime(z, t, trans)
+        else:
+            rnn.stepTime(z_hat_transed, t, identity)
     flat_z_hat = untrans(z_hat_transed.view(
         -1, LATENT_DIM, 
     ).T).T

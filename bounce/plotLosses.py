@@ -4,10 +4,11 @@ from os import path
 import importlib.util
 
 from matplotlib import pyplot as plt
+from matplotlib.colors import hsv_to_rgb
 
 from shared import *
 
-EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/bce_mse'
+EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/teacher_F'
 
 AVERAGE_OVER = 300
 START = 20
@@ -131,7 +132,17 @@ def extract(exp_path, exp_name, exp_i):
             i = loss_i
         plt.plot(
             epochs[START:END], lossAcc.losses[START:END], 
-            c='rgbky'[i], label=label, 
+            c=(
+                # 'rgbky'
+                (
+                    hsv_to_rgb((0, 1, 1)), 
+                    hsv_to_rgb((.1, 1, 1)), 
+                    hsv_to_rgb((.2, 1, 1)), 
+                    hsv_to_rgb((.3, 1, 1)), 
+                    hsv_to_rgb((.4, 1, 1)), 
+                    hsv_to_rgb((.5, 1, 1)), 
+                )
+            )[i], label=label, 
         )
 
 main()

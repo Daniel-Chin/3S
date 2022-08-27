@@ -12,6 +12,8 @@
 #SBATCH --error=slurm_train.err
 #SBATCH --partition=aquila
 
+rm slurm_train.out
+rm slurm_train.err
 module purge
 module load miniconda
 source activate danielTorch

@@ -3,9 +3,11 @@ from betaSched import Constant, WarmUp, Osc
 
 RAND_INIT_TIMES = 1
 
+# Symmetry is off!
+
 EXPERIMENTS = [
     ('0', Config(
-        Constant(1e-5), 1, 1, do_symmetry=True, 
+        Constant(1e-5), 1, 1, do_symmetry=False, 
         variational_rnn=True, rnn_width=128, 
         deep_spread=False, vae_channels=[16, 32, 64], 
         vvrnn=False, vvrnn_static=-25, rnn_min_context=4, 
@@ -15,7 +17,7 @@ EXPERIMENTS = [
         teacher_forcing_duration=0, 
     )), 
     ('1e2', Config(
-        Constant(1e-5), 1, 1, do_symmetry=True, 
+        Constant(1e-5), 1, 1, do_symmetry=False, 
         variational_rnn=True, rnn_width=128, 
         deep_spread=False, vae_channels=[16, 32, 64], 
         vvrnn=False, vvrnn_static=-25, rnn_min_context=4, 
@@ -25,7 +27,7 @@ EXPERIMENTS = [
         teacher_forcing_duration=1e2, 
     )), 
     ('1e3', Config(
-        Constant(1e-5), 1, 1, do_symmetry=True, 
+        Constant(1e-5), 1, 1, do_symmetry=False, 
         variational_rnn=True, rnn_width=128, 
         deep_spread=False, vae_channels=[16, 32, 64], 
         vvrnn=False, vvrnn_static=-25, rnn_min_context=4, 
@@ -35,7 +37,7 @@ EXPERIMENTS = [
         teacher_forcing_duration=1e3, 
     )), 
     ('1e4', Config(
-        Constant(1e-5), 1, 1, do_symmetry=True, 
+        Constant(1e-5), 1, 1, do_symmetry=False, 
         variational_rnn=True, rnn_width=128, 
         deep_spread=False, vae_channels=[16, 32, 64], 
         vvrnn=False, vvrnn_static=-25, rnn_min_context=4, 
@@ -45,7 +47,7 @@ EXPERIMENTS = [
         teacher_forcing_duration=1e4, 
     )), 
     ('1e5', Config(
-        Constant(1e-5), 1, 1, do_symmetry=True, 
+        Constant(1e-5), 1, 1, do_symmetry=False, 
         variational_rnn=True, rnn_width=128, 
         deep_spread=False, vae_channels=[16, 32, 64], 
         vvrnn=False, vvrnn_static=-25, rnn_min_context=4, 
@@ -55,7 +57,7 @@ EXPERIMENTS = [
         teacher_forcing_duration=1e5, 
     )), 
     ('1e6', Config(
-        Constant(1e-5), 1, 1, do_symmetry=True, 
+        Constant(1e-5), 1, 1, do_symmetry=False, 
         variational_rnn=True, rnn_width=128, 
         deep_spread=False, vae_channels=[16, 32, 64], 
         vvrnn=False, vvrnn_static=-25, rnn_min_context=4, 

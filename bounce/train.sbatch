@@ -12,9 +12,9 @@
 #SBATCH --error=slurm_train.err
 #SBATCH --partition=aquila
 
+# rm -f slurm_train.err
+# rm -f slurm_train.out
 module purge
-rm -f slurm_train.err
-rm -f slurm_train.out
 module load miniconda
 source activate danielTorch
 python main.py

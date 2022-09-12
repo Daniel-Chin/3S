@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rm -f slurm_train.err
+rm -f slurm_train.out
+sbatch train.sbatch

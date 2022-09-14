@@ -8,7 +8,7 @@ from matplotlib.colors import hsv_to_rgb
 
 from shared import *
 
-EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/teacher_F_2'
+EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/loss_weight'
 
 AVERAGE_OVER = 300
 START = 20

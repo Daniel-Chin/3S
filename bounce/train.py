@@ -159,18 +159,23 @@ def oneBatch(
     flat_video_batch = video_batch.view(
         batch_size * SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
     )
-    reconstructions, mu, log_var, z_flat = vae.forward(
-        flat_video_batch, 
-    )
-    vae_loss, recon_loss, kld_loss = vae.computeLoss(
-        flat_video_batch, reconstructions, mu, log_var, beta, 
-    )
+    if vae_loss_coef == 0:
+        vae_loss, recon_loss, kld_loss = 0, 0, 0
+        log_var = torch.tensor(0)
+        z = None
+    else:
+        reconstructions, mu, log_var, z_flat = vae.forward(
+            flat_video_batch, 
+        )
+        vae_loss, recon_loss, kld_loss = vae.computeLoss(
+            flat_video_batch, reconstructions, mu, log_var, beta, 
+        )
 
-    if not variational_rnn:
-        z_flat = mu
-    z: torch.Tensor = z_flat.view(
-        batch_size, SEQ_LEN, LATENT_DIM, 
-    )
+        if not variational_rnn:
+            z_flat = mu
+        z: torch.Tensor = z_flat.view(
+            batch_size, SEQ_LEN, LATENT_DIM, 
+        )
 
     t = random.choice(
         ['I' ] * I + 
@@ -190,6 +195,7 @@ def oneBatch(
         vae, rnn, video_batch, traj_batch, 
         vvrnn, vvrnn_static, rnn_min_context, imgCriterion, 
         teacher_forcing_rate, supervised_rnn, 
+        img_pred_loss_coef == 0, 
         batch_size, 
         z, trans, untrans, 
     )
@@ -230,7 +236,7 @@ def oneTrans(
     vae: VAE, rnn: RNN, 
     video_batch: torch.Tensor, traj_batch: torch.Tensor, 
     vvrnn, vvrnn_static, rnn_min_context, imgCriterion, 
-    teacher_forcing_rate, supervised_rnn, 
+    teacher_forcing_rate, supervised_rnn, skip_image_pred, 
     batch_size, 
     z, trans, untrans, 
 ):
@@ -258,13 +264,20 @@ def oneTrans(
     ).T).T
     flat_log_var = log_var.view(-1, LATENT_DIM)
     r_flat_z_hat = reparameterize(flat_z_hat, flat_log_var)
-    predictions = vae.decode(r_flat_z_hat).view(
-        batch_size, SEQ_LEN - rnn_min_context, 
-        IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
-    )
-    img_pred_loss = imgCriterion(predictions, video_batch[
-        :, rnn_min_context:, :, :, :, 
-    ])
+    if skip_image_pred:
+        predictions = torch.zeros((
+            batch_size, RESOLUTION, RESOLUTION, 
+            IMG_N_CHANNELS, 
+        ))
+        img_pred_loss = 0
+    else:
+        predictions = vae.decode(r_flat_z_hat).view(
+            batch_size, SEQ_LEN - rnn_min_context, 
+            IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
+        )
+        img_pred_loss = imgCriterion(predictions, video_batch[
+            :, rnn_min_context:, :, :, :, 
+        ])
 
     z_hat = flat_z_hat.view(
         batch_size, SEQ_LEN - rnn_min_context, LATENT_DIM, 

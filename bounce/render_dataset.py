@@ -1,16 +1,19 @@
 import time
 from typing import List
+import pickle
+
 import numpy as np
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 import cv2
 from PIL import Image
-from physics import *
-from shared import *
 
-PATH = TRAIN_PATH
-# PATH = VALIDATE_PATH
+from shared import *
+from physics import *
+
+# PATH = TRAIN_PATH
+PATH = VALIDATE_PATH
 
 # GIF_INTERVAL = 200
 
@@ -86,6 +89,10 @@ class BallViewer:
         # GIF image compression is uncontrollable
         os.makedirs(str(self.output_i), exist_ok=True)
         os.chdir(str(self.output_i))
+        with open(TRAJ_FILENAME, 'wb') as f:
+            pickle.dump(self.trajectory, f)
+            # These files require `from physics import Body`
+            # Wow, you don't need?
         for i, img in enumerate(self.frames):
             img.save(f'{i}.png')
         os.chdir('..')

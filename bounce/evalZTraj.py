@@ -49,10 +49,10 @@ def getModels(rand_init_i, config):
     return vae, rnn
 
 def main():
-    train_set    = loadDataset(
+    train_set   , _ = loadDataset(
         TRAIN_PATH,       TRAIN_SET_SIZE, DEVICE, 
     )
-    validate_set = loadDataset(
+    validate_set, _ = loadDataset(
         VALIDATE_PATH, VALIDATE_SET_SIZE, DEVICE, 
     )
     dataset = train_set

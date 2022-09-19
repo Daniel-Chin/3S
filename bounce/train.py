@@ -41,12 +41,13 @@ if HAS_CUDA:
         print(gpu_name, file=f)
 else:
     DEVICE = CPU
-    print("We DON'T have CUDA.")
+    print("We DON'T have CUDA.", flush=True)
 
 def oneEpoch(
     profiler: StreamProfiler, epoch: int, 
     vae: VAE, rnn: RNN, optim: torch.optim.Optimizer, 
-    train_set, validate_set, 
+    train_videos, validate_videos, 
+    train_traj, validate_traj, 
     lossLogger: LossLogger, 
     config: Config, 
     beta, vae_loss_coef, img_pred_loss_coef, do_symmetry, 
@@ -68,7 +69,7 @@ def oneEpoch(
     epoch_rnn_stdnorm = 0
     for batch_pos in range(0, TRAIN_SET_SIZE, BATCH_SIZE):
         profiler.gonna('b_pre')
-        batch = train_set[
+        video_batch = train_videos[
             batch_pos : batch_pos + BATCH_SIZE, 
             :, :, :, :, 
         ]
@@ -83,12 +84,13 @@ def oneEpoch(
             teacher_forcing_rate = 0
 
         profiler.gonna('1b')
+        print('batch position', batch_pos, end='  \r', flush=True)
         (
             total_loss, recon_loss, kld_loss, 
             img_pred_loss, z_pred_loss, 
             rnn_stdnorm, 
         ) = oneBatch(
-            vae, rnn, batch, beta, 
+            vae, rnn, video_batch, beta, 
             vae_loss_coef, img_pred_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
             rnn_min_context, z_pred_loss_coef, 
@@ -120,7 +122,7 @@ def oneEpoch(
             validate_img_pred_loss, validate_z_pred_loss, 
             validate_rnn_std_norm, 
         ) = oneBatch(
-            vae, rnn, validate_set, beta, 
+            vae, rnn, validate_videos, beta, 
             vae_loss_coef, img_pred_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
             rnn_min_context, z_pred_loss_coef, 
@@ -143,21 +145,21 @@ def oneEpoch(
     profiler.display()
 
 def oneBatch(
-    vae: VAE, rnn: RNN, batch: torch.Tensor, beta, 
+    vae: VAE, rnn: RNN, video_batch: torch.Tensor, beta, 
     vae_loss_coef, img_pred_loss_coef, do_symmetry, 
     variational_rnn, vvrnn, vvrnn_static, rnn_min_context, 
     z_pred_loss_coef, T, R, TR, I, imgCriterion, 
     teacher_forcing_rate, 
     visualize=False, batch_size = BATCH_SIZE, 
 ):
-    flat_batch = batch.view(
+    flat_video_batch = video_batch.view(
         batch_size * SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
     )
     reconstructions, mu, log_var, z_flat = vae.forward(
-        flat_batch, 
+        flat_video_batch, 
     )
     vae_loss, recon_loss, kld_loss = vae.computeLoss(
-        flat_batch, reconstructions, mu, log_var, beta, 
+        flat_video_batch, reconstructions, mu, log_var, beta, 
     )
 
     if not variational_rnn:
@@ -181,7 +183,7 @@ def oneBatch(
     elif t == 'TR':
         trans, untrans = sampleTR(DEVICE)
     img_pred_loss, z_pred_loss, predictions = oneTrans(
-        vae, rnn, batch, 
+        vae, rnn, video_batch, 
         vvrnn, vvrnn_static, rnn_min_context, imgCriterion, 
         teacher_forcing_rate, 
         batch_size, 
@@ -221,7 +223,7 @@ def getGradNorm(optim: torch.optim.Optimizer):
     return s ** .5
 
 def oneTrans(
-    vae: VAE, rnn: RNN, batch: torch.Tensor, 
+    vae: VAE, rnn: RNN, video_batch: torch.Tensor, 
     vvrnn, vvrnn_static, rnn_min_context, imgCriterion, 
     teacher_forcing_rate, 
     batch_size, 
@@ -253,7 +255,7 @@ def oneTrans(
         batch_size, SEQ_LEN - rnn_min_context, 
         IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
     )
-    img_pred_loss = imgCriterion(predictions, batch[
+    img_pred_loss = imgCriterion(predictions, video_batch[
         :, rnn_min_context:, :, :, :, 
     ])
 

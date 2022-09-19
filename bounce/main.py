@@ -34,14 +34,18 @@ EPOCH_INTERVAL = 2000
 
 class Trainer:
     def __init__(
-        self, vae, rnn, optim, train_set, validate_set, 
+        self, vae, rnn, optim, 
+        train_videos, validate_videos, 
+        train_traj, validate_traj, 
         rand_init_i, config: Config, 
     ) -> None:
         self.vae = vae
         self.rnn = rnn
         self.optim = optim
-        self.train_set = train_set
-        self.validate_set = validate_set
+        self.train_videos = train_videos
+        self.train_traj = train_traj
+        self.validate_videos = validate_videos
+        self.validate_traj = validate_traj
 
         self.config = config
         self.experiment_path = renderExperimentPath(
@@ -74,7 +78,8 @@ class Trainer:
             oneEpoch(
                 profiler, 
                 self.epoch, self.vae, self.rnn, self.optim, 
-                self.train_set, self.validate_set, 
+                self.train_videos, self.validate_videos, 
+                self.train_traj, self.validate_traj, 
                 self.lossLogger, self.config, *self.config, 
             )
             if self.epoch % EPOCH_INTERVAL == 0:
@@ -93,10 +98,10 @@ def main():
         shutil.rmtree(EXPERIMENTS_PATH)
     except FileNotFoundError:
         pass
-    train_set    = loadDataset(
+    train_videos   , train_traj    = loadDataset(
         TRAIN_PATH,       TRAIN_SET_SIZE, DEVICE, 
     )
-    validate_set = loadDataset(
+    validate_videos, validate_traj = loadDataset(
         VALIDATE_PATH, VALIDATE_SET_SIZE, DEVICE, 
     )
     assert TRAIN_SET_SIZE % BATCH_SIZE == 0
@@ -111,12 +116,15 @@ def main():
                 ], lr=config.lr, 
             )
             trainers.append(Trainer(
-                vae, rnn, optim, train_set, validate_set, 
+                vae, rnn, optim, 
+                train_videos, validate_videos, 
+                train_traj, validate_traj, 
                 rand_init_i, config, 
             ))
     profiler = StreamProfiler(
         DO_PROFILE=False, filename='profiler.log', 
     )
+    print('Training starts...', flush=True)
     for i in roundRobinSched(len(trainers)):
         trainer: Trainer = trainers[i]
         # print(trainer.config)
@@ -124,15 +132,15 @@ def main():
         if trainer.epoch % EPOCH_INTERVAL == 0:
             with torch.no_grad():
                 with trainer:
-                    for label, data_set in [
-                        ('train', train_set), 
-                        ('validate', validate_set), 
+                    for label, videos in [
+                        ('train', train_videos), 
+                        ('validate', validate_videos), 
                     ]:
                         evalGIFs(
                             trainer.epoch, 
                             trainer.vae, 
                             trainer.rnn, 
-                            data_set[:24, :, :, :, :], 
+                            videos[:24, :, :, :, :], 
                             trainer.config.rnn_min_context, 
                             label,
                         )

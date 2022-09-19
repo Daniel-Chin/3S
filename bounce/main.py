@@ -153,9 +153,9 @@ def evalGIFs(
     vae.eval()
     rnn.eval()
     predictions, reconstructions = oneBatch(
-        vae, rnn, dataset, 0, 0, 0, False, False, False, 
+        vae, rnn, dataset, None, 0, 0, 0, False, False, False, 
         -20, rnn_min_context, 0, 0, 0, 1, 0, F.mse_loss, 
-        0, 
+        0, False, 
         visualize=True, batch_size=n_datapoints, 
     )
     frames = []

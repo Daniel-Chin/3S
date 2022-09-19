@@ -54,7 +54,7 @@ def oneEpoch(
     variational_rnn, rnn_width, deep_spread, vae_channels, 
     vvrnn, vvrnn_static, rnn_min_context, z_pred_loss_coef, 
     T, R, TR, I, lr, do_residual, grad_clip, BCE_not_MSE, 
-    teacher_forcing_duration, 
+    teacher_forcing_duration, supervised_rnn, 
 ):
     profiler.gonna('pre')
     imgCriterion = config.imgCriterion
@@ -73,6 +73,10 @@ def oneEpoch(
             batch_pos : batch_pos + BATCH_SIZE, 
             :, :, :, :, 
         ]
+        traj_batch = train_traj[
+            batch_pos : batch_pos + BATCH_SIZE, 
+            :, :, 
+        ]
         batch_pos = (
             batch_pos + BATCH_SIZE
         ) % TRAIN_SET_SIZE
@@ -90,11 +94,12 @@ def oneEpoch(
             img_pred_loss, z_pred_loss, 
             rnn_stdnorm, 
         ) = oneBatch(
-            vae, rnn, video_batch, beta, 
+            vae, rnn, video_batch, traj_batch, beta, 
             vae_loss_coef, img_pred_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
             rnn_min_context, z_pred_loss_coef, 
             T, R, TR, I, imgCriterion, teacher_forcing_rate, 
+            supervised_rnn, 
         )
         
         profiler.gonna('bp')
@@ -122,11 +127,12 @@ def oneEpoch(
             validate_img_pred_loss, validate_z_pred_loss, 
             validate_rnn_std_norm, 
         ) = oneBatch(
-            vae, rnn, validate_videos, beta, 
+            vae, rnn, validate_videos, validate_traj, beta, 
             vae_loss_coef, img_pred_loss_coef, do_symmetry, 
             variational_rnn, vvrnn, vvrnn_static, 
             rnn_min_context, z_pred_loss_coef, 
             T, R, TR, I, imgCriterion, teacher_forcing_rate=0, 
+            supervised_rnn=supervised_rnn, 
         )
     lossLogger.eat(
         epoch, True, 
@@ -145,11 +151,12 @@ def oneEpoch(
     profiler.display()
 
 def oneBatch(
-    vae: VAE, rnn: RNN, video_batch: torch.Tensor, beta, 
+    vae: VAE, rnn: RNN, video_batch: torch.Tensor, 
+    traj_batch: torch.Tensor, beta, 
     vae_loss_coef, img_pred_loss_coef, do_symmetry, 
     variational_rnn, vvrnn, vvrnn_static, rnn_min_context, 
     z_pred_loss_coef, T, R, TR, I, imgCriterion, 
-    teacher_forcing_rate, 
+    teacher_forcing_rate, supervised_rnn, 
     visualize=False, batch_size = BATCH_SIZE, 
 ):
     flat_video_batch = video_batch.view(
@@ -183,9 +190,9 @@ def oneBatch(
     elif t == 'TR':
         trans, untrans = sampleTR(DEVICE)
     img_pred_loss, z_pred_loss, predictions = oneTrans(
-        vae, rnn, video_batch, 
+        vae, rnn, video_batch, traj_batch, 
         vvrnn, vvrnn_static, rnn_min_context, imgCriterion, 
-        teacher_forcing_rate, 
+        teacher_forcing_rate, supervised_rnn, 
         batch_size, 
         z, trans, untrans, 
     )
@@ -223,12 +230,15 @@ def getGradNorm(optim: torch.optim.Optimizer):
     return s ** .5
 
 def oneTrans(
-    vae: VAE, rnn: RNN, video_batch: torch.Tensor, 
+    vae: VAE, rnn: RNN, 
+    video_batch: torch.Tensor, traj_batch: torch.Tensor, 
     vvrnn, vvrnn_static, rnn_min_context, imgCriterion, 
-    teacher_forcing_rate, 
+    teacher_forcing_rate, supervised_rnn, 
     batch_size, 
     z, trans, untrans, 
 ):
+    if supervised_rnn:
+        z = traj_batch
     z_hat_transed = torch.zeros((
         batch_size, SEQ_LEN - rnn_min_context, LATENT_DIM, 
     )).to(DEVICE)

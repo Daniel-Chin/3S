@@ -123,27 +123,28 @@ def main():
             ))
     profiler = StreamProfiler(
         DO_PROFILE=False, filename='profiler.log', 
-    )
+    )   # Obselete, since we are scheduling multiple trainers. 
     print('Training starts...', flush=True)
     for i in roundRobinSched(len(trainers)):
         trainer: Trainer = trainers[i]
         # print(trainer.config)
         trainer.oneEpoch(profiler)
         if trainer.epoch % EPOCH_INTERVAL == 0:
-            with torch.no_grad():
-                with trainer:
-                    for label, videos in [
-                        ('train', train_videos), 
-                        ('validate', validate_videos), 
-                    ]:
-                        evalGIFs(
-                            trainer.epoch, 
-                            trainer.vae, 
-                            trainer.rnn, 
-                            videos[:24, :, :, :, :], 
-                            trainer.config.rnn_min_context, 
-                            label,
-                        )
+            if trainer.config.vae_loss_coef != 0:
+                with torch.no_grad():
+                    with trainer:
+                        for label, videos in [
+                            ('train', train_videos), 
+                            ('validate', validate_videos), 
+                        ]:
+                            evalGIFs(
+                                trainer.epoch, 
+                                trainer.vae, 
+                                trainer.rnn, 
+                                videos[:24, :, :, :, :], 
+                                trainer.config.rnn_min_context, 
+                                label,
+                            )
 
 def evalGIFs(
     epoch, vae: VAE, rnn: RNN, dataset: torch.Tensor, 

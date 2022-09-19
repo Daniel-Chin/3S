@@ -132,7 +132,7 @@ def oneEpoch(
             supervised_rnn=supervised_rnn, 
         )
     lossLogger.eat(
-        epoch, True, 
+        epoch, False, 
         train____recon__loss=epoch_recon__loss, 
         validate_recon__loss=validate_recon__loss, 
         train____kld____loss=epoch_kld____loss, 
@@ -146,6 +146,8 @@ def oneEpoch(
         grad_norm=grad_norm, 
     )
     profiler.display()
+    if epoch % 8 == 0:
+        print('epoch', epoch, '  ', flush=True)
 
 def oneBatch(
     vae: VAE, rnn: RNN, video_batch: torch.Tensor, 

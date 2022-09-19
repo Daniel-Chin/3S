@@ -77,9 +77,6 @@ def oneEpoch(
             batch_pos : batch_pos + BATCH_SIZE, 
             :, :, 
         ]
-        batch_pos = (
-            batch_pos + BATCH_SIZE
-        ) % TRAIN_SET_SIZE
         try:
             teacher_forcing_rate = 1 - min(
                 1, epoch / teacher_forcing_duration, 

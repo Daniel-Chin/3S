@@ -26,6 +26,7 @@ class Config:
         'lr', 'residual', 'grad_clip', 
         'BCE_not_MSE', 'teacher_forcing_duration', 
         'supervised_rnn', 'skip_vae', 'supervised_vae', 
+        'vae_supervision_loss_coef', 
     ]
     defaults=[
         Constant(1e-5), 1, 1, 
@@ -35,7 +36,8 @@ class Config:
         0, 0, 1, 0, 
         0.001, True, 1, 
         False, 0, 
-        False, 
+        False, False, False, 
+        0, 
     ]
     def __init__(self, *a, **kw):
         for k, v in zip(self.keys, self.defaults):

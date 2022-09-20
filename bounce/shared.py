@@ -25,7 +25,7 @@ class Config:
         'T', 'R', 'TR', 'I', 
         'lr', 'residual', 'grad_clip', 
         'BCE_not_MSE', 'teacher_forcing_duration', 
-        'supervised_rnn', 
+        'supervised_rnn', 'skip_vae', 'supervised_vae', 
     ]
     defaults=[
         Constant(1e-5), 1, 1, 
@@ -53,13 +53,12 @@ class Config:
                 self.prefix_len += 1
             self.__setattr__(k, v)
         
-        do_symmetry = self.T + self.R + self.TR > 0
-        assert self.do_symmetry == do_symmetry
-
         if self.BCE_not_MSE:
             self.imgCriterion = torch.nn.BCELoss()
         else:
             self.imgCriterion = F.mse_loss
+        
+        self.assertValid()
     
     def getPrefix(self):
         return [
@@ -76,6 +75,18 @@ class Config:
     def __iter__(self):
         for k in self.keys:
             yield self.__getattribute__(k)
+    
+    def assertValid(self):
+        do_symmetry = self.T + self.R + self.TR > 0
+        assert self.do_symmetry == do_symmetry
+
+        if self.skip_vae:
+            assert not self.supervised_vae
+            assert self.vae_loss_coef == 0
+            assert self.img_pred_loss_coef == 0
+        
+        if self.supervised_rnn:
+            assert self.z_pred_loss_coef != 0
 
 def torch2PIL(torchImg: torch.Tensor):
     return Image.fromarray((

@@ -55,6 +55,7 @@ def oneEpoch(
     vvrnn, vvrnn_static, rnn_min_context, z_pred_loss_coef, 
     T, R, TR, I, lr, do_residual, grad_clip, BCE_not_MSE, 
     teacher_forcing_duration, supervised_rnn, 
+    skip_vae, supervised_vae, 
 ):
     profiler.gonna('pre')
     imgCriterion = config.imgCriterion
@@ -96,7 +97,7 @@ def oneEpoch(
             variational_rnn, vvrnn, vvrnn_static, 
             rnn_min_context, z_pred_loss_coef, 
             T, R, TR, I, imgCriterion, teacher_forcing_rate, 
-            supervised_rnn, 
+            supervised_rnn, skip_vae, supervised_vae, 
         )
         
         profiler.gonna('bp')
@@ -130,6 +131,7 @@ def oneEpoch(
             rnn_min_context, z_pred_loss_coef, 
             T, R, TR, I, imgCriterion, teacher_forcing_rate=0, 
             supervised_rnn=supervised_rnn, 
+            skip_vae=skip_vae, supervised_vae=supervised_vae, 
         )
     lossLogger.eat(
         epoch, False, 
@@ -156,12 +158,13 @@ def oneBatch(
     variational_rnn, vvrnn, vvrnn_static, rnn_min_context, 
     z_pred_loss_coef, T, R, TR, I, imgCriterion, 
     teacher_forcing_rate, supervised_rnn, 
+    skip_vae, supervised_vae, 
     visualize=False, batch_size = BATCH_SIZE, 
 ):
     flat_video_batch = video_batch.view(
         batch_size * SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
     )
-    if vae_loss_coef == 0:
+    if skip_vae:
         vae_loss, recon_loss, kld_loss = 0, 0, 0
         log_var = torch.tensor(0)
         z = None

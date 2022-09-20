@@ -130,7 +130,7 @@ def main():
         # print(trainer.config)
         trainer.oneEpoch(profiler)
         if trainer.epoch % EPOCH_INTERVAL == 0:
-            if trainer.config.vae_loss_coef != 0:
+            if not trainer.config.skip_vae:
                 with torch.no_grad():
                     with trainer:
                         for label, videos in [
@@ -154,7 +154,7 @@ def evalGIFs(
     vae.eval()
     rnn.eval()
     predictions, reconstructions = oneBatch(
-        vae, rnn, dataset, None, 0, 0, 0, False, False, False, 
+        vae, rnn, dataset, None, 0, 1, 1, False, False, False, 
         -20, rnn_min_context, 0, 0, 0, 1, 0, F.mse_loss, 
         0, False, False, False, 0, 
         visualize=True, batch_size=n_datapoints, 

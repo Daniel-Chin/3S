@@ -34,7 +34,7 @@ class Config:
         False, [16, 32, 64], False, -5, 
         7, 0.005, 
         0, 0, 1, 0, 
-        0.001, True, 1, 
+        0.001, True, .03, 
         False, 0, 
         False, False, False, 
         0, 
@@ -92,6 +92,11 @@ class Config:
         
         assert self.supervised_vae == (
             self.vae_supervision_loss_coef != 0
+        )
+
+        assert not (
+            self.supervised_vae and 
+            self.vae_loss_coef != 0
         )
 
 def torch2PIL(torchImg: torch.Tensor):

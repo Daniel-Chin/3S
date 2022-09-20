@@ -171,18 +171,32 @@ def oneBatch(
         log_var = torch.tensor(0)
         z = None
     else:
-        reconstructions, mu, log_var, z_flat = vae.forward(
-            flat_video_batch, 
-        )
-        vae_loss, recon_loss, kld_loss = vae.computeLoss(
-            flat_video_batch, reconstructions, mu, log_var, beta, 
-        )
-
-        if not variational_rnn:
-            z_flat = mu
-        z: torch.Tensor = z_flat.view(
-            batch_size, SEQ_LEN, LATENT_DIM, 
-        )
+        if vae_loss_coef == 0:
+            vae_loss, recon_loss, kld_loss = 0, 0, 0
+            log_var = torch.tensor(0)
+            z = None
+        else:
+            reconstructions, mu, log_var, z_flat = vae.forward(
+                flat_video_batch, 
+            )
+            vae_loss, recon_loss, kld_loss = vae.computeLoss(
+                flat_video_batch, reconstructions, mu, log_var, beta, 
+            )
+            
+            if not variational_rnn:
+                z_flat = mu
+            z: torch.Tensor = z_flat.view(
+                batch_size, SEQ_LEN, LATENT_DIM, 
+            )
+        if supervised_vae:
+            mu, _ = vae.encode(flat_video_batch)
+            vae_supervision_loss = F.mse_loss(
+                mu, traj_batch.view(batch_size * SEQ_LEN, SPACE_DIM), 
+            )
+            reconstructions = vae.decode(mu)
+            vae_supervision_loss += imgCriterion(
+                reconstructions, flat_video_batch, 
+            )
 
     t = random.choice(
         ['I' ] * I + 
@@ -214,6 +228,8 @@ def oneBatch(
         img_pred_loss * img_pred_loss_coef + 
         z_pred_loss   * z_pred_loss_coef
     )
+    if supervised_vae:
+        total_loss += vae_supervision_loss * vae_supervision_loss_coef
 
     if visualize:
         return predictions, reconstructions.view(

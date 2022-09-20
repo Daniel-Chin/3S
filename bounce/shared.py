@@ -89,6 +89,10 @@ class Config:
         
         if self.supervised_rnn:
             assert self.z_pred_loss_coef != 0
+        
+        assert self.supervised_vae == (
+            self.vae_supervision_loss_coef != 0
+        )
 
 def torch2PIL(torchImg: torch.Tensor):
     return Image.fromarray((

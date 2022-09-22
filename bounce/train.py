@@ -68,6 +68,8 @@ def oneEpoch(
     epoch_img_pred_loss = 0
     epoch_z_pred_loss = 0
     epoch_rnn_stdnorm = 0
+    epoch_vae_en_sup_loss = 0
+    epoch_vae_de_sup_loss = 0
     for batch_pos in range(0, TRAIN_SET_SIZE, BATCH_SIZE):
         profiler.gonna('b_pre')
         video_batch = train_videos[
@@ -90,6 +92,7 @@ def oneEpoch(
         (
             total_loss, recon_loss, kld_loss, 
             img_pred_loss, z_pred_loss, 
+            vae_en_sup_loss, vae_de_sup_loss, 
             rnn_stdnorm, 
         ) = oneBatch(
             vae, rnn, video_batch, traj_batch, beta, 
@@ -114,6 +117,8 @@ def oneEpoch(
         epoch_kld____loss +=   kld_loss / n_batches
         epoch_img_pred_loss += img_pred_loss / n_batches
         epoch_z_pred_loss += z_pred_loss / n_batches
+        epoch_vae_en_sup_loss += vae_en_sup_loss / n_batches
+        epoch_vae_de_sup_loss += vae_de_sup_loss / n_batches
         epoch_rnn_stdnorm += rnn_stdnorm / n_batches
 
     profiler.gonna('ev')
@@ -124,6 +129,7 @@ def oneEpoch(
             _, validate_recon__loss, 
             validate_kld____loss, 
             validate_img_pred_loss, validate_z_pred_loss, 
+            validate_vae_en_sup_loss, validate_vae_de_sup_loss, 
             validate_rnn_std_norm, 
         ) = oneBatch(
             vae, rnn, validate_videos, validate_traj, beta, 
@@ -147,6 +153,10 @@ def oneEpoch(
         validate_z_pred_loss=validate_z_pred_loss, 
         # train____rnn_std_norm=epoch_rnn_stdnorm, 
         # validate_rnn_std_norm=validate_rnn_std_norm, 
+        train_vae_en_sup_loss=epoch_vae_en_sup_loss, 
+        validate_vae_en_sup_loss=validate_vae_en_sup_loss, 
+        train_vae_de_sup_loss=epoch_vae_de_sup_loss, 
+        validate_vae_de_sup_loss=validate_vae_de_sup_loss, 
         grad_norm=grad_norm, 
     )
     profiler.display()
@@ -166,6 +176,7 @@ def oneBatch(
     flat_video_batch = video_batch.view(
         batch_size * SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
     )
+    vae_en_sup_loss, vae_de_sup_loss = 0, 0
     if skip_vae:
         vae_loss, recon_loss, kld_loss = 0, 0, 0
         log_var = torch.tensor(0)
@@ -190,13 +201,17 @@ def oneBatch(
             )
         if supervised_vae:
             mu, _ = vae.encode(flat_video_batch)
-            vae_supervision_loss = F.mse_loss(
-                mu, traj_batch.view(batch_size * SEQ_LEN, SPACE_DIM), 
+            flat_traj_batch = traj_batch.view(
+                batch_size * SEQ_LEN, SPACE_DIM, 
             )
-            reconstructions = vae.decode(mu)
-            vae_supervision_loss += imgCriterion(
+            vae_en_sup_loss = F.mse_loss(
+                mu, flat_traj_batch, 
+            )
+            reconstructions = vae.decode(flat_traj_batch)
+            vae_de_sup_loss = imgCriterion(
                 reconstructions, flat_video_batch, 
             )
+            vae_supervision_loss = vae_en_sup_loss + vae_de_sup_loss
 
     t = random.choice(
         ['I' ] * I + 
@@ -239,6 +254,7 @@ def oneBatch(
         return (
             total_loss, recon_loss, kld_loss, 
             img_pred_loss, z_pred_loss, 
+            vae_en_sup_loss, vae_de_sup_loss, 
             torch.exp(0.5 * log_var).norm(2) / batch_size, 
         )
 

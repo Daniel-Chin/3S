@@ -2,7 +2,7 @@ from torchWork import *
 AbstractLossNode = loss_tree.AbstractLossNode
 
 def main():
-    absLossRoot = AbstractLossNode('total_loss', [
+    absLossRoot = AbstractLossNode('loss_root', [
         'self_recon', 
         'kld', 
         AbstractLossNode('predict', [

@@ -7,23 +7,23 @@ assert LATENT_DIM == 3
 
 def sampleTranslate(device, std=1):
     '''
-    The first dimension is the spatial coordinates. 
-    e.g. input is shape (3, 100). 
+    The second dimension is the spatial coordinates. 
+    e.g. input is shape (100, 3). 
     '''
     translate   = (torch.randn((3, 1)) * std).to(
         device, 
     )
     translate[2] = 0
     def transform(x):
-        return x + translate
+        return (x.T + translate).T
     def untransform(x):
-        return x - translate
+        return (x.T - translate).T
     return transform, untransform
 
 def sampleRotate(device):
     '''
-    The first dimension is the spatial coordinates. 
-    e.g. input is shape (3, 100). 
+    The second dimension is the spatial coordinates. 
+    e.g. input is shape (100, 3). 
     '''
     theta = np.random.uniform(0, 2 * np.pi)
     c = np.cos(theta)
@@ -35,15 +35,15 @@ def sampleRotate(device):
         [c, -s, 0], [s, c, 0], [0, 0, 1], 
     ]).T.to(device)
     def transform(x):
-        return rotate @ x
+        return (rotate @ x.T).T
     def untransform(x):
-        return unrotate @ x
+        return (unrotate @ x.T).T
     return transform, untransform
 
 def sampleTR(device, translate_std=1):
     '''
-    The first dimension is the spatial coordinates. 
-    e.g. input is shape (3, 100). 
+    The second dimension is the spatial coordinates. 
+    e.g. input is shape (100, 3). 
     '''
     t, unt = sampleTranslate(device, translate_std)
     r, unr = sampleRotate(device)
@@ -57,7 +57,7 @@ def identity(x):
     return x
 
 def test(size=100):
-    points = torch.randn((3, size))
+    points = torch.randn((size, 3))
     trans, untrans = sampleTR(torch.device("cpu"))
     poof = trans(points)
     print('trans untrans', (points - untrans(poof)).norm(2))
@@ -71,12 +71,12 @@ def test(size=100):
         b = (random() - .5) * 2
         X = torch.linspace(-2, 2, n_points)
         Y = k * X + b
-        points = torch.zeros((3, n_points))
-        points[0, :] = X
-        points[1, :] = Y
+        points = torch.zeros((n_points, 3))
+        points[:, 0] = X
+        points[:, 1] = Y
         poof = trans(points)
         plt.scatter(X, Y, c='b')
-        plt.scatter(poof[0, :], poof[1, :], c='r')
+        plt.scatter(poof[:, 0], poof[:, 1], c='r')
         plt.axis('equal')
         plt.show()
 

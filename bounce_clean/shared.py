@@ -16,6 +16,7 @@ RESOLUTION = 32
 IMG_N_CHANNELS = 3
 SPACE_DIM = 3
 LATENT_DIM = 3
+ENTIRE_DATASET_IN_DEVICE = True
 
 class HyperParams(BaseHyperParams):
     def __init__(self) -> None:
@@ -39,6 +40,7 @@ class HyperParams(BaseHyperParams):
         self.deep_spread: bool = None
 
         self.lr: float = None
+        self.batch_size: int = None
         self.grad_clip: Optional[float] = None
 
         self.image_loss: str = None
@@ -60,6 +62,14 @@ class HyperParams(BaseHyperParams):
             'mse': F.mse_loss, 
             'bce': torch.nn.BCELoss(), 
         }[self.image_loss]
+    
+    def getTeacherForcingRate(self, epoch):
+        try:
+            return 1 - min(
+                1, epoch / self.teacher_forcing_duration, 
+            )
+        except ZeroDivisionError:
+            return 0
 
 def torch2PIL(torchImg: torch.Tensor):
     return Image.fromarray((

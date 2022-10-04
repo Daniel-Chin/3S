@@ -1,0 +1,7 @@
+dataset/
+*.pyc
+*.log
+*.mp4
+*.gif
+*.ttf
+losses.py

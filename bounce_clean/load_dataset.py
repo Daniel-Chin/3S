@@ -13,7 +13,7 @@ from shared import (
 )
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, dataset_path, size) -> None:
+    def __init__(self, dataset_path, size, device=None) -> None:
         super().__init__()
 
         prev_cwd = os.getcwd()
@@ -48,6 +48,10 @@ class Dataset(torch.utils.data.Dataset):
                         data_i, t, c, :, :
                     ] = torchImg[:, :, c]
         os.chdir(prev_cwd)
+
+        if device is not None:
+            video_set = video_set.to(device)
+            label_set = label_set.to(device)
 
         self.size = size
         self.video_set = video_set

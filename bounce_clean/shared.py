@@ -9,6 +9,7 @@ from torchWork import *
 
 TRAIN_PATH    = './dataset/train'
 VALIDATE_PATH = './dataset/validate'
+VALIDATE_SET_SIZE = 64
 TRAJ_FILENAME = 'trajectory.pickle'
 SEQ_LEN = 20
 RESOLUTION = 32
@@ -44,6 +45,8 @@ class HyperParams(BaseHyperParams):
         self.teacher_forcing_duration: int = None
 
         self.imgCriterion: str = None
+
+        self.train_set_size: int = None
     
     def ready(self):
         assert self.supervise_rnn == (

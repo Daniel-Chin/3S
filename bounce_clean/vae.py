@@ -120,9 +120,3 @@ class VAE(nn.Module):
         t = self.decoder(t)
         t = self.finalLayer(t)
         return t
-        
-    def forward(self, x):
-        mu, log_var = self.encode(x)
-        z = reparameterize(mu, log_var)
-        reconstructions = self.decode(z)
-        return reconstructions, mu, log_var, z

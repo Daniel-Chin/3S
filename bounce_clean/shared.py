@@ -20,30 +20,30 @@ class HyperParams(BaseHyperParams):
     def __init__(self) -> None:
         super().__init__()
 
-        self.I = None
-        self.T = None
-        self.R = None
-        self.TR = None
+        self.I: int = None
+        self.T: int = None
+        self.R: int = None
+        self.TR: int = None
         self.supervise_rnn: bool = None
         self.supervise_vae: bool = None
 
         self.variational_rnn: bool = None
         self.vvrnn: bool = None
         self.vvrnn_static: float = None
-        self.rnn_min_context = None
+        self.rnn_min_context: int = None
 
-        self.rnn_width = None
+        self.rnn_width: int = None
+        self.residual: bool = None
         self.vae_channels: List[int] = None
         self.deep_spread: bool = None
-        self.residual: bool = None
 
-        self.lr = None
+        self.lr: float = None
         self.grad_clip: Optional[float] = None
 
         self.image_loss: str = None
-        self.teacher_forcing_duration = None
+        self.teacher_forcing_duration: int = None
 
-        self.imgCriterion = None
+        self.imgCriterion: str = None
     
     def ready(self):
         assert self.supervise_rnn == (

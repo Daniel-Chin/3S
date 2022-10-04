@@ -8,7 +8,7 @@ from matplotlib.colors import hsv_to_rgb
 
 from shared import *
 
-EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/loss_weight_5'
+EXP_PATH = 'C:/Users/iGlop/d/symmetry/danRepo/bounce/results/supervise'
 
 AVERAGE_OVER = 300
 START = 20
@@ -21,6 +21,10 @@ validate_kld____loss = 'validate_kld____loss'
 train____img_pred_loss = 'train____img_pred_loss'
 validate_img_pred_loss = 'validate_img_pred_loss'
 validate_z_pred_loss = 'validate_z_pred_loss'
+train_vae_en_sup_loss = 'train_vae_en_sup_loss'
+validate_vae_en_sup_loss = 'validate_vae_en_sup_loss'
+train_vae_de_sup_loss = 'train_vae_de_sup_loss'
+validate_vae_de_sup_loss = 'validate_vae_de_sup_loss'
 MAP = [
     None, 
     train____recon__loss, 
@@ -31,6 +35,10 @@ MAP = [
     validate_img_pred_loss, 
     None, 
     validate_z_pred_loss, 
+    train_vae_en_sup_loss, 
+    validate_vae_en_sup_loss, 
+    train_vae_de_sup_loss, 
+    validate_vae_de_sup_loss, 
     None, 
 ]
 MAP_LEN = len(MAP)

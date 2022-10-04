@@ -27,17 +27,15 @@ class RNN(nn.Module):
     def zeroHidden(self, batch_size, device):
         self.hidden = torch.zeros((
             batch_size, self.hParams.rnn_width, 
-        )).to(device)
+        ), device=device)
     
-    def stepTime(self, z: torch.Tensor, time: int, trans):
+    def stepTime(self, z_t: torch.Tensor):
         '''
         `z` is (BATCH_SIZE, SEQ_LEN, LATENT_DIM). 
         '''
-        output = self.updateHidden(
-            torch.cat((self.hidden, trans(
-                z[:, time, :].T, 
-            ).T), dim=1)
-        )
+        output = self.updateHidden(torch.cat((
+            self.hidden, z_t, 
+        ), dim=1))
         if self.hParams.residual:
             self.hidden = self.hidden + output
         else:

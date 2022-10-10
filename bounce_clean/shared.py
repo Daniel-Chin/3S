@@ -34,7 +34,6 @@ SPACE_DIM = 3
 LATENT_DIM = 3
 ENTIRE_DATASET_IN_DEVICE = True
 EPOCH_INTERVAL = 2000
-EPOCH_INTERVAL = 1
 
 class HyperParams(BaseHyperParams):
     def __init__(self) -> None:

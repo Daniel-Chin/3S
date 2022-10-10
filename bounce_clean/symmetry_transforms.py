@@ -14,9 +14,9 @@ def sampleTranslate(device, std=1):
         device, 
     )
     translate[2] = 0
-    def transform(x):
+    def transform(x: torch.Tensor):
         return (x.T + translate).T
-    def untransform(x):
+    def untransform(x: torch.Tensor):
         return (x.T - translate).T
     return transform, untransform
 
@@ -34,9 +34,9 @@ def sampleRotate(device):
     unrotate = torch.Tensor([
         [c, -s, 0], [s, c, 0], [0, 0, 1], 
     ]).T.to(device)
-    def transform(x):
+    def transform(x: torch.Tensor):
         return (rotate @ x.T).T
-    def untransform(x):
+    def untransform(x: torch.Tensor):
         return (unrotate @ x.T).T
     return transform, untransform
 
@@ -47,9 +47,9 @@ def sampleTR(device, translate_std=1):
     '''
     t, unt = sampleTranslate(device, translate_std)
     r, unr = sampleRotate(device)
-    def transform(x):
+    def transform(x: torch.Tensor):
         return t(r(x))
-    def untransform(x):
+    def untransform(x: torch.Tensor):
         return unr(unt(x))
     return transform, untransform
 

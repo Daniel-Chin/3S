@@ -1,4 +1,20 @@
-from typing import List, Optional
+__all__ = [
+    'TRAIN_PATH', 
+    'VALIDATE_PATH', 
+    'VALIDATE_SET_SIZE', 
+    'TRAJ_FILENAME', 
+    'SEQ_LEN', 
+    'RESOLUTION', 
+    'IMG_N_CHANNELS', 
+    'SPACE_DIM', 
+    'LATENT_DIM', 
+    'ENTIRE_DATASET_IN_DEVICE', 
+    'EPOCH_INTERVAL', 
+    
+    'HyperParams', 'torch2PIL', 'reparameterize', 
+]
+
+from typing import Callable, List, Optional
 
 import numpy as np
 import torch
@@ -17,6 +33,8 @@ IMG_N_CHANNELS = 3
 SPACE_DIM = 3
 LATENT_DIM = 3
 ENTIRE_DATASET_IN_DEVICE = True
+EPOCH_INTERVAL = 2000
+EPOCH_INTERVAL = 1
 
 class HyperParams(BaseHyperParams):
     def __init__(self) -> None:
@@ -39,16 +57,16 @@ class HyperParams(BaseHyperParams):
         self.vae_channels: List[int] = None
         self.deep_spread: bool = None
 
-        self.lr: float = None
         self.batch_size: int = None
         self.grad_clip: Optional[float] = None
+        self.optim_name: str = None
 
         self.image_loss: str = None
         self.teacher_forcing_duration: int = None
 
-        self.imgCriterion: str = None
-
         self.train_set_size: int = None
+
+        self.imgCriterion: Callable = None
     
     def ready(self):
         assert self.supervise_rnn == (
@@ -58,10 +76,17 @@ class HyperParams(BaseHyperParams):
             self.lossWeightTree['supervise']['vae']['encode'].weight != 0 or
             self.lossWeightTree['supervise']['vae']['decode'].weight != 0
         )
+        assert self.vvrnn == (self.vvrnn_static is None)
+        assert self.supervise_rnn == (
+            self.lossWeightTree['predict']['z'].weight == 0
+        )
         self.imgCriterion = {
             'mse': F.mse_loss, 
             'bce': torch.nn.BCELoss(), 
         }[self.image_loss]
+        self.OptimClass = {
+            'adam': torch.optim.Adam, 
+        }[self.optim_name]
     
     def getTeacherForcingRate(self, epoch):
         try:

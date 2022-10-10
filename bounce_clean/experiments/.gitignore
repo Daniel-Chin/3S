@@ -1,0 +1,3 @@
+*.torchworklosslog
+*.pt
+*.gif

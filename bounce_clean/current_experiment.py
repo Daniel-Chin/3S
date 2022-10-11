@@ -1,4 +1,4 @@
-from torchWork import LossWeightTree, ExperimentGroup
+from torchWork import LossWeightTree, ExperimentGroup, DEVICE
 
 from shared import *
 
@@ -30,7 +30,7 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
             LossWeightTree('decode', 1, None), 
         ]), 
     ]), 
-])
+]).to(DEVICE)
 hP.lr = 0.001
 hP.I = 1
 hP.T = 0
@@ -70,7 +70,7 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
             LossWeightTree('decode', 1, None), 
         ]), 
     ]), 
-])
+]).to(DEVICE)
 hP.lr = 0.001
 hP.I = 1
 hP.T = 0
@@ -110,7 +110,7 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
             LossWeightTree('decode', 1, None), 
         ]), 
     ]), 
-])
+]).to(DEVICE)
 hP.lr = 0.001
 hP.I = 1
 hP.T = 0

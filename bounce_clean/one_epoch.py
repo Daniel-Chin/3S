@@ -16,7 +16,7 @@ def dataLoader(dataset, batch_size, set_size=None):
     n_batches = None
     if set_size is not None:
         if set_size % batch_size:
-            assert batch_size < set_size
+            assert set_size < batch_size
             batch_size = set_size
         n_batches = set_size // batch_size
     batch_i = 0

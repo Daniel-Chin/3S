@@ -20,7 +20,7 @@ def forward(
     profiler: torchWork.Profiler, 
     require_img_predictions: bool = True, 
 ):
-    batch_size = hParams.batch_size
+    batch_size = video_batch.shape[0]
     lossTree = Loss_root()
 
     # remove time axis

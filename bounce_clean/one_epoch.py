@@ -27,21 +27,22 @@ def dataLoader(dataset, batch_size, set_size=None):
             return
 
 def oneEpoch(
-    epoch, hParams: HyperParams, 
+    group_name: str, epoch: int, hParams: HyperParams, 
     models, optim: torch.optim.Optimizer, 
     trainSet, validateSet, 
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, 
 ):
-    vae: VAE = models['vae']
-    rnn: RNN = models['rnn']
+    with profiler('load'):
+        vae: VAE = models['vae']
+        rnn: RNN = models['rnn']
 
-    trainLoader    = dataLoader(
-        trainSet,    hParams.batch_size, hParams.train_set_size, 
-    )
-    validateLoader = dataLoader(
-        validateSet, hParams.batch_size, 
-    )
+        trainLoader    = dataLoader(
+            trainSet,    hParams.batch_size, hParams.train_set_size, 
+        )
+        validateLoader = dataLoader(
+            validateSet, hParams.batch_size, 
+        )
 
     vae.train()
     rnn.train()
@@ -62,10 +63,11 @@ def oneEpoch(
         with profiler('good'):
             optim.zero_grad()
             total_loss.backward()
-        grad_norm = getGradNorm(optim)
-        torch.nn.utils.clip_grad_norm_(
-            getParams(optim), hParams.grad_clip, 
-        )
+        with profiler('grad clip'):
+            grad_norm = getGradNorm(optim)
+            torch.nn.utils.clip_grad_norm_(
+                getParams(optim), hParams.grad_clip, 
+            )
         with profiler('good'):
             optim.step()
         with profiler('log'):
@@ -113,7 +115,7 @@ def oneEpoch(
                         reconstructions, img_predictions, 
                     )
     
-    print('epoch', epoch, 'finished.', flush=True)
+    print(group_name, 'epoch', epoch, 'finished.', flush=True)
     profiler.report()
 
 def evalGIFs(

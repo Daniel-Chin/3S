@@ -15,4 +15,5 @@
 module purge
 module load miniconda
 source activate danielTorch
-python ../main.py
+cd ..
+python main.py

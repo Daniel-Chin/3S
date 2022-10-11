@@ -80,7 +80,7 @@ def oneEpoch(
                     ('grad_norm', grad_norm), 
                     *extra_logs, 
                 ], 
-                profiler, 
+                # profiler, 
             )
 
     vae.eval()
@@ -104,7 +104,7 @@ def oneEpoch(
                         ('grad_norm', 0), 
                         *extra_logs, 
                     ], 
-                    profiler, 
+                    # profiler, 
                 )
 
         with profiler('gif'):

@@ -48,30 +48,34 @@ def oneEpoch(
     for batch_i, (video_batch, traj_batch) in enumerate(
         trainLoader, 
     ):
-        (
-            lossTree, reconstructions, img_predictions, 
-            extra_logs, 
-        ) = forward(
-            epoch, hParams, video_batch, traj_batch, 
-            vae, rnn, profiler, False, 
-        )
+        with profiler('train'):
+            (
+                lossTree, reconstructions, img_predictions, 
+                extra_logs, 
+            ) = forward(
+                epoch, hParams, video_batch, traj_batch, 
+                vae, rnn, profiler, False, 
+            )
         total_loss = lossTree.sum(
             hParams.lossWeightTree, epoch, 
         )
-        optim.zero_grad()
-        total_loss.backward()
+        with profiler('good'):
+            optim.zero_grad()
+            total_loss.backward()
         grad_norm = getGradNorm(optim)
         torch.nn.utils.clip_grad_norm_(
             getParams(optim), hParams.grad_clip, 
         )
-        optim.step()
-        lossLogger.eat(
-            epoch, batch_i, True, 
-            lossTree, hParams.lossWeightTree, [
-                ('grad_norm', grad_norm), 
-                *extra_logs, 
-            ], 
-        )
+        with profiler('good'):
+            optim.step()
+        with profiler('log'):
+            lossLogger.eat(
+                epoch, batch_i, True, 
+                lossTree, hParams.lossWeightTree, [
+                    ('grad_norm', grad_norm), 
+                    *extra_logs, 
+                ], 
+            )
 
     vae.eval()
     rnn.eval()
@@ -79,32 +83,35 @@ def oneEpoch(
         for batch_i, (video_batch, traj_batch) in enumerate(
             validateLoader, 
         ):
-            (
-                lossTree, reconstructions, img_predictions, 
-                extra_logs, 
-            ) = forward(
-                epoch, hParams, video_batch, traj_batch, 
-                vae, rnn, profiler, True, 
-            )
-            lossLogger.eat(
-                epoch, batch_i, False, 
-                lossTree, hParams.lossWeightTree, [
-                    ('grad_norm', 0), 
-                    *extra_logs, 
-                ], 
-            )
-
-        if epoch % EPOCH_INTERVAL == 0:
-            for name, dataset in [
-                ('train', trainSet), 
-                ('validate', validateSet), 
-            ]:
-                loader = dataLoader(dataset, 24)
-                evalGIFs(
-                    epoch, next(loader)[0], save_path, 
-                    hParams.rnn_min_context, name,
-                    reconstructions, img_predictions, 
+            with profiler('validate'):
+                (
+                    lossTree, reconstructions, img_predictions, 
+                    extra_logs, 
+                ) = forward(
+                    epoch, hParams, video_batch, traj_batch, 
+                    vae, rnn, profiler, True, 
                 )
+            with profiler('log'):
+                lossLogger.eat(
+                    epoch, batch_i, False, 
+                    lossTree, hParams.lossWeightTree, [
+                        ('grad_norm', 0), 
+                        *extra_logs, 
+                    ], 
+                )
+
+        with profiler('gif'):
+            if epoch % EPOCH_INTERVAL == 0:
+                for name, dataset in [
+                    ('train', trainSet), 
+                    ('validate', validateSet), 
+                ]:
+                    loader = dataLoader(dataset, 24)
+                    evalGIFs(
+                        epoch, next(loader)[0], save_path, 
+                        hParams.rnn_min_context, name,
+                        reconstructions, img_predictions, 
+                    )
     
     print('epoch', epoch, 'finished.', flush=True)
     profiler.report()

@@ -32,7 +32,7 @@ def forward(
     )
 
     # vae forward pass
-    with profiler.goodTime():
+    with profiler('good'):
         mu, log_var = vae.encode(flat_video_batch)
         flat_z = reparameterize(mu, log_var)
         reconstructions = vae.decode(flat_z)
@@ -47,7 +47,7 @@ def forward(
         lossTree.supervise.vae.encode = F.mse_loss(
             mu, flat_traj_batch, 
         )
-        with profiler.goodTime():
+        with profiler('good'):
             synthesis = vae.decode(flat_traj_batch)
             lossTree.supervise.vae.decode = hParams.imgCriterion(
                 synthesis, flat_video_batch, 
@@ -95,7 +95,7 @@ def forward(
     if hParams.vvrnn_static is not None:
         log_var *= hParams.vvrnn_static
     rnn.zeroHidden(batch_size, DEVICE)
-    with profiler.goodTime():
+    with profiler('good'):
         for global_t in range(min_context):
             rnn.stepTime(z_transed[:, global_t, :])
         for global_t in range(min_context, SEQ_LEN):
@@ -121,13 +121,13 @@ def forward(
             IMG_N_CHANNELS, 
         ))
     else:
-        with profiler.goodTime():
+        with profiler('good'):
             flat_predictions = vae.decode(r_flat_z_hat)
         img_predictions = flat_predictions.view(
             batch_size, SEQ_LEN - min_context, 
             IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
         )
-        with profiler.goodTime():
+        with profiler('good'):
             lossTree.predict.image = hParams.imgCriterion(
                 img_predictions, 
                 video_batch[:, min_context:, :, :, :], 

@@ -33,16 +33,15 @@ def oneEpoch(
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, 
 ):
-    with profiler('load'):
-        vae: VAE = models['vae']
-        rnn: RNN = models['rnn']
+    vae: VAE = models['vae']
+    rnn: RNN = models['rnn']
 
-        trainLoader    = dataLoader(
-            trainSet,    hParams.batch_size, hParams.train_set_size, 
-        )
-        validateLoader = dataLoader(
-            validateSet, hParams.batch_size, 
-        )
+    trainLoader    = dataLoader(
+        trainSet,    hParams.batch_size, hParams.train_set_size, 
+    )
+    validateLoader = dataLoader(
+        validateSet, hParams.batch_size, 
+    )
 
     vae.train()
     rnn.train()
@@ -63,10 +62,13 @@ def oneEpoch(
         with profiler('good'):
             optim.zero_grad()
             total_loss.backward()
+        with profiler('get params'):
+            params = getParams(optim)
+        with profiler('get grad norm'):
+            grad_norm = getGradNorm(params)
         with profiler('grad clip'):
-            grad_norm = getGradNorm(optim)
             torch.nn.utils.clip_grad_norm_(
-                getParams(optim), hParams.grad_clip, 
+                params, hParams.grad_clip, 
             )
         with profiler('good'):
             optim.step()

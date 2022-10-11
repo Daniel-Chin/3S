@@ -16,4 +16,5 @@ module purge
 module load miniconda
 source activate danielTorch
 cd ..
+python loss_meta.py
 python main.py

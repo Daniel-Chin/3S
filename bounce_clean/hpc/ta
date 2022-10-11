@@ -1,0 +1,1 @@
+tail -f slurm_train.out slurm_train.err

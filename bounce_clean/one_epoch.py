@@ -58,9 +58,10 @@ def oneEpoch(
                 epoch, hParams, video_batch, traj_batch, 
                 vae, rnn, profiler, False, 
             )
-        total_loss = lossTree.sum(
-            hParams.lossWeightTree, epoch, 
-        )
+        with profiler('sum loss'):
+            total_loss = lossTree.sum(
+                hParams.lossWeightTree, epoch, 
+            )
         with profiler('good'):
             optim.zero_grad()
             total_loss.backward()

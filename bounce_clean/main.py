@@ -1,4 +1,5 @@
 import torchWork
+from torchWork import DEVICE
 from torchWork.experiment_control import (
     runExperiment, loadCurrentExperiment, ExperimentGroup, 
 )
@@ -24,8 +25,12 @@ def main():
             max_dataset_size, 
             hParams.train_set_size, 
         )
-    trainSet    = Dataset(TRAIN_PATH,    max_dataset_size)
-    validateSet = Dataset(VALIDATE_PATH, VALIDATE_SET_SIZE)
+    trainSet    = Dataset(
+        TRAIN_PATH,    max_dataset_size,  DEVICE, 
+    )
+    validateSet = Dataset(
+        VALIDATE_PATH, VALIDATE_SET_SIZE, DEVICE, 
+    )
     runExperiment(CURRENT_EXP, oneEpoch, {
         'vae': VAE, 
         'rnn': RNN, 

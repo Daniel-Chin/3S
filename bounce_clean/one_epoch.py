@@ -96,7 +96,7 @@ def oneEpoch(
                     epoch, hParams, video_batch, traj_batch, 
                     vae, rnn, profiler, True, 
                 )
-            with profiler('log'):
+            with profiler('log losses'):
                 lossLogger.eat(
                     epoch, batch_i, False, 
                     lossTree, hParams.lossWeightTree, [

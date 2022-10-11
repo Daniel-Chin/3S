@@ -15,7 +15,9 @@ from rnn import RNN
 def dataLoader(dataset, batch_size, set_size=None):
     n_batches = None
     if set_size is not None:
-        assert set_size % batch_size == 0
+        if set_size % batch_size:
+            assert batch_size < set_size
+            batch_size = set_size
         n_batches = set_size // batch_size
     batch_i = 0
     for batch in torch.utils.data.DataLoader(
@@ -40,7 +42,7 @@ def oneEpoch(
         trainSet,    hParams.batch_size, hParams.train_set_size, 
     )
     validateLoader = dataLoader(
-        validateSet, hParams.batch_size, 
+        validateSet, hParams.batch_size, VALIDATE_SET_SIZE, 
     )
 
     vae.train()

@@ -38,20 +38,20 @@ def forward(
         reconstructions = vae.decode(flat_z)
         lossTree.self_recon = hParams.imgCriterion(
             reconstructions, flat_video_batch, 
-        )
+        ).cpu()
         lossTree.kld = torch.mean(-0.5 * torch.sum(
             1 + log_var - mu ** 2 - log_var.exp(), dim=1, 
-        ), dim=0)
+        ), dim=0).cpu()
     
     if hParams.supervise_vae:
         lossTree.supervise.vae.encode = F.mse_loss(
             mu, flat_traj_batch, 
-        )
+        ).cpu()
         with profiler('good'):
             synthesis = vae.decode(flat_traj_batch)
             lossTree.supervise.vae.decode = hParams.imgCriterion(
                 synthesis, flat_video_batch, 
-            )
+            ).cpu()
 
     if not hParams.variational_rnn:
         flat_z = mu
@@ -131,16 +131,16 @@ def forward(
             lossTree.predict.image = hParams.imgCriterion(
                 img_predictions, 
                 video_batch[:, min_context:, :, :, :], 
-            )
+            ).cpu()
 
     z_hat = flat_z_hat.view(
         batch_size, SEQ_LEN - min_context, LATENT_DIM, 
     )
     z_loss = F.mse_loss(z_hat, z[:, min_context:, :])
     if hParams.supervise_rnn:
-        lossTree.supervise.rnn = z_loss
+        lossTree.supervise.rnn = z_loss.cpu()
     else:
-        lossTree.predict.z = z_loss
+        lossTree.predict.z = z_loss.cpu()
 
     mean_square_vrnn_std = torch.exp(
         0.5 * log_var

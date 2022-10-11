@@ -66,14 +66,13 @@ def oneEpoch(
             optim.zero_grad()
             total_loss.backward()
         params = getParams(optim)
-        with profiler('get grad norm'):
-            grad_norm = getGradNorm(params)
+        grad_norm = getGradNorm(params)
         torch.nn.utils.clip_grad_norm_(
             params, hParams.grad_clip, 
         )
         with profiler('good'):
             optim.step()
-        with profiler('log'):
+        with profiler('log losses'):
             lossLogger.eat(
                 epoch, batch_i, True, 
                 lossTree, hParams.lossWeightTree, [

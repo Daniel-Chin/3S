@@ -28,12 +28,12 @@ def sampleRotate(device):
     theta = np.random.uniform(0, 2 * np.pi)
     c = np.cos(theta)
     s = np.sin(theta)
-    rotate   = torch.Tensor([
+    rotate   = torch.tensor([
         [c, s, 0], [-s, c, 0], [0, 0, 1], 
-    ]).T.to(device)
-    unrotate = torch.Tensor([
+    ], device=device).T
+    unrotate = torch.tensor([
         [c, -s, 0], [s, c, 0], [0, 0, 1], 
-    ]).T.to(device)
+    ], device=device).T
     def transform(x: torch.Tensor):
         return (rotate @ x.T).T
     def untransform(x: torch.Tensor):

@@ -1,5 +1,5 @@
 from os import path
-from typing import List
+from typing import List, Dict
 
 import torch
 import torch.utils.data
@@ -30,7 +30,8 @@ def dataLoader(dataset, batch_size, set_size=None):
 
 def oneEpoch(
     group_name: str, epoch: int, hParams: HyperParams, 
-    models, optim: torch.optim.Optimizer, 
+    models: Dict[str, torch.nn.Module], 
+    optim: torch.optim.Optimizer, 
     trainSet, validateSet, 
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, 
@@ -106,8 +107,13 @@ def oneEpoch(
                     # profiler, 
                 )
 
-        with profiler('gif'):
-            if epoch % EPOCH_INTERVAL == 0:
+        if epoch % EPOCH_INTERVAL == 0:
+            for key, model in models.items():
+                torch.save(model.state_dict(), path.join(
+                    save_path, f'{key}_epoch_{epoch}.pt', 
+                ))
+
+            with profiler('gif'):
                 for name, dataset in [
                     ('train', trainSet), 
                     ('validate', validateSet), 

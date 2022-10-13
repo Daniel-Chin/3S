@@ -1,7 +1,7 @@
 import torchWork
 from torchWork import DEVICE
 from torchWork.experiment_control import (
-    runExperiment, loadCurrentExperiment, ExperimentGroup, 
+    runExperiment, loadExperiment, ExperimentGroup, 
 )
 
 from shared import *
@@ -15,7 +15,7 @@ CURRENT_EXP = './current_experiment.py'
 def main():
     (
         experiment_name, n_rand_inits, groups, 
-    ) = loadCurrentExperiment(CURRENT_EXP)
+    ) = loadExperiment(CURRENT_EXP)
     print('Experiment:', experiment_name, 'x', n_rand_inits)
     max_dataset_size = 0
     for group in groups:

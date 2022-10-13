@@ -1,5 +1,6 @@
 from os import path
 from typing import List, Dict
+# import inspect
 
 import torch
 import torch.utils.data
@@ -36,6 +37,7 @@ def oneEpoch(
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, 
 ):
+    # with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
     vae: VAE = models['vae']
     rnn: RNN = models['rnn']
 
@@ -66,6 +68,7 @@ def oneEpoch(
         with profiler('good'):
             optim.zero_grad()
             total_loss.backward()
+        # with profiler('grad norm'):
         params = getParams(optim)
         grad_norm = getGradNorm(params)
         torch.nn.utils.clip_grad_norm_(
@@ -83,6 +86,7 @@ def oneEpoch(
                 # profiler, 
             )
 
+    # with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
     vae.eval()
     rnn.eval()
     with torch.no_grad():
@@ -108,10 +112,11 @@ def oneEpoch(
                 )
 
         if epoch % EPOCH_INTERVAL == 0:
-            for key, model in models.items():
-                torch.save(model.state_dict(), path.join(
-                    save_path, f'{key}_epoch_{epoch}.pt', 
-                ))
+            with profiler('save checkpoints'):
+                for key, model in models.items():
+                    torch.save(model.state_dict(), path.join(
+                        save_path, f'{key}_epoch_{epoch}.pt', 
+                    ))
 
             with profiler('gif'):
                 for name, dataset in [

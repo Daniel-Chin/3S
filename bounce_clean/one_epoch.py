@@ -1,6 +1,6 @@
 from os import path
 from typing import List, Dict
-# import inspect
+import inspect
 
 import torch
 import torch.utils.data
@@ -37,19 +37,19 @@ def oneEpoch(
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, 
 ):
-    # with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
-    vae: VAE = models['vae']
-    rnn: RNN = models['rnn']
+    with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
+        vae: VAE = models['vae']
+        rnn: RNN = models['rnn']
 
-    trainLoader    = dataLoader(
-        trainSet,    hParams.batch_size, hParams.train_set_size, 
-    )
-    validateLoader = dataLoader(
-        validateSet, hParams.batch_size, VALIDATE_SET_SIZE, 
-    )
+        trainLoader    = dataLoader(
+            trainSet,    hParams.batch_size, hParams.train_set_size, 
+        )
+        validateLoader = dataLoader(
+            validateSet, hParams.batch_size, VALIDATE_SET_SIZE, 
+        )
 
-    vae.train()
-    rnn.train()
+        vae.train()
+        rnn.train()
     for batch_i, (video_batch, traj_batch) in enumerate(
         trainLoader, 
     ):
@@ -68,12 +68,12 @@ def oneEpoch(
         with profiler('good'):
             optim.zero_grad()
             total_loss.backward()
-        # with profiler('grad norm'):
-        params = getParams(optim)
-        grad_norm = getGradNorm(params)
-        torch.nn.utils.clip_grad_norm_(
-            params, hParams.grad_clip, 
-        )
+        with profiler('grad norm'):
+            params = getParams(optim)
+            grad_norm = getGradNorm(params)
+            torch.nn.utils.clip_grad_norm_(
+                params, hParams.grad_clip, 
+            )
         with profiler('good'):
             optim.step()
         with profiler('log losses'):
@@ -86,9 +86,9 @@ def oneEpoch(
                 # profiler, 
             )
 
-    # with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
-    vae.eval()
-    rnn.eval()
+    with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
+        vae.eval()
+        rnn.eval()
     with torch.no_grad():
         for batch_i, (video_batch, traj_batch) in enumerate(
             validateLoader, 

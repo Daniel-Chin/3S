@@ -1,3 +1,4 @@
 *.torchworklosslog
 *.pt
 *.gif
+*.gz

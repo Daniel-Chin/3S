@@ -90,7 +90,7 @@ def oneEpoch(
         with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
             vae.eval()
             rnn.eval()
-        with torch.no_grad():
+        with torch.no_grad(), hParams.eval():
             for batch_i, (video_batch, traj_batch) in enumerate(
                 validateLoader, 
             ):

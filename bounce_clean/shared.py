@@ -15,6 +15,7 @@ __all__ = [
 ]
 
 from typing import Callable, List, Optional
+from contextlib import contextmanager
 
 import numpy as np
 import torch
@@ -94,6 +95,16 @@ class HyperParams(BaseHyperParams):
             )
         except ZeroDivisionError:
             return 0
+    
+    @contextmanager
+    def eval(self):
+        # enter eval mode
+        saved = self.teacher_forcing_duration
+        self.teacher_forcing_duration = 0
+        try:
+            yield
+        finally:
+            self.teacher_forcing_duration = saved
 
 def torch2PIL(torchImg: torch.Tensor):
     return Image.fromarray((

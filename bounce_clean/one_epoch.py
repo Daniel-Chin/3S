@@ -5,7 +5,7 @@ import inspect
 import torch
 import torch.utils.data
 from PIL import Image, ImageDraw
-from torchWork import Profiler, LossLogger
+from torchWork import Profiler, LossLogger, saveModels
 from torchWork.utils import getGradNorm, getParams
 
 from shared import *
@@ -115,11 +115,7 @@ def oneEpoch(
 
         if epoch % SLOW_EVAL_EPOCH_INTERVAL == 0:
             with profiler('save checkpoints'):
-                for key, model in models.items():
-                    torch.save(model.state_dict(), path.join(
-                        save_path, f'{key}_epoch_{epoch}.pt', 
-                    ))
-
+                saveModels(models, epoch, save_path)
             with profiler('gif'):
                 for name, dataset in [
                     ('train', trainSet), 

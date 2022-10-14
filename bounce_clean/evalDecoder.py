@@ -5,7 +5,7 @@ from typing import List
 
 import torch
 from torchWork import ExperimentGroup, loadExperiment, DEVICE
-from torchWork.experiment_control import getGroupPath, EXPERIMENT_PY_FILENAME
+from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModels
 from PIL import ImageTk
 
 from shared import LATENT_DIM, torch2PIL
@@ -19,32 +19,6 @@ LOCK_EPOCH = None
 
 RADIUS = 2
 TICK_INTERVAL = 0.05
-
-def getModels(group: ExperimentGroup, rand_init_i):
-    vae = VAE(group.hyperParams)
-    rnn = RNN(group.hyperParams)
-    
-    group_path = getGroupPath(EXPERIMENT_PATH, group.name(), rand_init_i)
-    if LOCK_EPOCH is None:
-        max_epoch = 0
-        for filename in os.listdir(group_path):
-            try:
-                x = filename.split('vae_epoch_')[1]
-                x = x.split('.pt')[0]
-                epoch = int(x)
-            except (ValueError, IndexError):
-                continue
-            else:
-                max_epoch = max(max_epoch, epoch)
-        epoch = max_epoch
-    else:
-        epoch = LOCK_EPOCH
-    print('taking epoch', epoch)
-    for name, thing in (('vae', vae), ('rnn', rnn)):
-        thing.load_state_dict(torch.load(path.join(
-            group_path, f'{name}_epoch_{epoch}.pt', 
-        ), map_location=DEVICE))
-    return vae, rnn
 
 class TestUI:
     def __init__(self, vae, group_name):
@@ -100,7 +74,9 @@ def main():
         group.hyperParams.print(depth=1)
         for rand_init_i in range(n_rand_inits):
             print(f'{rand_init_i = }')
-            vae, _ = getModels(group, rand_init_i)
+            vae = loadLatestModels(EXPERIMENT_PATH, group, rand_init_i, dict(
+                vae=VAE, rnn=RNN, 
+            ), LOCK_EPOCH)['vae']
             vae.eval()
             test_ui = TestUI(vae, group.name())
             test_ui.win.mainloop()

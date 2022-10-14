@@ -83,7 +83,7 @@ def oneEpoch(
                 lossTree, hParams.lossWeightTree, [
                     ('grad_norm', grad_norm), 
                     *extra_logs, 
-                ], 
+                ], flush=False, 
             )
 
     with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
@@ -108,8 +108,10 @@ def oneEpoch(
                     lossTree, hParams.lossWeightTree, [
                         ('grad_norm', 0), 
                         *extra_logs, 
-                    ], 
+                    ], flush=False, 
                 )
+        if epoch % 8 == 0:
+            lossLogger.compressor.flush()
 
         if epoch % SLOW_EVAL_EPOCH_INTERVAL == 0:
             with profiler('save checkpoints'):
@@ -131,7 +133,8 @@ def oneEpoch(
                     )
     
     print(group_name, 'epoch', epoch, 'finished.', flush=True)
-    profiler.report()
+    with profiler('report'):
+        profiler.report()
 
 def evalGIFs(
     epoch, video_set: torch.Tensor, save_path, 

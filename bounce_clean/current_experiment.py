@@ -18,7 +18,7 @@ hP = HyperParams()
 GROUPS.append(MyExpGroup(hP))
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 0, None), 
-    LossWeightTree('kld', 0, None), 
+    LossWeightTree('kld', 1e-5, None), 
     LossWeightTree('predict', 0, [
         LossWeightTree('z', 0, None), 
         LossWeightTree('image', 0, None), 
@@ -58,7 +58,7 @@ hP = HyperParams()
 GROUPS.append(MyExpGroup(hP))
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 0, None), 
-    LossWeightTree('kld', 0, None), 
+    LossWeightTree('kld', 1e-5, None), 
     LossWeightTree('predict', 0, [
         LossWeightTree('z', 0, None), 
         LossWeightTree('image', 0, None), 
@@ -98,7 +98,7 @@ hP = HyperParams()
 GROUPS.append(MyExpGroup(hP))
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 0, None), 
-    LossWeightTree('kld', 0, None), 
+    LossWeightTree('kld', 1e-5, None), 
     LossWeightTree('predict', 0, [
         LossWeightTree('z', 0, None), 
         LossWeightTree('image', 0, None), 

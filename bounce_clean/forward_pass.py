@@ -45,7 +45,7 @@ def forward(
     
     if hParams.supervise_vae:
         lossTree.supervise.vae.encode = F.mse_loss(
-            mu, flat_traj_batch, 
+            flat_z, flat_traj_batch, 
         ).cpu()
         with profiler('good'):
             synthesis = vae.decode(flat_traj_batch)

@@ -66,7 +66,9 @@ class HyperParams(BaseHyperParams):
 
         self.train_set_size: int = None
 
-        self.imgCriterion: Callable = None
+        self.imgCriterion: Callable[
+            [torch.Tensor, torch.Tensor], torch.Tensor, 
+        ] = None
     
     def ready(self):
         assert self.supervise_rnn == (

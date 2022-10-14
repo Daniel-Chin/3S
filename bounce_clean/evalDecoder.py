@@ -10,7 +10,6 @@ from PIL import ImageTk
 
 from shared import LATENT_DIM, torch2PIL
 from vae import VAE
-from rnn import RNN
 
 EXPERIMENT_PATH = path.join('./experiments', '''
 supervised_rnn_width_2022_Oct_13_22;48;34
@@ -75,7 +74,7 @@ def main():
         for rand_init_i in range(n_rand_inits):
             print(f'{rand_init_i = }')
             vae = loadLatestModels(EXPERIMENT_PATH, group, rand_init_i, dict(
-                vae=VAE, rnn=RNN, 
+                vae=VAE, 
             ), LOCK_EPOCH)['vae']
             vae.eval()
             test_ui = TestUI(vae, group.name())

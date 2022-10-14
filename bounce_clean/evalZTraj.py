@@ -12,9 +12,9 @@ from vae import LATENT_DIM, VAE
 EXPERIMENT_PATH = path.join('./experiments', '''
 supervised_rnn_width_2022_Oct_13_22;48;34
 '''.strip())
+RAND_INIT_I = 0
 LOCK_EPOCH = None
 
-RAND_INIT_I = 0
 RADIUS = 2
 
 def main():

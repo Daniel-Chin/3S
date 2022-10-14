@@ -37,101 +37,100 @@ def oneEpoch(
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, 
 ):
-    with profiler('epochs'):
-        with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
-            vae: VAE = models['vae']
-            rnn: RNN = models['rnn']
+    with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
+        vae: VAE = models['vae']
+        rnn: RNN = models['rnn']
 
-            trainLoader    = dataLoader(
-                trainSet,    hParams.batch_size, hParams.train_set_size, 
+        trainLoader    = dataLoader(
+            trainSet,    hParams.batch_size, hParams.train_set_size, 
+        )
+        validateLoader = dataLoader(
+            validateSet, hParams.batch_size, VALIDATE_SET_SIZE, 
+        )
+
+        vae.train()
+        rnn.train()
+    for batch_i, (video_batch, traj_batch) in enumerate(
+        trainLoader, 
+    ):
+        with profiler('train'):
+            (
+                lossTree, reconstructions, img_predictions, 
+                extra_logs, 
+            ) = forward(
+                epoch, hParams, video_batch, traj_batch, 
+                vae, rnn, profiler, False, 
             )
-            validateLoader = dataLoader(
-                validateSet, hParams.batch_size, VALIDATE_SET_SIZE, 
+        with profiler('sum loss'):
+            total_loss = lossTree.sum(
+                hParams.lossWeightTree, epoch, 
+            )
+        with profiler('good', 'backward'):
+            optim.zero_grad()
+            total_loss.backward()
+        with profiler('grad norm'):
+            params = getParams(optim)
+            grad_norm = getGradNorm(params)
+            torch.nn.utils.clip_grad_norm_(
+                params, hParams.grad_clip, 
+            )
+        with profiler('good', 'step'):
+            optim.step()
+        with profiler('log losses'):
+            lossLogger.eat(
+                epoch, batch_i, True, 
+                profiler, 
+                lossTree, hParams.lossWeightTree, [
+                    ('grad_norm', grad_norm), 
+                    *extra_logs, 
+                ], 
             )
 
-            vae.train()
-            rnn.train()
+    with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
+        vae.eval()
+        rnn.eval()
+    with torch.no_grad(), hParams.eval():
         for batch_i, (video_batch, traj_batch) in enumerate(
-            trainLoader, 
+            validateLoader, 
         ):
-            with profiler('train'):
+            with profiler('validate'):
                 (
                     lossTree, reconstructions, img_predictions, 
                     extra_logs, 
                 ) = forward(
                     epoch, hParams, video_batch, traj_batch, 
-                    vae, rnn, profiler, False, 
+                    vae, rnn, profiler, True, 
                 )
-            with profiler('sum loss'):
-                total_loss = lossTree.sum(
-                    hParams.lossWeightTree, epoch, 
-                )
-            with profiler('good'):
-                optim.zero_grad()
-                total_loss.backward()
-            with profiler('grad norm'):
-                params = getParams(optim)
-                grad_norm = getGradNorm(params)
-                torch.nn.utils.clip_grad_norm_(
-                    params, hParams.grad_clip, 
-                )
-            with profiler('good'):
-                optim.step()
             with profiler('log losses'):
                 lossLogger.eat(
-                    epoch, batch_i, True, 
+                    epoch, batch_i, False, 
                     profiler, 
                     lossTree, hParams.lossWeightTree, [
-                        ('grad_norm', grad_norm), 
+                        ('grad_norm', 0), 
                         *extra_logs, 
                     ], 
                 )
 
-        with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
-            vae.eval()
-            rnn.eval()
-        with torch.no_grad(), hParams.eval():
-            for batch_i, (video_batch, traj_batch) in enumerate(
-                validateLoader, 
-            ):
-                with profiler('validate'):
-                    (
-                        lossTree, reconstructions, img_predictions, 
-                        extra_logs, 
-                    ) = forward(
-                        epoch, hParams, video_batch, traj_batch, 
-                        vae, rnn, profiler, True, 
-                    )
-                with profiler('log losses'):
-                    lossLogger.eat(
-                        epoch, batch_i, False, 
-                        profiler, 
-                        lossTree, hParams.lossWeightTree, [
-                            ('grad_norm', 0), 
-                            *extra_logs, 
-                        ], 
-                    )
+        if epoch % EPOCH_INTERVAL == 0:
+            with profiler('save checkpoints'):
+                for key, model in models.items():
+                    torch.save(model.state_dict(), path.join(
+                        save_path, f'{key}_epoch_{epoch}.pt', 
+                    ))
 
-            if epoch % EPOCH_INTERVAL == 0:
-                with profiler('save checkpoints'):
-                    for key, model in models.items():
-                        torch.save(model.state_dict(), path.join(
-                            save_path, f'{key}_epoch_{epoch}.pt', 
-                        ))
-
-                with profiler('gif'):
-                    for name, dataset in [
-                        ('train', trainSet), 
-                        ('validate', validateSet), 
-                    ]:
-                        loader = dataLoader(dataset, 24)
-                        evalGIFs(
-                            epoch, next(loader)[0], save_path, 
-                            hParams.rnn_min_context, name,
-                            reconstructions, img_predictions, 
-                        )
-        
-        print(group_name, 'epoch', epoch, 'finished.', flush=True)
+            with profiler('gif'):
+                for name, dataset in [
+                    ('train', trainSet), 
+                    ('validate', validateSet), 
+                ]:
+                    loader = dataLoader(dataset, 24)
+                    evalGIFs(
+                        epoch, next(loader)[0], save_path, 
+                        hParams.rnn_min_context, name,
+                        reconstructions, img_predictions, 
+                    )
+    
+    print(group_name, 'epoch', epoch, 'finished.', flush=True)
     profiler.report()
 
 def evalGIFs(

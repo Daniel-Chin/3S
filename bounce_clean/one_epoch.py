@@ -80,11 +80,11 @@ def oneEpoch(
             with profiler('log losses'):
                 lossLogger.eat(
                     epoch, batch_i, True, 
+                    profiler, 
                     lossTree, hParams.lossWeightTree, [
                         ('grad_norm', grad_norm), 
                         *extra_logs, 
                     ], 
-                    # profiler, 
                 )
 
         with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
@@ -105,11 +105,11 @@ def oneEpoch(
                 with profiler('log losses'):
                     lossLogger.eat(
                         epoch, batch_i, False, 
+                        profiler, 
                         lossTree, hParams.lossWeightTree, [
                             ('grad_norm', 0), 
                             *extra_logs, 
                         ], 
-                        # profiler, 
                     )
 
             if epoch % EPOCH_INTERVAL == 0:

@@ -5,6 +5,9 @@ from os import path
 
 def main():
     os.chdir('../experiments')
+    os.system('git add .')
+    os.system('git commit -m "auto commit exp"')
+    os.system('git push')
     list_dir = os.listdir()
     all_gz = set()
     all_dir = set()

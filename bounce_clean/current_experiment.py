@@ -1,3 +1,4 @@
+from functools import lru_cache
 from torchWork import LossWeightTree, ExperimentGroup, DEVICE
 
 from shared import *
@@ -9,6 +10,7 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
     
+    @lru_cache(1)
     def name(self):
         return f'rnn_width={self.hyperParams.rnn_width}'
 

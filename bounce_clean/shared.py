@@ -9,7 +9,7 @@ __all__ = [
     'SPACE_DIM', 
     'LATENT_DIM', 
     'ENTIRE_DATASET_IN_DEVICE', 
-    'EPOCH_INTERVAL', 
+    'SLOW_EVAL_EPOCH_INTERVAL', 
     
     'HyperParams', 'torch2PIL', 'reparameterize', 
 ]
@@ -34,7 +34,7 @@ IMG_N_CHANNELS = 3
 SPACE_DIM = 3
 LATENT_DIM = 3
 ENTIRE_DATASET_IN_DEVICE = True
-EPOCH_INTERVAL = 5000
+SLOW_EVAL_EPOCH_INTERVAL = 5000
 
 class HyperParams(BaseHyperParams):
     def __init__(self) -> None:

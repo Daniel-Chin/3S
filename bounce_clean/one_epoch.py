@@ -111,7 +111,7 @@ def oneEpoch(
                     ], 
                 )
 
-        if epoch % EPOCH_INTERVAL == 0:
+        if epoch % SLOW_EVAL_EPOCH_INTERVAL == 0:
             with profiler('save checkpoints'):
                 for key, model in models.items():
                     torch.save(model.state_dict(), path.join(

@@ -35,7 +35,7 @@ def oneEpoch(
     optim: torch.optim.Optimizer, 
     trainSet, validateSet, 
     lossLogger: LossLogger, profiler: Profiler, 
-    save_path: str, 
+    save_path: str, trainer_id: int, 
 ):
     with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
         vae: VAE = models['vae']
@@ -129,7 +129,8 @@ def oneEpoch(
     
     print(group_name, 'epoch', epoch, 'finished.', flush=True)
     with profiler('report'):
-        profiler.report()
+        if trainer_id == 0:
+            profiler.report()
 
 def evalGIFs(
     epoch, save_path, set_name, 

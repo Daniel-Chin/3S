@@ -99,7 +99,7 @@ def oneEpoch(
                     extra_logs, 
                 ) = forward(
                     epoch, hParams, video_batch, traj_batch, 
-                    vae, rnn, profiler, True, 
+                    vae, rnn, profiler, False, 
                 )
             with profiler('log losses'):
                 lossLogger.eat(
@@ -123,9 +123,8 @@ def oneEpoch(
                 ]:
                     loader = dataLoader(dataset, 24)
                     evalGIFs(
-                        epoch, next(loader)[0], save_path, 
-                        hParams.rnn_min_context, name,
-                        reconstructions, img_predictions, 
+                        epoch, save_path, name, 
+                        hParams, *next(loader), vae, rnn, profiler, 
                     )
     
     print(group_name, 'epoch', epoch, 'finished.', flush=True)
@@ -133,10 +132,18 @@ def oneEpoch(
         profiler.report()
 
 def evalGIFs(
-    epoch, video_set: torch.Tensor, save_path, 
-    rnn_min_context, set_name, reconstructions, img_predictions, 
+    epoch, save_path, set_name, 
+    hParams: HyperParams, video_batch: torch.Tensor, traj_batch, 
+    vae, rnn, profiler, 
 ):
-    n_datapoints = video_set.shape[0]
+    n_datapoints = video_batch.shape[0]
+    (
+        lossTree, reconstructions, img_predictions, 
+        extra_logs, 
+    ) = forward(
+        epoch, hParams, video_batch, traj_batch, 
+        vae, rnn, profiler, True, 
+    )
     frames: List[Image.Image] = []
     for t in range(SEQ_LEN):
         frame = Image.new('RGB', (
@@ -146,17 +153,17 @@ def evalGIFs(
         imDraw = ImageDraw.Draw(frame)
         for i in range(n_datapoints):
             frame.paste(
-                torch2PIL(video_set[i, t, :, :, :]), 
+                torch2PIL(video_batch[i, t, :, :, :]), 
                 (i * RESOLUTION, 0 * RESOLUTION), 
             )
             frame.paste(
                 torch2PIL(reconstructions[i, t, :, :, :]), 
                 (i * RESOLUTION, 1 * RESOLUTION), 
             )
-            if t >= rnn_min_context:
+            if t >= hParams.rnn_min_context:
                 frame.paste(
                     torch2PIL(img_predictions[
-                        i, t - rnn_min_context, :, :, :, 
+                        i, t - hParams.rnn_min_context, :, :, :, 
                     ]), 
                     (i * RESOLUTION, 2 * RESOLUTION), 
                 )

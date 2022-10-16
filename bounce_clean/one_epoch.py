@@ -127,9 +127,10 @@ def oneEpoch(
                         hParams, *next(loader), vae, rnn, profiler, 
                     )
     
-    print(group_name, 'epoch', epoch, 'finished.', flush=True)
-    with profiler('report'):
-        if trainer_id == 0:
+    if epoch % 32 == 0:
+        print(group_name, 'epoch', epoch, 'finished.', flush=True)
+    if trainer_id == 0:
+        with profiler('report'):
             profiler.report()
 
 def evalGIFs(

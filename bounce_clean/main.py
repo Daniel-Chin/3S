@@ -16,7 +16,10 @@ def main():
     (
         experiment_name, n_rand_inits, groups, 
     ) = loadExperiment(CURRENT_EXP)
-    print('Experiment:', experiment_name, 'x', n_rand_inits)
+    print(
+        'Experiment:', experiment_name, ',', 
+        len(groups), 'x', n_rand_inits, 
+    )
     max_dataset_size = 0
     for group in groups:
         group: ExperimentGroup

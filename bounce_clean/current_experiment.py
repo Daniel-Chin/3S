@@ -12,9 +12,8 @@ class MyExpGroup(ExperimentGroup):
     
     @lru_cache(1)
     def name(self):
-        return f'''teacher_f_time={
-            self.hyperParams.teacher_forcing_duration:.1E
-        }'''
+        x = self.hyperParams.teacher_forcing_duration
+        return f'''teacher_f_time={x:.1E}'''
 
 GROUPS = []
 

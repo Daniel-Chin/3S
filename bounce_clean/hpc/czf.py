@@ -25,6 +25,6 @@ def main():
             print('Warning: unknown file:', node)
     for dir in all_dir:
         if dir not in all_gz:
-            os.system(f'tar -vczf {dir}')
+            os.system(f'tar -vczf "{dir}.tar.gz" "{dir}"')
 
 main()

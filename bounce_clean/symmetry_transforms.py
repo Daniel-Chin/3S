@@ -10,8 +10,8 @@ def sampleTranslate(device, std=1):
     The second dimension is the spatial coordinates. 
     e.g. input is shape (100, 3). 
     '''
-    translate   = (torch.randn((3, 1)) * std).to(
-        device, 
+    translate = std * torch.randn(
+        (3, 1), device=device, dtype=torch.float32, 
     )
     translate[2] = 0
     def transform(x: torch.Tensor):
@@ -30,10 +30,10 @@ def sampleRotate(device):
     s = np.sin(theta)
     rotate   = torch.tensor([
         [c, s, 0], [-s, c, 0], [0, 0, 1], 
-    ], device=device).T
+    ], device=device, dtype=torch.float32).T
     unrotate = torch.tensor([
         [c, -s, 0], [s, c, 0], [0, 0, 1], 
-    ], device=device).T
+    ], device=device, dtype=torch.float32).T
     def transform(x: torch.Tensor):
         return (rotate @ x.T).T
     def untransform(x: torch.Tensor):

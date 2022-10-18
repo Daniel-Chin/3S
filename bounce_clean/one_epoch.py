@@ -108,8 +108,9 @@ def oneEpoch(
                         *extra_logs, 
                     ], flush=False, 
                 )
-        if epoch % 8 == 0:
-            lossLogger.compressor.flush(profiler)
+        with profiler('flush logs'):
+            if epoch % 8 == 0:
+                lossLogger.compressor.flush()
 
         if epoch % SLOW_EVAL_EPOCH_INTERVAL == 0:
             with profiler('save checkpoints'):

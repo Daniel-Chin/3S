@@ -108,7 +108,7 @@ def oneEpoch(
                         *extra_logs, 
                     ], flush=False, 
                 )
-        with profiler('flush logs'):
+        with profiler('logs.flush'):
             if epoch % 8 == 0:
                 lossLogger.compressor.flush()
 

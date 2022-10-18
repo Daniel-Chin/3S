@@ -79,7 +79,6 @@ def oneEpoch(
         with profiler('log losses'):
             lossLogger.eat(
                 epoch, batch_i, True, 
-                profiler, 
                 lossTree, hParams.lossWeightTree, [
                     ('grad_norm', grad_norm), 
                     *extra_logs, 
@@ -104,14 +103,13 @@ def oneEpoch(
             with profiler('log losses'):
                 lossLogger.eat(
                     epoch, batch_i, False, 
-                    profiler, 
                     lossTree, hParams.lossWeightTree, [
                         ('grad_norm', 0), 
                         *extra_logs, 
                     ], flush=False, 
                 )
         if epoch % 8 == 0:
-            lossLogger.compressor.flush()
+            lossLogger.compressor.flush(profiler)
 
         if epoch % SLOW_EVAL_EPOCH_INTERVAL == 0:
             with profiler('save checkpoints'):

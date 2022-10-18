@@ -4,7 +4,7 @@ from torchWork import LossWeightTree, ExperimentGroup, DEVICE
 from shared import *
 
 EXP_NAME = 'symm_rnn_width'
-N_RAND_INITS = 1
+N_RAND_INITS = 3
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:

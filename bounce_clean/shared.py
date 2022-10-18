@@ -79,9 +79,8 @@ class HyperParams(BaseHyperParams):
             self.lossWeightTree['supervise']['vae']['decode'].weight != 0
         )
         assert self.vvrnn == (self.vvrnn_static is None)
-        assert self.supervise_rnn == (
-            self.lossWeightTree['predict']['z'].weight == 0
-        )
+        if self.supervise_rnn:
+            assert self.lossWeightTree['predict']['z'].weight != 0
         self.imgCriterion = {
             'mse': F.mse_loss, 
             'bce': torch.nn.BCELoss(), 

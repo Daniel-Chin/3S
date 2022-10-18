@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=24:00:00
 #SBATCH --mem=6GB
-#SBATCH --gres=gpu:1080Ti:1
+#SBATCH --gres=gpu:2080Ti:1
 #SBATCH --job-name=bounce
 #SBATCH --output=slurm_train.out
 #SBATCH --error=slurm_train.err

@@ -78,7 +78,7 @@ def oneEpoch(
             optim.step()
         with profiler('log losses'):
             lossLogger.eat(
-                epoch, batch_i, True, 
+                epoch, batch_i, True, profiler, 
                 lossTree, hParams.lossWeightTree, [
                     ('grad_norm', grad_norm), 
                     *extra_logs, 
@@ -102,7 +102,7 @@ def oneEpoch(
                 )
             with profiler('log losses'):
                 lossLogger.eat(
-                    epoch, batch_i, False, 
+                    epoch, batch_i, False, profiler, 
                     lossTree, hParams.lossWeightTree, [
                         ('grad_norm', 0), 
                         *extra_logs, 

@@ -20,9 +20,12 @@ def main():
         if path.isdir(node):
             all_dir.add(path.normpath(node))
         elif ext.lower() == '.gz':
-            all_gz.add(path.normpath(base))
+            _base, tar = path.splitext(base)
+            all_gz.add(path.normpath(_base))
         else:
             print('Warning: unknown file:', node)
+    print(all_dir)
+    print(all_gz)
     for dir in all_dir:
         if dir not in all_gz:
             os.system(f'tar -vczf "{dir}.tar.gz" "{dir}"')

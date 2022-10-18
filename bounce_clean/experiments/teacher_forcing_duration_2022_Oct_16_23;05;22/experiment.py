@@ -10,15 +10,18 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
     
+        self.variable_name = 'teacher_f_time'
+        self.variable_value = format(
+            hyperParams.teacher_forcing_duration, '.1E', 
+        )
+    
     @lru_cache(1)
     def name(self):
-        x = self.hyperParams.teacher_forcing_duration
-        return f'''teacher_f_time={x:.1E}'''
+        return f'{self.variable_name}={self.variable_value}'
 
 GROUPS = []
 
 hP = HyperParams()
-GROUPS.append(MyExpGroup(hP))
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
@@ -56,9 +59,9 @@ hP.image_loss = 'mse'
 hP.train_set_size = 256
 hP.teacher_forcing_duration = 0
 hP.ready()
+GROUPS.append(MyExpGroup(hP))
 
 hP = HyperParams()
-GROUPS.append(MyExpGroup(hP))
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
@@ -96,9 +99,9 @@ hP.image_loss = 'mse'
 hP.train_set_size = 256
 hP.teacher_forcing_duration = 1e2
 hP.ready()
+GROUPS.append(MyExpGroup(hP))
 
 hP = HyperParams()
-GROUPS.append(MyExpGroup(hP))
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
@@ -136,9 +139,9 @@ hP.image_loss = 'mse'
 hP.train_set_size = 256
 hP.teacher_forcing_duration = 1e3
 hP.ready()
+GROUPS.append(MyExpGroup(hP))
 
 hP = HyperParams()
-GROUPS.append(MyExpGroup(hP))
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
@@ -176,10 +179,9 @@ hP.image_loss = 'mse'
 hP.train_set_size = 256
 hP.teacher_forcing_duration = 1e4
 hP.ready()
-
+GROUPS.append(MyExpGroup(hP))
 
 hP = HyperParams()
-GROUPS.append(MyExpGroup(hP))
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
@@ -217,10 +219,9 @@ hP.image_loss = 'mse'
 hP.train_set_size = 256
 hP.teacher_forcing_duration = 1e5
 hP.ready()
-
+GROUPS.append(MyExpGroup(hP))
 
 hP = HyperParams()
-GROUPS.append(MyExpGroup(hP))
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
@@ -258,3 +259,4 @@ hP.image_loss = 'mse'
 hP.train_set_size = 256
 hP.teacher_forcing_duration = 1e6
 hP.ready()
+GROUPS.append(MyExpGroup(hP))

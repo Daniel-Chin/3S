@@ -9,15 +9,17 @@ N_RAND_INITS = 1
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
+
+        self.variable_name = 'teacher_f'
+        self.variable_value = hyperParams.teacher_forcing_duration
     
     @lru_cache(1)
     def name(self):
-        return f'teacher_f={self.hyperParams.teacher_forcing_duration}'
+        return f'{self.variable_name}={self.variable_value}'
 
 GROUPS = []
 
 hP = HyperParams()
-GROUPS.append(MyExpGroup(hP))
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
@@ -55,9 +57,9 @@ hP.image_loss = 'mse'
 hP.train_set_size = 256
 hP.teacher_forcing_duration = 30000
 hP.ready()
+GROUPS.append(MyExpGroup(hP))
 
 hP = HyperParams()
-GROUPS.append(MyExpGroup(hP))
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
@@ -95,9 +97,9 @@ hP.image_loss = 'mse'
 hP.train_set_size = 256
 hP.teacher_forcing_duration = 60000
 hP.ready()
+GROUPS.append(MyExpGroup(hP))
 
 hP = HyperParams()
-GROUPS.append(MyExpGroup(hP))
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
@@ -135,3 +137,4 @@ hP.image_loss = 'mse'
 hP.train_set_size = 256
 hP.teacher_forcing_duration = 100000
 hP.ready()
+GROUPS.append(MyExpGroup(hP))

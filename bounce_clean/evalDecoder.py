@@ -12,7 +12,7 @@ from shared import LATENT_DIM, torch2PIL
 from vae import VAE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-supervised_rnn_width_2022_Oct_13_22;48;34
+symm_rnn_width_2022_Oct_17_23;54;09
 '''.strip())
 LOCK_EPOCH = None
 

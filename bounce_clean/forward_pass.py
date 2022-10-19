@@ -12,6 +12,7 @@ from rnn import RNN
 from symmetry_transforms import (
     sampleTranslate, sampleRotate, sampleTR, identity, 
 )
+from linearity_metric import projectionMSE
 
 def forward(
     epoch, hParams: HyperParams, 
@@ -146,6 +147,11 @@ def forward(
         0.5 * log_var
     ).norm(2) ** 2 / batch_size
 
+    with profiler('eval_linearity'):
+        linear_proj_mse = projectionMSE(
+            mu, flat_traj_batch, 
+        )
+    
     return (
         lossTree, reconstructions.view(
             batch_size, SEQ_LEN, 
@@ -153,5 +159,6 @@ def forward(
         ), img_predictions, 
         [
             ('mean_square_vrnn_std', mean_square_vrnn_std), 
+            ('linear_proj_mse', linear_proj_mse)
         ], 
     )

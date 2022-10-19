@@ -4,13 +4,13 @@ from typing import List
 import torch
 from torchWork import loadExperiment, DEVICE
 from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModels
-from sklearn.linear_model import LinearRegression
 from matplotlib import pyplot as plt
 
 from shared import VALIDATE_PATH, VALIDATE_SET_SIZE
 from vae import VAE
 from load_dataset import Dataset
 from current_experiment import MyExpGroup
+from linearity_metric import projectionMSE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
 z_loss_2022_Oct_19_03;58;34
@@ -44,7 +44,7 @@ def main():
             ), LOCK_EPOCH)['vae']
             vae.eval()
             with torch.no_grad():
-                mse = evalOne(vae, image_set, traj_set)
+                mse = projectionMSE(vae, image_set, traj_set)
             Y[rand_init_i].append(mse)
     for Y_i in Y:
         plt.plot(
@@ -56,23 +56,5 @@ def main():
     plt.xlabel = group.variable_name
     plt.xticks(X, [g.variable_value for g in groups])
     plt.show()
-
-def evalOne(vae: VAE, image_set, traj_set: torch.Tensor):
-    Z, _ = vae.encode(image_set)
-    Y = traj_set
-    Y /= Y.std(dim=0)
-    err = getErr(Z, Y)
-    # x_mse = err[:, 0].square().mean().item()
-    # y_mse = err[:, 1].square().mean().item()
-    # z_mse = err[:, 2].square().mean().item()
-
-    # xyz_mse = (x_mse + z_mse + y_mse) / 3
-
-    mse = err.square().mean().item()
-    return mse
-
-def getErr(X, Y) -> torch.Tensor:
-    regression = LinearRegression().fit(X, Y)
-    return Y - regression.predict(X)
 
 main()

@@ -11,7 +11,7 @@ import cv2
 from PIL import Image
 
 from shared import *
-from physics import *
+from physics_bounce import *
 
 PATH = path.join(
     '../datasets/bounce', 

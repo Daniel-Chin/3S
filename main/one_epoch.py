@@ -108,7 +108,7 @@ def oneEpoch(
                 lossLogger.eat(
                     epoch, batch_i, False, profiler, 
                     lossTree, hParams.lossWeightTree, [
-                        ('grad_norm', 0), 
+                        ('grad_norm', torch.tensor(0)), 
                         *extra_logs, 
                     ], flush=False, 
                 )

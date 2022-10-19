@@ -145,7 +145,7 @@ def forward(
 
     mean_square_vrnn_std = torch.exp(
         0.5 * log_var
-    ).norm(2) ** 2 / batch_size
+    ).norm(2).cpu() ** 2 / batch_size
 
     with profiler('eval_linearity'):
         linear_proj_mse = projectionMSE(

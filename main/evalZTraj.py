@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 from shared import *
 from load_dataset import Dataset
-from vae import LATENT_DIM, VAE
+from vae import VAE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
 supervised_rnn_width_2022_Oct_13_22;48;34
@@ -22,10 +22,12 @@ def main():
     ))
     print(f'{exp_name = }')
     dataset, _ = Dataset(
-        experiment.TRAIN_SET_PATH, 256, DEVICE, 
+        experiment.TRAIN_SET_PATH, 256, 
+        experiment.ACTUAL_DIM, DEVICE, 
     )
     # dataset, _ = Dataset(
-    #     VALIDATE_PATH, VALIDATE_SET_SIZE, DEVICE, 
+    #     VALIDATE_PATH, VALIDATE_SET_SIZE, 
+    #     experiment.ACTUAL_DIM, DEVICE, 
     # )
 
     for group in groups:
@@ -36,16 +38,16 @@ def main():
             vae=VAE, 
         ), LOCK_EPOCH)['vae']
         vae.eval()
-        evalZTraj(vae, dataset)
+        evalZTraj(vae, dataset, group.hyperParams)
 
-def evalZTraj(vae: VAE, dataset: Dataset):
+def evalZTraj(vae: VAE, dataset: Dataset, hParam: HyperParams):
     # Entire dataset as one batch. Not optimized for GPU! 
     batch_size = dataset.size
     flat_batch = dataset.video_set.view(
         batch_size * SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
     )
     flat_mu, _ = vae.encode(flat_batch)
-    mu = flat_mu.detach().view(batch_size, SEQ_LEN, LATENT_DIM)
+    mu = flat_mu.detach().view(batch_size, SEQ_LEN, hParam.latent_dim)
     for i in range(batch_size):
         print(f'{i=}')
         plt.plot(mu[i, :, 0], mu[i, :, 1])

@@ -1,10 +1,6 @@
 import numpy as np
 import torch
 
-from shared import LATENT_DIM
-
-assert LATENT_DIM == 3
-
 def sampleTranslate(device, std=1):
     '''
     The second dimension is the spatial coordinates. 

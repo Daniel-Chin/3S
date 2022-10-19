@@ -12,7 +12,10 @@ from physics_bounce import Body
 from shared import *
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, dataset_path, size, device=None) -> None:
+    def __init__(
+        self, dataset_path, size, 
+        ACTUAL_DIM: int, device=None, 
+    ) -> None:
         super().__init__()
 
         prev_cwd = os.getcwd()
@@ -27,7 +30,7 @@ class Dataset(torch.utils.data.Dataset):
         label_set = torch.zeros((
             size, 
             SEQ_LEN, 
-            SPACE_DIM, 
+            ACTUAL_DIM, 
         ))
         for data_i in tqdm.trange(size, desc='load dataset'):
             with open(os.path.join(
@@ -89,7 +92,7 @@ def PersistentLoader(dataset, batch_size):
             yield video_batch, traj_batch
 
 if __name__ == '__main__':
-    dataset = Dataset('../datasets/bounce/train', 128)
+    dataset = Dataset('../datasets/bounce/train', 128, 3)
     loader = PersistentLoader(dataset, 32)
     for i, (x, y) in enumerate(loader):
         print(i, x.shape, y.shape)

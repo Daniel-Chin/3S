@@ -15,7 +15,7 @@ from symmetry_transforms import (
 from linearity_metric import projectionMSE
 
 def forward(
-    epoch, hParams: HyperParams, 
+    epoch, experiment, hParams: HyperParams, 
     video_batch: torch.Tensor, traj_batch: torch.Tensor, 
     vae: VAE, rnn: RNN, 
     profiler: torchWork.Profiler, 
@@ -29,7 +29,7 @@ def forward(
         batch_size * SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
     )
     flat_traj_batch = traj_batch.view(
-        batch_size * SEQ_LEN, SPACE_DIM, 
+        batch_size * SEQ_LEN, -1, 
     )
 
     # vae forward pass
@@ -78,20 +78,20 @@ def forward(
 
     # restore time axis
     z = flat_z.view(
-        batch_size, SEQ_LEN, LATENT_DIM, 
+        batch_size, SEQ_LEN, hParams.latent_dim, 
     )
     z_transed = flat_z_transed.view(
-        batch_size, SEQ_LEN, LATENT_DIM, 
+        batch_size, SEQ_LEN, hParams.latent_dim, 
     )
     
     # rnn forward pass
     min_context = hParams.rnn_min_context
     teacher_rate = hParams.getTeacherForcingRate(epoch)
     z_hat_transed = torch.zeros((
-        batch_size, SEQ_LEN - min_context, LATENT_DIM, 
+        batch_size, SEQ_LEN - min_context, hParams.latent_dim, 
     ), device=DEVICE)
     log_var = torch.ones((
-        batch_size, SEQ_LEN - min_context, LATENT_DIM, 
+        batch_size, SEQ_LEN - min_context, hParams.latent_dim, 
     ), device=DEVICE)
     if hParams.vvrnn_static is not None:
         log_var *= hParams.vvrnn_static
@@ -109,9 +109,9 @@ def forward(
             else:
                 rnn.stepTime(z_hat_transed[:,        t, :])
     flat_z_hat = untrans(z_hat_transed.view(
-        -1, LATENT_DIM, 
+        -1, hParams.latent_dim, 
     ))
-    flat_log_var = log_var.view(-1, LATENT_DIM)
+    flat_log_var = log_var.view(-1, hParams.latent_dim)
     r_flat_z_hat = reparameterize(flat_z_hat, flat_log_var)
     if (
         not require_img_predictions and 
@@ -135,7 +135,7 @@ def forward(
             ).cpu()
 
     z_hat = flat_z_hat.view(
-        batch_size, SEQ_LEN - min_context, LATENT_DIM, 
+        batch_size, SEQ_LEN - min_context, hParams.latent_dim, 
     )
     z_loss = F.mse_loss(z_hat, z[:, min_context:, :])
     if hParams.supervise_rnn:

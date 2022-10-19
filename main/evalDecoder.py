@@ -7,7 +7,7 @@ from torchWork import loadExperiment, DEVICE
 from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModels
 from PIL import ImageTk
 
-from shared import LATENT_DIM, torch2PIL
+from shared import torch2PIL
 from vae import VAE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
@@ -19,12 +19,13 @@ RADIUS = 2
 TICK_INTERVAL = 0.05
 
 class TestUI:
-    def __init__(self, vae, group_name):
+    def __init__(self, vae, group_name, latent_dim):
         self.vae: VAE = vae
+        self.latent_dim = latent_dim
         self.win = tk.Tk()
         self.win.title(group_name)
         self.z = torch.zeros(
-            (LATENT_DIM, ), dtype=torch.float, device=DEVICE, 
+            (latent_dim, ), dtype=torch.float, device=DEVICE, 
         )
         self.sliders: List[tk.Scale] = []
         self.photo = None
@@ -34,7 +35,7 @@ class TestUI:
         self.initSliders()
 
     def initSliders(self):
-        for i in range(LATENT_DIM):
+        for i in range(self.latent_dim):
             slider = tk.Scale(
                 self.win,
                 variable=tk.DoubleVar(value=self.z[i]),
@@ -63,7 +64,7 @@ def decode(vae: VAE, z: torch.Tensor):
     return torch2PIL(recon[0, :, :, :])
 
 def main():
-    exp_name, n_rand_inits, groups, _ = loadExperiment(path.join(
+    exp_name, n_rand_inits, groups, experiment = loadExperiment(path.join(
         EXPERIMENT_PATH, EXPERIMENT_PY_FILENAME, 
     ))
     print(f'{exp_name = }')
@@ -76,7 +77,7 @@ def main():
                 vae=VAE, 
             ), LOCK_EPOCH)['vae']
             vae.eval()
-            test_ui = TestUI(vae, group.name())
+            test_ui = TestUI(vae, group.name(), group.hyperParams.LATENT_DIM)
             test_ui.win.mainloop()
 
 main()

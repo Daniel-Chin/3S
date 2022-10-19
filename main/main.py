@@ -30,11 +30,11 @@ def main():
         )
     trainSet    = Dataset(
         experiment.TRAIN_SET_PATH,    max_dataset_size,  
-        DEVICE, 
+        experiment.ACTUAL_DIM, DEVICE, 
     )
     validateSet = Dataset(
         experiment.VALIDATE_SET_PATH, experiment.VALIDATE_SET_SIZE, 
-        DEVICE, 
+        experiment.ACTUAL_DIM, DEVICE, 
     )
     runExperiment(CURRENT_EXP, oneEpoch, {
         'vae': VAE, 

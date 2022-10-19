@@ -37,16 +37,16 @@ class VAE(nn.Module):
 
         self.encoder = nn.Sequential(*modules)
         self.fcMu  = nn.Linear(
-            self.conv_neck_dim, LATENT_DIM, 
+            self.conv_neck_dim, hyperParams.latent_dim, 
         )
         self.fcVar = nn.Linear(
-            self.conv_neck_dim, LATENT_DIM, 
+            self.conv_neck_dim, hyperParams.latent_dim, 
         )
 
         if hyperParams.deep_spread:
             self.fcBeforeDecode = nn.Sequential(
                 nn.Linear(
-                    LATENT_DIM, 
+                    hyperParams.latent_dim, 
                     8, 
                 ), 
                 nn.LeakyReLU(), 
@@ -57,7 +57,7 @@ class VAE(nn.Module):
             )
         else:
             self.fcBeforeDecode = nn.Linear(
-                LATENT_DIM, 
+                hyperParams.latent_dim, 
                 self.conv_neck_dim, 
             )
         modules = []
@@ -110,7 +110,7 @@ class VAE(nn.Module):
     
     def decode(self, z):
         '''
-        `z` is (batch_size, LATENT_DIM)
+        `z` is (batch_size, latent_dim)
         '''
         t: torch.Tensor = self.fcBeforeDecode(z)
         t = t.view(

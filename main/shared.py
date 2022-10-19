@@ -3,8 +3,6 @@ __all__ = [
     'SEQ_LEN', 
     'RESOLUTION', 
     'IMG_N_CHANNELS', 
-    'SPACE_DIM', 
-    'LATENT_DIM', 
     'ENTIRE_DATASET_IN_DEVICE', 
     'SLOW_EVAL_EPOCH_INTERVAL', 
     
@@ -25,8 +23,6 @@ TRAJ_FILENAME = 'trajectory.json'
 SEQ_LEN = 20
 RESOLUTION = 32
 IMG_N_CHANNELS = 3
-SPACE_DIM = 3
-LATENT_DIM = 3
 ENTIRE_DATASET_IN_DEVICE = True
 SLOW_EVAL_EPOCH_INTERVAL = 5000
 
@@ -34,6 +30,8 @@ class HyperParams(BaseHyperParams):
     def __init__(self) -> None:
         super().__init__()
 
+        self.latent_dim: int = None
+        
         self.I: int = None
         self.T: int = None
         self.R: int = None

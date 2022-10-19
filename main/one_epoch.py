@@ -60,7 +60,8 @@ def oneEpoch(
                 lossTree, reconstructions, img_predictions, 
                 extra_logs, 
             ) = forward(
-                epoch, hParams, video_batch, traj_batch, 
+                epoch, experiment, hParams, 
+                video_batch, traj_batch, 
                 vae, rnn, profiler, False, 
             )
         with profiler('sum loss'):
@@ -99,7 +100,8 @@ def oneEpoch(
                     lossTree, reconstructions, img_predictions, 
                     extra_logs, 
                 ) = forward(
-                    epoch, hParams, video_batch, traj_batch, 
+                    epoch, experiment, hParams, 
+                    video_batch, traj_batch, 
                     vae, rnn, profiler, False, 
                 )
             with profiler('log losses'):
@@ -125,7 +127,8 @@ def oneEpoch(
                     loader = dataLoader(dataset, 24)
                     evalGIFs(
                         epoch, save_path, name, 
-                        hParams, *next(loader), vae, rnn, profiler, 
+                        experiment, hParams, *next(loader), 
+                        vae, rnn, profiler, 
                     )
     
     if epoch % 32 == 0:
@@ -136,7 +139,8 @@ def oneEpoch(
 
 def evalGIFs(
     epoch, save_path, set_name, 
-    hParams: HyperParams, video_batch: torch.Tensor, traj_batch, 
+    experiment, hParams: HyperParams, 
+    video_batch: torch.Tensor, traj_batch, 
     vae, rnn, profiler, 
 ):
     n_datapoints = video_batch.shape[0]
@@ -144,7 +148,7 @@ def evalGIFs(
         lossTree, reconstructions, img_predictions, 
         extra_logs, 
     ) = forward(
-        epoch, hParams, video_batch, traj_batch, 
+        epoch, experiment, hParams, video_batch, traj_batch, 
         vae, rnn, profiler, True, 
     )
     frames: List[Image.Image] = []

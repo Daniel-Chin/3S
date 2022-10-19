@@ -9,13 +9,13 @@ class RNN(nn.Module):
         hidden_dim = hyperParams.rnn_width
 
         self.updateHidden = nn.Sequential(
-            nn.Linear(hidden_dim + LATENT_DIM, hidden_dim), 
+            nn.Linear(hidden_dim + hyperParams.latent_dim, hidden_dim), 
             nn.Tanh(), 
         )
         
-        self.projHead = nn.Linear(hidden_dim, LATENT_DIM)
+        self.projHead = nn.Linear(hidden_dim, hyperParams.latent_dim)
         if hyperParams.vvrnn:
-            self.logVarHead = nn.Linear(hidden_dim, LATENT_DIM)
+            self.logVarHead = nn.Linear(hidden_dim, hyperParams.latent_dim)
 
         self.hidden = None
         
@@ -31,7 +31,7 @@ class RNN(nn.Module):
     
     def stepTime(self, z_t: torch.Tensor):
         '''
-        `z` is (BATCH_SIZE, SEQ_LEN, LATENT_DIM). 
+        `z` is (BATCH_SIZE, SEQ_LEN, latent_dim). 
         '''
         output = self.updateHidden(torch.cat((
             self.hidden, z_t, 

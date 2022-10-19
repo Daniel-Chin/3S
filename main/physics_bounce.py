@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import List
 import numpy as np
 
+from physics_shared import *
+
 __all__ = [
     'Body', 'initLegalBody', 'oneLegalRun', 
     'BALL_RADIUS', 
@@ -11,49 +13,16 @@ POSITION_MU = np.array([0, 6, 2])
 POSITION_STD = (2, 2, 1)
 VELOCITY_STD = 2
 BIG_G = 10
-FINE_DT = .01   # very fine dt. This is for sim, not for DL. 
 BALL_RADIUS = .5
 
-class Body:
-    def __init__(self) -> None:
-        self.position = np.zeros((3, ))
-        self.velocity = np.zeros((3, ))
-    
-    def snapshot(self):
-        body = Body()
-        body.position = self.position.copy()
-        body.velocity = self.velocity.copy()
-        return body
-    
-    def __repr__(self):
-        return f'<ball {self.position}>'
-    
-    def stepFineTime(self, dt):
-        self.velocity[2] -= dt * BIG_G
-        if (
-            self.velocity[2] < 0 
-            and self.position[2] - BALL_RADIUS
-        ) < 0:
-            self.velocity[2] *= -1
-        self.position += dt * self.velocity
-    
-    def stepTime(self, time):
-        while time > 0:
-            if time < FINE_DT:
-                dt = time
-                time = -1   # make sure to exit loop
-            else:
-                dt = FINE_DT
-                time -= dt
-            self.stepFineTime(dt)
-    
-    def toJSON(self):
-        return [list(self.position), list(self.velocity)]
-    
-    def fromJSON(self, x: List[List[float]], /):
-        self.position = np.array(x[0])
-        self.velocity = np.array(x[1])
-        return self
+def stepFineTime(dt, body: Body):
+    body.velocity[2] -= dt * BIG_G
+    if (
+        body.velocity[2] < 0 
+        and body.position[2] - BALL_RADIUS
+    ) < 0:
+        body.velocity[2] *= -1
+    body.position += dt * body.velocity
 
 def initBody():
     body = Body()
@@ -81,7 +50,7 @@ def oneRun(dt, n_frames):
     trajectory: List[List[Body]] = []
     for _ in range(n_frames):
         trajectory.append([body.snapshot()])
-        body.stepTime(dt)
+        stepTime(dt, lambda x : stepFineTime(x, body))
         verify(body)
     return trajectory
 

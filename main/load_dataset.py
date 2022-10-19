@@ -7,7 +7,7 @@ import torch
 import torch.utils.data
 from PIL import Image
 import tqdm
-from physics_bounce import Body
+from physics_shared import Body
 
 from shared import *
 

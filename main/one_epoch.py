@@ -31,13 +31,13 @@ def dataLoader(dataset, batch_size, set_size=None):
             return
 
 def oneEpoch(
-    group_name: str, epoch: int, hParams: HyperParams, 
+    group_name: str, epoch: int, 
+    experiment, hParams: HyperParams, 
     models: Dict[str, torch.nn.Module], 
     optim: torch.optim.Optimizer, 
     trainSet: Dataset, validateSet: Dataset, 
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, trainer_id: int, 
-    experiment, 
 ):
     with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
         vae: VAE = models['vae']

@@ -1,3 +1,4 @@
+from os import path
 import time
 from typing import List
 import pickle
@@ -12,8 +13,11 @@ from PIL import Image
 from shared import *
 from physics import *
 
-# PATH = TRAIN_PATH
-PATH = VALIDATE_PATH
+PATH = path.join(
+    '../datasets/bounce', 
+    'train', 
+    # 'validate', 
+)
 
 # GIF_INTERVAL = 200
 

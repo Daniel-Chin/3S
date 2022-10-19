@@ -14,7 +14,7 @@ CURRENT_EXP = './current_experiment.py'
 
 def main():
     (
-        experiment_name, n_rand_inits, groups, 
+        experiment_name, n_rand_inits, groups, experiment, 
     ) = loadExperiment(CURRENT_EXP)
     print(
         'Experiment:', experiment_name, ',', 
@@ -29,10 +29,12 @@ def main():
             hParams.train_set_size, 
         )
     trainSet    = Dataset(
-        TRAIN_PATH,    max_dataset_size,  DEVICE, 
+        experiment.TRAIN_SET_PATH,    max_dataset_size,  
+        DEVICE, 
     )
     validateSet = Dataset(
-        VALIDATE_PATH, VALIDATE_SET_SIZE, DEVICE, 
+        experiment.VALIDATE_SET_PATH, experiment.VALIDATE_SET_SIZE, 
+        DEVICE, 
     )
     runExperiment(CURRENT_EXP, oneEpoch, {
         'vae': VAE, 

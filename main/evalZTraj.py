@@ -17,17 +17,17 @@ LOCK_EPOCH = None
 RADIUS = 2
 
 def main():
+    exp_name, n_rand_inits, groups, experiment = loadExperiment(path.join(
+        EXPERIMENT_PATH, EXPERIMENT_PY_FILENAME, 
+    ))
+    print(f'{exp_name = }')
     dataset, _ = Dataset(
-        TRAIN_PATH, 256, DEVICE, 
+        experiment.TRAIN_SET_PATH, 256, DEVICE, 
     )
     # dataset, _ = Dataset(
     #     VALIDATE_PATH, VALIDATE_SET_SIZE, DEVICE, 
     # )
 
-    exp_name, n_rand_inits, groups = loadExperiment(path.join(
-        EXPERIMENT_PATH, EXPERIMENT_PY_FILENAME, 
-    ))
-    print(f'{exp_name = }')
     for group in groups:
         print(group.name())
         group.hyperParams.print(depth=1)

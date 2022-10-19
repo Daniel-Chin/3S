@@ -37,6 +37,7 @@ def oneEpoch(
     trainSet: Dataset, validateSet: Dataset, 
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, trainer_id: int, 
+    experiment, 
 ):
     with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
         vae: VAE = models['vae']
@@ -46,7 +47,7 @@ def oneEpoch(
             trainSet,    hParams.batch_size, hParams.train_set_size, 
         )
         validateLoader = dataLoader(
-            validateSet, hParams.batch_size, VALIDATE_SET_SIZE, 
+            validateSet, hParams.batch_size, experiment.VALIDATE_SET_SIZE, 
         )
 
         vae.train()

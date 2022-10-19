@@ -1,7 +1,4 @@
 __all__ = [
-    'TRAIN_PATH', 
-    'VALIDATE_PATH', 
-    'VALIDATE_SET_SIZE', 
     'TRAJ_FILENAME', 
     'SEQ_LEN', 
     'RESOLUTION', 
@@ -24,9 +21,6 @@ from PIL import Image
 
 from torchWork import *
 
-TRAIN_PATH    = './dataset/train'
-VALIDATE_PATH = './dataset/validate'
-VALIDATE_SET_SIZE = 64
 TRAJ_FILENAME = 'trajectory.pickle'
 SEQ_LEN = 20
 RESOLUTION = 32

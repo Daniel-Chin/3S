@@ -1,10 +1,9 @@
-import os
 from os import path
 import tkinter as tk
 from typing import List
 
 import torch
-from torchWork import ExperimentGroup, loadExperiment, DEVICE
+from torchWork import loadExperiment, DEVICE
 from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModels
 from PIL import ImageTk
 
@@ -64,7 +63,7 @@ def decode(vae: VAE, z: torch.Tensor):
     return torch2PIL(recon[0, :, :, :])
 
 def main():
-    exp_name, n_rand_inits, groups = loadExperiment(path.join(
+    exp_name, n_rand_inits, groups, _ = loadExperiment(path.join(
         EXPERIMENT_PATH, EXPERIMENT_PY_FILENAME, 
     ))
     print(f'{exp_name = }')

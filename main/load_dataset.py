@@ -9,7 +9,7 @@ import tqdm
 
 from shared import (
     SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, SPACE_DIM, 
-    TRAJ_FILENAME, TRAIN_PATH, 
+    TRAJ_FILENAME, 
 )
 
 class Dataset(torch.utils.data.Dataset):
@@ -84,7 +84,7 @@ def PersistentLoader(dataset, batch_size):
             yield video_batch, traj_batch
 
 if __name__ == '__main__':
-    dataset = Dataset(TRAIN_PATH, 128)
+    dataset = Dataset('../datasets/bounce/train', 128)
     loader = PersistentLoader(dataset, 32)
     for i, (x, y) in enumerate(loader):
         print(i, x.shape, y.shape)

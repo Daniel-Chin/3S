@@ -6,7 +6,6 @@ from torchWork import loadExperiment, DEVICE
 from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModels
 from matplotlib import pyplot as plt
 
-from shared import VALIDATE_PATH, VALIDATE_SET_SIZE
 from vae import VAE
 from load_dataset import Dataset
 from current_experiment import MyExpGroup
@@ -18,7 +17,15 @@ z_loss_2022_Oct_19_03;58;34
 LOCK_EPOCH = None
 
 def main():
-    dataset = Dataset(VALIDATE_PATH, VALIDATE_SET_SIZE, DEVICE)
+    exp_name, n_rand_inits, groups, experiment = loadExperiment(path.join(
+        EXPERIMENT_PATH, EXPERIMENT_PY_FILENAME, 
+    ))
+    groups: List[MyExpGroup]
+    print(f'{exp_name = }')
+    dataset = Dataset(
+        experiment.VALIDATE_SET_PATH, 
+        experiment.VALIDATE_SET_SIZE, DEVICE, 
+    )
     _shape = dataset.video_set.shape
     image_set = dataset.video_set.view(
         _shape[0] * _shape[1], _shape[2], _shape[3], _shape[4], 
@@ -27,11 +34,6 @@ def main():
     traj_set = dataset.label_set.view(
         _shape[0] * _shape[1], _shape[2], 
     )
-    exp_name, n_rand_inits, groups = loadExperiment(path.join(
-        EXPERIMENT_PATH, EXPERIMENT_PY_FILENAME, 
-    ))
-    groups: List[MyExpGroup]
-    print(f'{exp_name = }')
     X = range(len(groups))
     Y = [[] for _ in range(n_rand_inits)]
     for group in groups:

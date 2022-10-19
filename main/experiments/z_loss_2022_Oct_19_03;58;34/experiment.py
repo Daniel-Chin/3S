@@ -3,6 +3,10 @@ from torchWork import LossWeightTree, ExperimentGroup, DEVICE
 
 from shared import *
 
+TRAIN_SET_PATH    = '../datasets/bounce/train'
+VALIDATE_SET_PATH = '../datasets/bounce/validate'
+VALIDATE_SET_SIZE = 64
+
 EXP_NAME = 'z_loss'
 N_RAND_INITS = 3
 

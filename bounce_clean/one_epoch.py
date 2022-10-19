@@ -12,6 +12,7 @@ from shared import *
 from forward_pass import forward
 from vae import VAE
 from rnn import RNN
+from load_dataset import Dataset
 
 def dataLoader(dataset, batch_size, set_size=None):
     n_batches = None
@@ -33,7 +34,7 @@ def oneEpoch(
     group_name: str, epoch: int, hParams: HyperParams, 
     models: Dict[str, torch.nn.Module], 
     optim: torch.optim.Optimizer, 
-    trainSet, validateSet, 
+    trainSet: Dataset, validateSet: Dataset, 
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, trainer_id: int, 
 ):

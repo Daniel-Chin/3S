@@ -48,7 +48,8 @@ def main():
             Y[rand_init_i].append(mse)
     for Y_i in Y:
         plt.plot(
-            X, Y_i, linestyle='none', markerfacecolor='none', 
+            X, Y_i, linestyle='none', 
+            markerfacecolor='none', markeredgecolor='k', 
             marker='o', markersize=10, 
         )
     plt.ylabel('Linear projection MSE (↓)')

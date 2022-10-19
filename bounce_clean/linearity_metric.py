@@ -2,11 +2,7 @@ import torch
 from torch.linalg import lstsq
 from shared import *
 
-from vae import VAE
-
-def projectionMSE(vae: VAE, image_set, traj_set: torch.Tensor):
-    X, _ = vae.encode(image_set)
-    Y = traj_set
+def projectionMSE(X: torch.Tensor, Y: torch.Tensor):
     Y /= Y.std(dim=0)
 
     X_mean = X.mean(dim=0)

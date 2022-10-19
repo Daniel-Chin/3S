@@ -39,12 +39,13 @@ def main():
         group.hyperParams.print(depth=1)
         for rand_init_i in range(n_rand_inits):
             print(f'{rand_init_i = }')
-            vae = loadLatestModels(EXPERIMENT_PATH, group, rand_init_i, dict(
+            vae: VAE = loadLatestModels(EXPERIMENT_PATH, group, rand_init_i, dict(
                 vae=VAE, 
             ), LOCK_EPOCH)['vae']
             vae.eval()
             with torch.no_grad():
-                mse = projectionMSE(vae, image_set, traj_set)
+                Z, _ = vae.encode(image_set)
+                mse = projectionMSE(Z, traj_set)
             Y[rand_init_i].append(mse)
     for Y_i in Y:
         plt.plot(

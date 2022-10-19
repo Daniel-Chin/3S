@@ -1,16 +1,15 @@
 import os
-import pickle
+import json
+from typing import List
 
 import numpy as np
 import torch
 import torch.utils.data
 from PIL import Image
 import tqdm
+from physics_bounce import Body
 
-from shared import (
-    SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, SPACE_DIM, 
-    TRAJ_FILENAME, 
-)
+from shared import *
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, dataset_path, size, device=None) -> None:
@@ -33,12 +32,18 @@ class Dataset(torch.utils.data.Dataset):
         for data_i in tqdm.trange(size, desc='load dataset'):
             with open(os.path.join(
                 str(data_i), TRAJ_FILENAME, 
-            ), 'rb') as f:
-                trajectory = pickle.load(f)
+            ), 'r') as f:
+                trajectory: List[List[Body]] = []
+                for bodies_json in json.load(f):
+                    bodies = []
+                    trajectory.append(bodies)
+                    for body_json in bodies_json:
+                        bodies.append(Body().fromJSON(body_json))
             for t in range(SEQ_LEN):
-                label_set[data_i, t, :] = torch.from_numpy(
-                    trajectory[t].position, 
-                )
+                for body_i, body in enumerate(trajectory[t]):
+                    label_set[
+                        data_i, t, 3 * body_i : 3 * (body_i + 1)
+                    ] = torch.from_numpy(body.position)
                 img = Image.open(os.path.join(
                     str(data_i), f'{t}.png', 
                 ))

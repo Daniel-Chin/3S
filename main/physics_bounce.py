@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import List
 import numpy as np
 
 __all__ = [
@@ -45,6 +46,14 @@ class Body:
                 dt = FINE_DT
                 time -= dt
             self.stepFineTime(dt)
+    
+    def toJSON(self):
+        return [list(self.position), list(self.velocity)]
+    
+    def fromJSON(self, x: List[List[float]], /):
+        self.position = np.array(x[0])
+        self.velocity = np.array(x[1])
+        return self
 
 def initBody():
     body = Body()
@@ -69,9 +78,9 @@ def initLegalBody():
 
 def oneRun(dt, n_frames):
     body = initLegalBody()
-    trajectory = []
+    trajectory: List[List[Body]] = []
     for _ in range(n_frames):
-        trajectory.append(body.snapshot())
+        trajectory.append([body.snapshot()])
         body.stepTime(dt)
         verify(body)
     return trajectory

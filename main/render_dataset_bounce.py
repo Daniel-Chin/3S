@@ -1,7 +1,7 @@
 from os import path
 import time
 from typing import List
-import pickle
+import json
 
 import numpy as np
 from OpenGL.GL import *
@@ -44,10 +44,10 @@ EYE_UP = np.array([0.0, 0.0, 1.0])  # 定义对观察者而言的上方（默认
 class BallViewer:
     def __init__(self) -> None:
         self.trajectory: List[List[Body]] = None
-        self.stage = None
+        self.stage: int = None
         self.output_i = 0
         self.render_or_screenshot = 0
-        self.frames = None
+        self.frames: List[Image.Image] = None
         self.reset()
     
     def reset(self):
@@ -67,18 +67,20 @@ class BallViewer:
                 self.reset()
                 self.output_i += 1
             
-            body: Body = self.trajectory[self.stage]
+            bodies = self.trajectory[self.stage]
 
             # render
-            makeBall(*body.position, BALL_RADIUS)
+            for body in bodies:
+                makeBall(*body.position, BALL_RADIUS)
             
             # step
             self.stage += 1
             if RUNNING_MODE is MODE_OBV_ONLY:
                 time.sleep(SPF)
         else:
-            body: Body = self.trajectory[self.stage - 1]
-            makeBall(*body.position, BALL_RADIUS)
+            bodies = self.trajectory[self.stage - 1]
+            for body in bodies:
+                makeBall(*body.position, BALL_RADIUS)
             if RUNNING_MODE is MODE_MAKE_IMG:
                 self.frames.append(screenShot())
         
@@ -93,10 +95,14 @@ class BallViewer:
         # GIF image compression is uncontrollable
         os.makedirs(str(self.output_i), exist_ok=True)
         os.chdir(str(self.output_i))
-        with open(TRAJ_FILENAME, 'wb') as f:
-            pickle.dump(self.trajectory, f)
-            # These files require `from physics import Body`
-            # Wow, you don't need?
+        with open(TRAJ_FILENAME, 'w') as f:
+            trajectory_json = []
+            for bodies in self.trajectory:
+                bodies_json = []
+                trajectory_json.append(bodies_json)
+                for body in bodies:
+                    bodies_json.append(body.toJSON())
+            json.dump(trajectory_json, f)
         for i, img in enumerate(self.frames):
             img.save(f'{i}.png')
         os.chdir('..')

@@ -21,7 +21,7 @@ from PIL import Image
 
 from torchWork import *
 
-TRAJ_FILENAME = 'trajectory.pickle'
+TRAJ_FILENAME = 'trajectory.json'
 SEQ_LEN = 20
 RESOLUTION = 32
 IMG_N_CHANNELS = 3

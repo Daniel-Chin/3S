@@ -11,7 +11,7 @@ class MyExpGroup(ExperimentGroup):
         self.hyperParams = hyperParams
 
         self.variable_name = 'z_loss_weight'
-        self.variable_value = hyperParams.lossWeightTree['predict']['z']
+        self.variable_value = hyperParams.lossWeightTree['predict']['z'].weight
     
     @lru_cache(1)
     def name(self):

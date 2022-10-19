@@ -18,9 +18,9 @@ teacher_forcing_duration_2022_Oct_19_03;51;45
         # LossType('train',    'loss_root.supervise.vae.decode'), 
         # LossType('train',    'loss_root.self_recon'), 
 
-        LossType('train',    'loss_root.predict.z'), 
-        LossType('train',    'loss_root.predict.image'), 
-        # LossType('validate', 'loss_root.predict.image'), 
+        # LossType('train',    'loss_root.predict.z'), 
+        # LossType('train',    'loss_root.predict.image'), 
+        LossType('validate', 'loss_root.predict.image'), 
     ], 
     average_over=300, epoch_start=3000, 
 )

@@ -5,7 +5,7 @@ import numpy as np
 from physics_shared import *
 
 __all__ = [
-    'Body', 'initLegalBody', 'oneLegalRun', 
+    'initLegalBody', 'oneLegalRun', 
     'BALL_RADIUS', 
 ]
 

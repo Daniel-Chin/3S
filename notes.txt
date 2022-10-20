@@ -290,6 +290,10 @@ next {
         See plot.pdf
         - once TF ends, or, once TF approaches 0 and slows down, overfitting begins. 
         - duration = 30k is long enough. we may even accelerate. 
+        - According to linear proj mse during training, disentanglement does require long-range RNN prediction, i.e. it only gets good when TF diminishes. 
+    
+    next exps:
+        - even faster TF dimish. 
 }
 next {
     8/17
@@ -301,10 +305,7 @@ todo {
         yihuajiemu half
     next step
         try incorrect constraints
-    supervised coord RNN
-        try disabling static_vrnn?
-    remember:
-        fix TRI
+    test z pred loss
     test TR vs T+R+I vs T+R
         ('TR', Config(
             Constant(1e-5), 1, 1, do_symmetry=True, 

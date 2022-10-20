@@ -1,5 +1,6 @@
 #!/bin/python3
 
+import sys
 from subprocess import Popen
 from datetime import datetime
 
@@ -14,5 +15,5 @@ with open('train.sbatch', 'r') as fin:
                 'slurm_train', f'slurm_{t}', 
             ))
 
-with Popen(['sbatch', sbatch_filename]) as p:
+with Popen(['sbatch', sbatch_filename, *sys.argv[1:]]) as p:
     p.wait()

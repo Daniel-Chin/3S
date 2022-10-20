@@ -17,4 +17,4 @@ module load miniconda
 source activate danielTorch
 cd ..
 python loss_meta.py
-python main.py
+python main.py $1

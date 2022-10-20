@@ -1,2 +1,3 @@
-slurm_train.out
-slurm_train.err
+slurm_*.out
+slurm_*.err
+auto_*.sbatch

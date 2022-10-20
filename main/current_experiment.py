@@ -9,7 +9,7 @@ VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 3
 
 EXP_NAME = 'dataset_size'
-N_RAND_INITS = 1
+N_RAND_INITS = 2
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -60,9 +60,9 @@ hP.batch_size = 256
 hP.grad_clip = .03
 hP.optim_name = 'adam'
 hP.train_set_size = 256
-hP.max_epoch = 100000
 hP.image_loss = 'mse'
-hP.teacher_forcing_duration = 5000
+hP.teacher_forcing_duration = 10000
+hP.max_epoch = hP.teacher_forcing_duration
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
@@ -103,9 +103,9 @@ hP.batch_size = 64
 hP.grad_clip = .03
 hP.optim_name = 'adam'
 hP.train_set_size = 64
-hP.max_epoch = 100000
 hP.image_loss = 'mse'
-hP.teacher_forcing_duration = 5000
+hP.teacher_forcing_duration = 10000
+hP.max_epoch = hP.teacher_forcing_duration
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
@@ -146,8 +146,8 @@ hP.batch_size = 16
 hP.grad_clip = .03
 hP.optim_name = 'adam'
 hP.train_set_size = 16
-hP.max_epoch = 100000
 hP.image_loss = 'mse'
-hP.teacher_forcing_duration = 5000
+hP.teacher_forcing_duration = 10000
+hP.max_epoch = hP.teacher_forcing_duration
 hP.ready()
 GROUPS.append(MyExpGroup(hP))

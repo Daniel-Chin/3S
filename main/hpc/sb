@@ -15,7 +15,4 @@ with open('train.sbatch', 'r') as fin:
             ))
 
 with Popen(['sbatch', sbatch_filename]) as p:
-    print('waiting...')
     p.wait()
-    print('waited')
-print('terminated')

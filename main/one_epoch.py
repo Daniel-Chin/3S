@@ -5,7 +5,7 @@ import inspect
 import torch
 import torch.utils.data
 from PIL import Image, ImageDraw
-from torchWork import Profiler, LossLogger, saveModels
+from torchWork import Profiler, LossLogger, saveModels, HAS_CUDA
 from torchWork.utils import getGradNorm, getParams
 
 from shared import *
@@ -39,6 +39,8 @@ def oneEpoch(
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, trainer_id: int, 
 ):
+    if epoch > hParams.max_epoch:
+        return False
     with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
         vae: VAE = models['vae']
         rnn: RNN = models['rnn']
@@ -52,7 +54,8 @@ def oneEpoch(
 
         vae.train()
         rnn.train()
-        torch.cuda.synchronize()    # just for profiling
+        if HAS_CUDA:
+            torch.cuda.synchronize()    # just for profiling
     for batch_i, (video_batch, traj_batch) in enumerate(
         trainLoader, 
     ):
@@ -65,26 +68,31 @@ def oneEpoch(
                 video_batch, traj_batch, 
                 vae, rnn, profiler, False, 
             )
-            torch.cuda.synchronize()    # just for profiling
+            if HAS_CUDA:
+                torch.cuda.synchronize()    # just for profiling
         with profiler('sum loss'):
             total_loss = lossTree.sum(
                 hParams.lossWeightTree, epoch, 
             )
-            torch.cuda.synchronize()    # just for profiling
+            if HAS_CUDA:
+                torch.cuda.synchronize()    # just for profiling
         with profiler('good', 'backward'):
             optim.zero_grad()
             total_loss.backward()
-            torch.cuda.synchronize()    # just for profiling
+            if HAS_CUDA:
+                torch.cuda.synchronize()    # just for profiling
         with profiler('grad norm'):
             params = getParams(optim)
             grad_norm = getGradNorm(params)
             torch.nn.utils.clip_grad_norm_(
                 params, hParams.grad_clip, 
             )
-            torch.cuda.synchronize()    # just for profiling
+            if HAS_CUDA:
+                torch.cuda.synchronize()    # just for profiling
         with profiler('good', 'step'):
             optim.step()
-            torch.cuda.synchronize()    # just for profiling
+            if HAS_CUDA:
+                torch.cuda.synchronize()    # just for profiling
         with profiler('log losses'):
             lossLogger.eat(
                 epoch, batch_i, True, profiler, 
@@ -110,7 +118,8 @@ def oneEpoch(
                     video_batch, traj_batch, 
                     vae, rnn, profiler, False, 
                 )
-                torch.cuda.synchronize()    # just for profiling
+                if HAS_CUDA:
+                    torch.cuda.synchronize()    # just for profiling
             with profiler('log losses'):
                 lossLogger.eat(
                     epoch, batch_i, False, profiler, 
@@ -143,6 +152,7 @@ def oneEpoch(
     if trainer_id == 0:
         with profiler('report'):
             profiler.report()
+    return True
 
 def evalGIFs(
     epoch, save_path, set_name, 

@@ -60,6 +60,7 @@ hP.batch_size = 256
 hP.grad_clip = .03
 hP.optim_name = 'adam'
 hP.train_set_size = 256
+hP.max_epoch = 100000
 hP.image_loss = 'mse'
 hP.teacher_forcing_duration = 5000
 hP.ready()
@@ -102,6 +103,7 @@ hP.batch_size = 64
 hP.grad_clip = .03
 hP.optim_name = 'adam'
 hP.train_set_size = 64
+hP.max_epoch = 100000
 hP.image_loss = 'mse'
 hP.teacher_forcing_duration = 5000
 hP.ready()
@@ -144,6 +146,7 @@ hP.batch_size = 16
 hP.grad_clip = .03
 hP.optim_name = 'adam'
 hP.train_set_size = 16
+hP.max_epoch = 100000
 hP.image_loss = 'mse'
 hP.teacher_forcing_duration = 5000
 hP.ready()

@@ -57,6 +57,7 @@ class HyperParams(BaseHyperParams):
         self.teacher_forcing_duration: int = None
 
         self.train_set_size: int = None
+        self.max_epoch: int = None
 
         self.imgCriterion: Callable[
             [torch.Tensor, torch.Tensor], torch.Tensor, 

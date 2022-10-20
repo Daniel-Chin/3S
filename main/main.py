@@ -22,6 +22,7 @@ def main():
     )
     args = parser.parse_args()
     exp_py_path = args.exp_py_path
+    print(f'{exp_py_path = }')
 
     (
         experiment_name, n_rand_inits, groups, experiment, 

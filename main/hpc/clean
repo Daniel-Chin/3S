@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rm ./slurm_*.err
+rm ./slurm_*.out
+rm ./auto_*.sbatch

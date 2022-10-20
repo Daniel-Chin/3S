@@ -1,0 +1,342 @@
+2022/4/13 {
+    一阶 markov 有问题吗？
+        z 里放 v
+        RNN(z, h) 替换成 NN(z)
+    东西全放到 h 里了怎么办？
+        z 上加变换只是在和 encoder decoder 玩， 与 RNN 无关怎么办
+        不可能。 RNN 的输入是 z. 
+    双体
+        只有二维椭圆轨道哦， ok? 
+            ok
+        渲染？ 更像 Junyan 还是更像 Xuanjie?
+            xuanjie
+        背景为黑
+            doesn't matter
+    读 S3 doc
+        最小作用量 = 变分模拟
+            和 GAN 有啥关系？
+            这里， 物理规律的时候， EBM 的输入是时序。 
+            GAN 没有时序， 但也是一种 EBM. 
+        如果把对称性理解成 "minimize z capacity", 
+            可以把 VAE 换成 AE, 然后加对称性。
+        "用对称性去构建context dependency"
+            我们做的对称性 focus on 时序规律
+}
+4/17 {
+    evaluate disentanglement
+        run linear regression z -> ball_pos
+        look at r-squared
+}
+4/20 {
+    two body:
+        两个球半径一样？
+            不一样？ encoder 无法区分半径和远近。
+            let's make them the same. 
+        z
+            x1, y1, z1, x2, y2, z2
+            the color needs to be different, otherwise encoder doesn't know which is which
+        实验结果
+            模拟
+            预测
+            解耦
+    JEPA slides
+}
+4/22 {
+    pretrain 单球， finetune 双体， 能否解耦双球坐标？
+}
+4/27 {
+    糟糕，双体 DoF 只有 3, 因为质心固定。
+        vary 质心？
+        6 -> 3? 
+        Gus: 6 -> 3
+    极坐标不符合对称性规约?
+        仅当起抛点固定时， 符合
+    RNN 的弱性
+        需要
+    两点目标： 2d
+        datapoints 的 z 受对称性规约
+        generalization (interpolation)
+            如果不行， 那就是得每个位置的球都见过？
+        try cycle
+}
+4/29 {
+    loss 不应该除以 T 和 R
+    RNN 预测应该跳过前三帧
+}
+5/4{
+    cycle consistency:
+        decoder 不变， encoder 变差
+    slides/2d_rnn
+        其中：
+        有了 recon 也不一定就 不 collapse. 
+            估计是为什么 xuanjie 在图片上作 loss 而不是 z 上。
+    continue pyxuanjie on hpc, disentangle
+        怎么和周五说的不一样? (周五说让我自己设计训练、重现)
+    ask yann / alf / cho
+        for RNN, GRU, 
+            besides hidden_dim, any other way to control its capacity? 
+        what do you think of VRNN
+}
+next {
+    VAE 需要数据多点
+        我不确定这样做会不会有用
+        测试 data efficiency 时， 能不能： 总图片数不变， sequence 数减少？
+        用不成视频的图片训练 vae. 
+    y is completely noy regularized! 
+        many times, x and z are good, but y is piece-wise, and correlated with x, y. 
+        VAE+RNN without symmetry can also provide piece-wise, almost-linear z space. 
+    how to limit RNN/GRU?
+        https://campuswire.com/c/GCEF8E4E7/feed/312
+    pitch:
+        one-hot vs one-dim
+        both can translate!
+    AE + symm 几乎总是会崩。 
+        decoder gives rubbish when traversing z space. 
+        但是 reconstruction 和预测都是好的。
+        说明 overfit 非常严重， z space 只有寥寥几个点是正常的小球图片。
+    为何 altitude ~ 0 的时候图片是糊的？ 未解之谜。
+        it is very consistent. 
+    看实验
+        epoch_206000
+}
+6/1 {
+    vvrnn
+    vvrnn_static
+    rnn_min_context
+    z_pred_loss_coef
+    试一试 平移 和 旋转 分开加
+        T R TR I
+    grad clip
+        xuanjie: 
+            1. early-stop before grad explosion
+            2. diminishing lr
+}
+6/15 {
+    note to self: if accidentally getting a fast GPU make you waste res, specify early stopping in code. 
+}
+6/16 {
+    plot 1000-epoch loss average
+}
+6/18 {
+    2080Ti: good to go. 
+    According to loss plots, overfit happens around 2h of training. 
+    神奇！ TR 就会预测不行， T+R 就会更好。
+}
+6/23 {
+    stochastic TRI
+        previously: every batch does a number of T+R+TR+I. Diff experiment groups will have diff # of trajectories because of this. 
+        Now: stochastically sample one tranformation from the TRI spectification. # of trajs is thus controlled across groups. 
+    TRI_5
+        the loss still jumps up from time to time! Why? already grad clip. 
+}
+6/28 {
+    grad_clip
+        0.02 looks good. 
+        Note, this conclusion will change if we change the loss to BCE
+        okay, let's do this again. lower grad clip gives faster overfitting???
+        Note: grad_clip=1 explosion at EPOCH 72053. 
+}
+6/29 {
+    It seems the consensus is low LR (in my case, low grad clip) leads to higher risk of overfitting. 
+        Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates (Smith & Topin 2018)
+        My take: Higher stochasticity may help jump out of high local minima. 
+    meeting, discuss with Xuanjie
+        I:T = 1:13 变成 0:13
+        Cycle consistency doesn't help?
+}
+6/30 {
+    grad_clip_3
+        grad_clip = 0.03 seems good. 
+        0.01: too much overfit
+        0.1: sometimes jumps. However, does not look like resets the training progress. 
+}
+7/6 {
+    trying to also print training set pred images. 
+        I'm facing overfit. 
+        If training pred looks good, then I should make RNN smaller, to avoid overfitting. 
+        If training pred looks bad, then RNN should be more powerful. 
+    reverb 导致不加对称性也能一维音高
+}
+7/8 {
+    TRI_8
+        Training image pred indeed looks much better than validation. Training image pred looks like they succesfully predict. 
+        This is surprising. Randomly augmented training set is fit, but validation set is not. Something about augmenting known paths is still weak such that the NNs can overfit. 
+        Now that we know it's overfitting, decrease rnn strenth? vae strength?
+        trying increasing beta. 
+}
+7/12 {
+    beta_2
+        results are weird, but according to vali loss, 1e-5 seems fine. 
+}
+7/13 {
+    vae_complexity_2
+        No significant difference! 
+            Maybe, VAE size doesn't matter. 
+            Maybe, we haven't sufficiently weakened VAE. 
+            But! Junyan said sometimes bigger networks will overfit later (虽然久了之后会更 worse)
+            Conclusion: let's leave VAE for now, and cripple RNN. Observe whether image pred overfit changes. 
+}
+7/14 {
+    Junyan was right. bigger network -> later overfit -> best epoch has lower validation loss than smaller netowkrs. 
+    However, validaiton minimum-loss epoch is not the best recon epoch. later epochs are better, when using evalDecoder. 
+        We need a repr metric to tune hyperparameters. 
+    Right now, I want to make gigantice networks and predict images well for once. 
+}
+7/24 {
+    dali_3
+        Bigger networks are sometimes harder to train. Junyan: "梯度性质不好。" So there's a sweet spot of size. 
+}
+7/28 {
+    结论： RNN 好难驯， 我训不出
+    正在问 xuanjie 要最新版， 准备直接 hpc 复现。
+}
+8 {
+    HPC 复现 xuanjie 代码成功。
+        可能的我做不成的原因
+            没加 teacher forcing
+            MSE != BCE
+}
+8/10 {
+    plot z traj for given seq. 
+        see encoder -> z
+        see rnn -> z
+    RTI = 001, see if rnn predicts clearly. 
+        maybe my aug is too much. I assumed KLD to work. 
+    接下来， 做 two body
+        新 idea: 一体 pretrain, 双体 finetune 的时候， 可以多加冗余维度。 可能既学到另一球位置， 又学到质心位置。 
+}
+8/15 {
+    Trying changing vae decoder last layer from tanh to sigmoid. 
+        reason: BCE requires prediction to be \in (0, 1)
+        Result: 还是老样子
+}
+8/17 {
+    BCE vs MSE
+        没啥区别。。。
+        然后意识到
+            BCE 可能好处是预测准的时候更像 L1
+                所以可能可以用 L1 替代
+            BCE 在预测正确的情况下也不是 0, 只要 ground truth 不是黑或白。
+    plot z traj for given seq. (see 8/10)
+        only plotted vae encoded, and not rnn (yet)
+        乱线。 as expected
+}
+8/24 {
+    Trying to use teacher forcing, T:R:I=0:0:1, big RNN size. 
+}
+9/7 {
+    Teacher forcing exps
+        result: no use
+}
+9/14 {
+    trying to de-emphasize the recon loss, to see if rnn pred is good. 
+        0.1:1 recon good pred bad
+}
+9/16 {
+    loss weight exp conclusion:
+        lowering self-recon loss weight increases pred loss. 
+    next, trying to lower pred loss weight instead. 
+}
+9/17 {
+    lowering pred loss by 0.3 and 0.1 does not affect pred loss. There's even a minor increase. 
+        try again, with more rand_inits. 
+}
+9/18 {
+    loss weight:
+        pred loss ~= 0.5 seems to provide low losses, but none of the exps successfully predicts the video. 
+    next step:
+        compare loss=1 with loss=0.5 to gain statistical significance. 
+        Meanwhile, develop supervised RNN training. 
+}
+9/19 {
+    z visualization should use 512 dataset
+}
+9/20 {
+    loss weight:
+        not siginificant. We will use 1:1. 
+}
+9/27 {
+    // fig 1 smaller. Too big now!!
+}
+9/28 {
+    result/supervise
+        maybe Bug? validate_img_prediction loss shouldn't be zero!
+}
+10/17 {
+    Debug success! SUpervised training works. 
+    
+    Remove supervision. 
+    
+    teacher forcing for 1e+5 epochs looks good. 
+    
+    exp: symmetry training. 
+}
+10/19 {
+    testing rnn width, teacher forcing duration, and z pred loss. 
+    
+    I'm trying to make z truly Gaussian. 
+        One challenge is with rejection sampling. 
+        Xuanjie: reject if the ball leaves the view. 
+        This kind of "clear cut" creates edges in the distribution, which deviates from gaussian. 
+        Why not let rnn predict empty frames? 
+        What if SPS makes RNN predict correct z even when the ball is out of view? 
+        On a tangent: object permanence. Occlude an object and check z. 
+        This disallows JEPA. 
+        This is a problem of JEPA! 
+        Make slides! 
+        对称性应加在 hidden state 和 embedding 之间的 bottleneck 上。
+    
+    teacher_forcing_duration_no_z_loss_2022_Oct_19_15;40;28
+        See plot.pdf
+        - once TF ends, or, once TF approaches 0 and slows down, overfitting begins. 
+        - duration = 30k is long enough. we may even accelerate. 
+}
+next {
+    8/17
+}
+todo {
+    read 5 balls by zhang kun
+    diffusion exp
+        more cases. 4x4 matrix
+        yihuajiemu half
+    next step
+        try incorrect constraints
+    supervised coord RNN
+        try disabling static_vrnn?
+    remember:
+        fix TRI
+    test TR vs T+R+I vs T+R
+        ('TR', Config(
+            Constant(1e-5), 1, 1, do_symmetry=True, 
+            variational_rnn=True, rnn_width=32, 
+            deep_spread=False, vae_channels=[16, 32, 64], 
+            vvrnn=False, vvrnn_static=-25, rnn_min_context=4, 
+            z_pred_loss_coef=.005, 
+            T=0, R=0, TR=1, I=0, lr=0.001, residual=True, 
+            grad_clip=.03, 
+        )), 
+        ('T=1 R=1', Config(
+            Constant(1e-5), 1, 1, do_symmetry=True, 
+            variational_rnn=True, rnn_width=32, 
+            deep_spread=False, vae_channels=[16, 32, 64], 
+            vvrnn=False, vvrnn_static=-25, rnn_min_context=4, 
+            z_pred_loss_coef=.005, 
+            T=1, R=1, TR=0, I=0, lr=0.001, residual=True, 
+            grad_clip=.03, 
+        )), 
+        ('T=4 R=4 I=1', Config(
+            Constant(1e-5), 1, 1, do_symmetry=True, 
+            variational_rnn=True, rnn_width=32, 
+            deep_spread=False, vae_channels=[16, 32, 64], 
+            vvrnn=False, vvrnn_static=-25, rnn_min_context=4, 
+            z_pred_loss_coef=.005, 
+            T=4, R=4, TR=0, I=1, lr=0.001, residual=True, 
+            grad_clip=.03, 
+        )), 
+}
+archive {
+    有些结， 升一维就能解开。 暂时升一维， 等会儿降回来？
+}
+if {
+    if weights still Inf, add weight decay. 
+}

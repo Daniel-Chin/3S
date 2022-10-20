@@ -16,13 +16,13 @@ from physics_two_body import *
 
 PATH = path.join(
     '../datasets/two_body', 
-    'train', 
-    # 'validate', 
+    # 'train', 
+    'validate', 
 )
 
 WIN_W = 320
 WIN_H = 320
-SPF = .2
+SPF = .1
 DT = .3
 DRAW_GIRD = False
 
@@ -31,8 +31,8 @@ MODE_OBV_ONLY = 'obv_only'
 MODE_MAKE_IMG = 'make_img'
 
 # RUNNING_MODE = MODE_LOCATE
-RUNNING_MODE = MODE_OBV_ONLY
-# RUNNING_MODE = MODE_MAKE_IMG
+# RUNNING_MODE = MODE_OBV_ONLY
+RUNNING_MODE = MODE_MAKE_IMG
 
 VIEW = np.array([-0.8, 0.8, -0.8, 0.8, 1.0, 100.0])  # 视景体的left/right/bottom/top/near/far六个面
 SCALE_K = np.array([1.0, 1.0, 1.0])  # 模型缩放比例

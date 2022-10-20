@@ -9,11 +9,15 @@ Transform = Callable[[torch.Tensor], torch.Tensor]
 TUT = Tuple[Transform, Transform]
 Range = Tuple[int, int]
 
+class Group(metaclass=ABCMeta):
+    @abstractmethod
+    def sample(self) -> TUT:
+        raise NotImplemented
+
 def identity(x):
     return x
 
-class Group(metaclass=ABCMeta):
-    @abstractmethod
+class Trivial(Group):   # The Trivial Group
     def sample(self) -> TUT:
         return identity, identity
 
@@ -22,7 +26,7 @@ class Translate(Group):
         self.n_dim = n_dim
         self.std = std
 
-    def sample(self):
+    def sample(self) -> TUT:
         '''
         The second dimension is the spatial coordinates. 
         e.g. input is shape (100, 3). 
@@ -38,35 +42,15 @@ class Translate(Group):
 
 class Rotate(Group):
     def __init__(self, n_dim: int) -> None:
-        if n_dim == 2:
-            self.matrices = self._matrices2D
-        elif n_dim == 3:
-            self.matrices = self._matrices3D
-        else:
-            raise ValueError(f'{n_dim}-dim rotation not supported')
+        self.n_dim = n_dim
     
-    def _matrices2D(self):
-        theta = np.random.uniform(0, 2 * np.pi)
-        c = np.cos(theta)
-        s = np.sin(theta)
-        rotate   = torch.tensor([
-            [c, s, 0], [-s, c, 0], [0, 0, 1], 
-        ], device=DEVICE, dtype=torch.float32)
-        unrotate = torch.tensor([
-            [c, -s, 0], [s, c, 0], [0, 0, 1], 
-        ], device=DEVICE, dtype=torch.float32)
-        return rotate, unrotate
-    
-    def _matrices3D(self):
+    def sample(self) -> TUT:
         A = torch.randn(
-            (3, 3), dtype=torch.float32, device=DEVICE, 
+            (self.n_dim, self.n_dim), 
+            dtype=torch.float32, device=DEVICE, 
         )
         rotate, _ = torch.linalg.qr(A)
         unrotate = torch.linalg.inv(rotate)
-        return rotate, unrotate
-    
-    def sample(self):
-        rotate, unrotate = self.matrices()
         def transform(x: torch.Tensor):
             return (x @ rotate)
         def untransform(x: torch.Tensor):
@@ -94,7 +78,9 @@ class SymmetryAssumption:
         out = []
         for (start, stop), tut_seq in instance:
             x_slice = x[:, start:stop]
-            for tut in tut_seq:
+            for tut in (
+                identity if trans_or_untrans == 0 else reversed
+            )(tut_seq):
                 f = tut[trans_or_untrans]
                 x_slice = f(x_slice)
             out.append(x_slice)
@@ -120,14 +106,17 @@ class SymmetryAssumption:
 def test(size=100):
     symm = SymmetryAssumption()
     symm.latent_dim = 3
-    symm.rule = [((0, 3), [Translate(2, 1), Rotate(2)])]
+    symm.rule = [
+        ((0, 2), [Translate(2, 1), Rotate(2)]), 
+        ((2, 3), [Trivial()]), 
+    ]
     symm.ready()
 
     points = torch.randn((size, 3))
     trans, untrans = symm.sample()
     poof = trans(points)
     print('trans untrans', (points - untrans(poof)).norm(2))
-    print('altitude change', (points[2, :] - poof[2, :]).norm(2))
+    print('altitude change', (points[:, 2] - poof[:, 2]).norm(2))
     from matplotlib import pyplot as plt
     from random import random
     n_points = 10

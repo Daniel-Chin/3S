@@ -13,16 +13,9 @@ def projectionMSE(X: torch.Tensor, Y: torch.Tensor):
 
     solution_centered, residuals, _, _ = lstsq(X_centered, Y_centered)
     solution_centered: torch.Tensor
-    residuals: torch.Tensor
 
-    if residuals.numel():
-        print('Tell dev: pyTorch returned residuals!')
-        # https://pytorch.org/docs/stable/generated/torch.linalg.lstsq.html  
-        # Semantically `residuals` should not be empty.  
-        # Either pyTorch messed up or I don't understand LA.  
-
-        # return residuals.mean().cpu() / LATENT_DIM
-        # Still, before using it, test if residuals equals to what we think. 
+    # Some versions of pyTorch has bugs with `residuals`. 
+    # Let's not use it. It doesn't save much time anyways. 
     
     coef = solution_centered
     intercept = Y_mean - X_mean @ solution_centered

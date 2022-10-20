@@ -14,5 +14,8 @@ with open('train.sbatch', 'r') as fin:
                 'slurm_train', f'slurm_{t}', 
             ))
 
-Popen(['sbatch', sbatch_filename])
-
+with Popen(['sbatch', sbatch_filename]) as p:
+    print('waiting...')
+    p.wait()
+    print('waited')
+print('terminated')

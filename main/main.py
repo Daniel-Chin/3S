@@ -20,8 +20,8 @@ def main():
         "exp_py_path", type=str, nargs='?', default=DEFAULT_EXP, 
         help="the python script that defines the experiment", 
     )
-    parser.parse_args()
-    exp_py_path = parser.exp_py_path
+    args = parser.parse_args()
+    exp_py_path = args.exp_py_path
 
     (
         experiment_name, n_rand_inits, groups, experiment, 

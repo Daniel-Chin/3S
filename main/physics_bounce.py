@@ -76,4 +76,4 @@ def oneLegalRun(*a, **kw):
             return trajectory
 
 if __name__ == '__main__':
-    print(*oneLegalRun(1, 30), sep='\n')
+    print(*oneLegalRun(.15, 20), sep='\n')

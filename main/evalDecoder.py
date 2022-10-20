@@ -16,7 +16,7 @@ teacher_forcing_duration_no_z_loss_2022_Oct_19_15;40;28
 LOCK_EPOCH = None
 
 RADIUS = 2
-TICK_INTERVAL = 0.05
+TICK_INTERVAL = 0.1
 
 class TestUI:
     def __init__(self, vae, group_name, latent_dim):

@@ -1,60 +1,130 @@
+from typing import Callable, Dict, List, Tuple
+from abc import ABCMeta, abstractmethod
+
 import numpy as np
 import torch
+from torchWork import DEVICE
 
-def sampleTranslate(device, std=1):
-    '''
-    The second dimension is the spatial coordinates. 
-    e.g. input is shape (100, 3). 
-    '''
-    translate = std * torch.randn(
-        (3, 1), device=device, dtype=torch.float32, 
-    )
-    translate[2] = 0
-    def transform(x: torch.Tensor):
-        return (x.T + translate).T
-    def untransform(x: torch.Tensor):
-        return (x.T - translate).T
-    return transform, untransform
-
-def sampleRotate(device):
-    '''
-    The second dimension is the spatial coordinates. 
-    e.g. input is shape (100, 3). 
-    '''
-    theta = np.random.uniform(0, 2 * np.pi)
-    c = np.cos(theta)
-    s = np.sin(theta)
-    rotate   = torch.tensor([
-        [c, s, 0], [-s, c, 0], [0, 0, 1], 
-    ], device=device, dtype=torch.float32).T
-    unrotate = torch.tensor([
-        [c, -s, 0], [s, c, 0], [0, 0, 1], 
-    ], device=device, dtype=torch.float32).T
-    def transform(x: torch.Tensor):
-        return (rotate @ x.T).T
-    def untransform(x: torch.Tensor):
-        return (unrotate @ x.T).T
-    return transform, untransform
-
-def sampleTR(device, translate_std=1):
-    '''
-    The second dimension is the spatial coordinates. 
-    e.g. input is shape (100, 3). 
-    '''
-    t, unt = sampleTranslate(device, translate_std)
-    r, unr = sampleRotate(device)
-    def transform(x: torch.Tensor):
-        return t(r(x))
-    def untransform(x: torch.Tensor):
-        return unr(unt(x))
-    return transform, untransform
+Transform = Callable[[torch.Tensor], torch.Tensor]
+TUT = Tuple[Transform, Transform]
+Range = Tuple[int, int]
 
 def identity(x):
     return x
 
+class Group(metaclass=ABCMeta):
+    @abstractmethod
+    def sample(self) -> TUT:
+        return identity, identity
+
+class Translate(Group):
+    def __init__(self, n_dim: int, std: float) -> None:
+        self.n_dim = n_dim
+        self.std = std
+
+    def sample(self):
+        '''
+        The second dimension is the spatial coordinates. 
+        e.g. input is shape (100, 3). 
+        '''
+        translate = self.std * torch.randn(
+            (1, self.n_dim), device=DEVICE, dtype=torch.float32, 
+        )
+        def transform(x: torch.Tensor):
+            return x + translate
+        def untransform(x: torch.Tensor):
+            return x - translate
+        return transform, untransform
+
+class Rotate(Group):
+    def __init__(self, n_dim: int) -> None:
+        if n_dim == 2:
+            self.matrices = self._matrices2D
+        elif n_dim == 3:
+            self.matrices = self._matrices3D
+        else:
+            raise ValueError(f'{n_dim}-dim rotation not supported')
+    
+    def _matrices2D(self):
+        theta = np.random.uniform(0, 2 * np.pi)
+        c = np.cos(theta)
+        s = np.sin(theta)
+        rotate   = torch.tensor([
+            [c, s, 0], [-s, c, 0], [0, 0, 1], 
+        ], device=DEVICE, dtype=torch.float32)
+        unrotate = torch.tensor([
+            [c, -s, 0], [s, c, 0], [0, 0, 1], 
+        ], device=DEVICE, dtype=torch.float32)
+        return rotate, unrotate
+    
+    def _matrices3D(self):
+        A = torch.randn(
+            (3, 3), dtype=torch.float32, device=DEVICE, 
+        )
+        rotate, _ = torch.linalg.qr(A)
+        unrotate = torch.linalg.inv(rotate)
+        return rotate, unrotate
+    
+    def sample(self):
+        rotate, unrotate = self.matrices()
+        def transform(x: torch.Tensor):
+            return (x @ rotate)
+        def untransform(x: torch.Tensor):
+            return (x @ unrotate)
+        return transform, untransform
+
+class SymmetryAssumption:
+    def __init__(self) -> None:
+        self.latent_dim: int
+        self.rule: List[Tuple[Range, List[Group]]] = {}
+    
+    def ready(self):
+        acc = 0
+        for (start, stop), _ in self.rule:
+            assert start == acc
+            assert stop > start
+            acc = stop
+        assert acc == self.latent_dim
+    
+    def apply(
+        self, x: torch.Tensor, /, 
+        instance: List[Tuple[Range, List[TUT]]], 
+        trans_or_untrans: int, 
+    ): 
+        out = []
+        for (start, stop), tut_seq in instance:
+            x_slice = x[:, start:stop]
+            for tut in tut_seq:
+                f = tut[trans_or_untrans]
+                x_slice = f(x_slice)
+            out.append(x_slice)
+        return torch.cat(out, dim=1)
+    
+    def sample(self) -> TUT:
+        # instantiate
+        instance: List[Tuple[Range, List[TUT]]] = []
+        for dim_range, group_seq in self.rule:
+            tut_seq: List[TUT] = []
+            instance.append((dim_range, tut_seq))
+            for group in group_seq:
+                tut_seq.append(group.sample())
+        
+        # def
+        def trans(x):
+            return self.apply(x, instance, 0)
+        def untrans(x):
+            return self.apply(x, instance, 1)
+        
+        return trans, untrans
+
 def test(size=100):
+    symm = SymmetryAssumption()
+    symm.latent_dim = 3
+    symm.rule = [((0, 3), [Translate(2, 1), Rotate(2)])]
+    symm.ready()
+
     points = torch.randn((size, 3))
-    trans, untrans = sampleTR(torch.device("cpu"))
+    trans, untrans = symm.sample()
     poof = trans(points)
     print('trans untrans', (points - untrans(poof)).norm(2))
     print('altitude change', (points[2, :] - poof[2, :]).norm(2))

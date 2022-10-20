@@ -1,12 +1,28 @@
 from __future__ import annotations
 from typing import List, Callable
+
+from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
+from scipy.stats import norm
 import numpy as np
 
+try:
+    from auto_bin import autoBin
+except ImportError as e:
+    module_name = str(e).split('No module named ', 1)[1].strip().strip('"\'')
+    if module_name in (
+        'auto_bin', 
+    ):
+        print(f'Missing module {module_name}. Please download at')
+        print(f'https://github.com/Daniel-Chin/Python_Lib')
+        input('Press Enter to quit...')
+    raise e
+
 __all__ = [
-    'Body', 'stepTime', 
+    'Body', 'stepTime', 'analyzeDistribution', 
 ]
 
-FINE_DT = .01   # very fine dt. This is for sim, not for DL. 
+FINE_DT = .001   # very fine dt. This is for sim, not for DL. 
 
 class Body:
     def __init__(self) -> None:
@@ -42,3 +58,12 @@ def stepTime(
             dt = fine_dt
             time -= dt
         stepFineTime(dt)
+
+def analyzeDistribution(data, ax: Axes = None):
+    ax = ax or plt
+    data = data - np.mean(data)
+    data = data / np.std(data)
+    ax.hist(data, bins=autoBin(data), density=True)
+    X = np.linspace(-4, 4, 1000)
+    Y = norm.pdf(X)
+    ax.plot(X, Y)

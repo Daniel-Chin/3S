@@ -3,6 +3,11 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
+TRAIN_SET_PATH    = '../datasets/bounce/train'
+VALIDATE_SET_PATH = '../datasets/bounce/validate'
+VALIDATE_SET_SIZE = 64
+ACTUAL_DIM = 3
+
 EXP_NAME = 'teacher_forcing_duration_no_z_loss'
 N_RAND_INITS = 1
 
@@ -36,6 +41,7 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
     ]), 
 ])
 hP.lr = 0.001
+hP.latent_dim = 3
 hP.I = 0
 hP.T = 0
 hP.R = 0
@@ -76,6 +82,7 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
     ]), 
 ])
 hP.lr = 0.001
+hP.latent_dim = 3
 hP.I = 0
 hP.T = 0
 hP.R = 0
@@ -116,6 +123,7 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
     ]), 
 ])
 hP.lr = 0.001
+hP.latent_dim = 3
 hP.I = 0
 hP.T = 0
 hP.R = 0

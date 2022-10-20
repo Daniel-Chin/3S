@@ -3,7 +3,7 @@
 from subprocess import Popen
 from datetime import datetime
 
-t = datetime.now().strftime('%Y_%b_%d_%H;%M;%S')
+t = datetime.now().strftime('%Y_%b_%d@%H_%M_%S')
 
 sbatch_filename = f'auto_{t}.sbatch'
 

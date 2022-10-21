@@ -1,4 +1,10 @@
 #!/bin/bash
 
+echo activitng
 source activate danielTorch
+echo activited
 python smart_sb.py
+echo deactivitng
+conda deactivate
+echo deactivited
+sbatch auto.sbatch

@@ -9,13 +9,13 @@ class RNN(nn.Module):
         hidden_dim = hyperParams.rnn_width
 
         self.updateHidden = nn.Sequential(
-            nn.Linear(hidden_dim + hyperParams.latent_dim, hidden_dim), 
+            nn.Linear(hidden_dim + hyperParams.symm.latent_dim, hidden_dim), 
             nn.Tanh(), 
         )
         
-        self.projHead = nn.Linear(hidden_dim, hyperParams.latent_dim)
+        self.projHead = nn.Linear(hidden_dim, hyperParams.symm.latent_dim)
         if hyperParams.vvrnn:
-            self.logVarHead = nn.Linear(hidden_dim, hyperParams.latent_dim)
+            self.logVarHead = nn.Linear(hidden_dim, hyperParams.symm.latent_dim)
 
         self.hidden = None
         

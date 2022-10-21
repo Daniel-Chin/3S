@@ -9,9 +9,6 @@ from shared import *
 from losses import Loss_root
 from vae import VAE
 from rnn import RNN
-from symmetry_transforms import (
-    sampleTranslate, sampleRotate, sampleTR, identity, 
-)
 from linearity_metric import projectionMSE
 
 def forward(
@@ -59,39 +56,25 @@ def forward(
     if hParams.supervise_rnn:
         flat_z = flat_traj_batch
     
-    t = random.choice(
-        ['I' ] * hParams.I + 
-        ['T' ] * hParams.T + 
-        ['R' ] * hParams.R + 
-        ['TR'] * hParams.TR
-    )
-    if t == 'I':
-        trans, untrans = identity, identity
-    elif t == 'T':
-        trans, untrans = sampleTranslate(DEVICE)
-    elif t == 'R':
-        trans, untrans = sampleRotate(DEVICE)
-    elif t == 'TR':
-        trans, untrans = sampleTR(DEVICE)
-        
+    trans, untrans = hParams.symm.sample()    
     flat_z_transed = trans(flat_z)
 
     # restore time axis
     z = flat_z.view(
-        batch_size, SEQ_LEN, hParams.latent_dim, 
+        batch_size, SEQ_LEN, hParams.symm.latent_dim, 
     )
     z_transed = flat_z_transed.view(
-        batch_size, SEQ_LEN, hParams.latent_dim, 
+        batch_size, SEQ_LEN, hParams.symm.latent_dim, 
     )
     
     # rnn forward pass
     min_context = hParams.rnn_min_context
     teacher_rate = hParams.getTeacherForcingRate(epoch)
     z_hat_transed = torch.zeros((
-        batch_size, SEQ_LEN - min_context, hParams.latent_dim, 
+        batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
     ), device=DEVICE)
     log_var = torch.ones((
-        batch_size, SEQ_LEN - min_context, hParams.latent_dim, 
+        batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
     ), device=DEVICE)
     if hParams.vvrnn_static is not None:
         log_var *= hParams.vvrnn_static
@@ -109,9 +92,9 @@ def forward(
             else:
                 rnn.stepTime(z_hat_transed[:,        t, :])
     flat_z_hat = untrans(z_hat_transed.view(
-        -1, hParams.latent_dim, 
+        -1, hParams.symm.latent_dim, 
     ))
-    flat_log_var = log_var.view(-1, hParams.latent_dim)
+    flat_log_var = log_var.view(-1, hParams.symm.latent_dim)
     r_flat_z_hat = reparameterize(flat_z_hat, flat_log_var)
     if (
         not require_img_predictions and 
@@ -135,7 +118,7 @@ def forward(
             ).cpu()
 
     z_hat = flat_z_hat.view(
-        batch_size, SEQ_LEN - min_context, hParams.latent_dim, 
+        batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
     )
     z_loss = F.mse_loss(z_hat, z[:, min_context:, :])
     if hParams.supervise_rnn:

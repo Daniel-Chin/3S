@@ -5,6 +5,12 @@ import numpy as np
 import torch
 from torchWork import DEVICE
 
+__all__ = [
+    'Transform', 'TUT', 'Range', 
+    'Trivial', 'Translate', 'Rotate', 
+    'SymmetryAssumption', 
+]
+
 Transform = Callable[[torch.Tensor], torch.Tensor]
 TUT = Tuple[Transform, Transform]
 Range = Tuple[int, int]

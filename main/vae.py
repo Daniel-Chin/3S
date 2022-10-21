@@ -37,16 +37,16 @@ class VAE(nn.Module):
 
         self.encoder = nn.Sequential(*modules)
         self.fcMu  = nn.Linear(
-            self.conv_neck_dim, hyperParams.latent_dim, 
+            self.conv_neck_dim, hyperParams.symm.latent_dim, 
         )
         self.fcVar = nn.Linear(
-            self.conv_neck_dim, hyperParams.latent_dim, 
+            self.conv_neck_dim, hyperParams.symm.latent_dim, 
         )
 
         if hyperParams.deep_spread:
             self.fcBeforeDecode = nn.Sequential(
                 nn.Linear(
-                    hyperParams.latent_dim, 
+                    hyperParams.symm.latent_dim, 
                     8, 
                 ), 
                 nn.LeakyReLU(), 
@@ -57,7 +57,7 @@ class VAE(nn.Module):
             )
         else:
             self.fcBeforeDecode = nn.Linear(
-                hyperParams.latent_dim, 
+                hyperParams.symm.latent_dim, 
                 self.conv_neck_dim, 
             )
         modules = []

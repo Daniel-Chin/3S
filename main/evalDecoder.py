@@ -11,7 +11,7 @@ from shared import torch2PIL
 from vae import VAE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-teacher_forcing_duration_no_z_loss_2022_Oct_19_15;40;28
+faster_sched_sampling_2022_Oct_20@15_28_39
 '''.strip())
 LOCK_EPOCH = None
 
@@ -77,7 +77,7 @@ def main():
                 vae=VAE, 
             ), LOCK_EPOCH)['vae']
             vae.eval()
-            test_ui = TestUI(vae, group.name(), group.hyperParams.latent_dim)
+            test_ui = TestUI(vae, group.name(), group.hyperParams.symm.latent_dim)
             test_ui.win.mainloop()
 
 main()

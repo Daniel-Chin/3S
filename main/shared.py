@@ -16,6 +16,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from PIL import Image
+from symmetry_transforms import SymmetryAssumption
 
 from torchWork import *
 
@@ -30,7 +31,7 @@ class HyperParams(BaseHyperParams):
     def __init__(self) -> None:
         super().__init__()
 
-        self.latent_dim: int = None
+        self.symm: SymmetryAssumption = None
         
         self.I: int = None
         self.T: int = None
@@ -81,6 +82,7 @@ class HyperParams(BaseHyperParams):
         self.OptimClass = {
             'adam': torch.optim.Adam, 
         }[self.optim_name]
+        self.symm.ready()
     
     def getTeacherForcingRate(self, epoch):
         try:

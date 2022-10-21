@@ -1,4 +1,5 @@
 from functools import lru_cache
+from symmetry_transforms import *
 from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
@@ -41,11 +42,12 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
     ]), 
 ])
 hP.lr = 0.001
-hP.latent_dim = 3
-hP.I = 0
-hP.T = 0
-hP.R = 0
-hP.TR = 1
+hP.symm = SymmetryAssumption()
+hP.symm.latent_dim = 3
+hP.symm.rule = [
+    ((0, 2), [Translate(2, 1), Rotate(2)]), 
+    ((2, 3), [Trivial()]), 
+]
 hP.supervise_rnn = False
 hP.supervise_vae = False
 hP.variational_rnn = True
@@ -84,7 +86,12 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
     ]), 
 ])
 hP.lr = 0.001
-hP.latent_dim = 3
+hP.symm = SymmetryAssumption()
+hP.symm.latent_dim = 3
+hP.symm.rule = [
+    ((0, 2), [Translate(2, 1), Rotate(2)]), 
+    ((2, 3), [Trivial()]), 
+]
 hP.I = 0
 hP.T = 0
 hP.R = 0
@@ -127,7 +134,12 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
     ]), 
 ])
 hP.lr = 0.001
-hP.latent_dim = 3
+hP.symm = SymmetryAssumption()
+hP.symm.latent_dim = 3
+hP.symm.rule = [
+    ((0, 2), [Translate(2, 1), Rotate(2)]), 
+    ((2, 3), [Trivial()]), 
+]
 hP.I = 0
 hP.T = 0
 hP.R = 0

@@ -316,11 +316,23 @@ next {
     loss observations
         image pred loss ~ .0007 means predicting a blur
         linear proj MSE <0.2 means kinda good
-}
-next {
-    8/17
+    
+    when repr augmentation DoF < z DoF, rnn can smuggle info past the augmentation. e.g. when you apply the SAME 2D translation to two balls in the same system (z has 4d), the augmentation is equivalent to one 2D transformation to 2d of the 4d z. 
 }
 todo {
+    do challenge: out-of-frame coord extraction
+    orbiting dataset
+    two-body:
+        reject empty frame
+        reject y-z plane only motion
+        3D z (CM fixed) first
+        wrong symm assumption! shared instance
+    symm assumption:
+        just with SO we can play a lot
+    think:
+        why can y axis be nice? run vae baseline. 
+    try:
+        rnn "only imagination", Will's results
     read 5 balls by zhang kun
     diffusion exp
         more cases. 4x4 matrix

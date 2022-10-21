@@ -43,7 +43,7 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
 ])
 hP.lr = 0.001
 hP.symm = SymmetryAssumption()
-hP.symm.latent_dim = 3
+hP.symm.latent_dim = 6
 hP.symm.rule = [
     ((0, 3), [Translate(3, 1), Rotate(3)]), 
     ((3, 6), [Translate(3, 1), Rotate(3)]), 

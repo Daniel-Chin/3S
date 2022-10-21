@@ -176,11 +176,13 @@ def evalAVIs(
         save_path, f'visualize_{set_name}_epoch_{epoch}.avi', 
     )
     col_width = RESOLUTION + COL_PAD
-    row_height = (
-        RESOLUTION + Z_BAR_HEIGHT * hParams.symm.latent_dim
+    row_heights = (
+        RESOLUTION + 1, 
+        RESOLUTION + Z_BAR_HEIGHT * hParams.symm.latent_dim, 
+        RESOLUTION + Z_BAR_HEIGHT * hParams.symm.latent_dim, 
     )
     width = col_width * n_datapoints
-    height = 3 * row_height
+    height = sum(row_heights)
     out = cv2.VideoWriter(
         filename, cv2.VideoWriter_fourcc(*'RGBA'), 
         4, (width, height), 
@@ -190,6 +192,7 @@ def evalAVIs(
         for col_i in range(n_datapoints):
             x = col_i * col_width
             frame[x + RESOLUTION : x + col_width, :, :] = 255
+            y = 0
             for row_i, img in enumerate([
                 video_batch[col_i, t, :, :, :], 
                 reconstructions[col_i, t, :, :, :], 
@@ -197,37 +200,36 @@ def evalAVIs(
                     col_i, t - hParams.rnn_min_context, :, :, :, 
                 ], 
             ]):
-                y = row_i * row_height
                 if row_i < 2 or t >= hParams.rnn_min_context:
                     frame[
                         x : x + RESOLUTION, 
                         y : y + RESOLUTION, :, 
                     ] = torch2np(img)
-                    if row_i == 0:
-                        continue
-                    elif row_i == 1:
-                        _z: np.ndarray = z.numpy()
-                        _t = t
-                    elif row_i == 2:
-                        _z: np.ndarray = z_hat.numpy()
-                        _t = t - hParams.rnn_min_context
-                    y += RESOLUTION
-                    cursorX = (
-                        (_z[col_i, _t, :] + 2) * .25 * RESOLUTION
-                    ).round().astype(np.int16)
-                    for z_dim in range(hParams.symm.latent_dim):
-                        x0 = (cursorX[z_dim] - 1).clip(0, RESOLUTION)
-                        x1 = (cursorX[z_dim] + 1).clip(0, RESOLUTION)
-                        frame[
-                            x + x0 : x + x1, 
-                            y : y + Z_BAR_HEIGHT, :, 
-                        ] = 255
-                        y += Z_BAR_HEIGHT
+                    if row_i != 0:
+                        if row_i == 1:
+                            _z: np.ndarray = z.numpy()
+                            _t = t
+                        elif row_i == 2:
+                            _z: np.ndarray = z_hat.numpy()
+                            _t = t - hParams.rnn_min_context
+                        _y = y + RESOLUTION
+                        cursorX = (
+                            (_z[col_i, _t, :] + 2) * .25 * RESOLUTION
+                        ).round().astype(np.int16)
+                        for z_dim in range(hParams.symm.latent_dim):
+                            x0 = (cursorX[z_dim] - 1).clip(0, RESOLUTION)
+                            x1 = (cursorX[z_dim] + 1).clip(0, RESOLUTION)
+                            frame[
+                                x + x0 : x + x1, 
+                                _y : _y + Z_BAR_HEIGHT, :, 
+                            ] = 255
+                            _y += Z_BAR_HEIGHT
                 else:
                     frame[
                         x : x + RESOLUTION, 
-                        y : y + row_height : 4, :, 
+                        y : y + row_heights[row_i] : 4, :, 
                     ] = 255
+                y += row_heights[row_i]
         out.write(frame.transpose([1, 0, 2]))
     out.release()
 

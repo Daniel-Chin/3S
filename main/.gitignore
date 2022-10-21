@@ -4,3 +4,5 @@
 *.gif
 *.ttf
 losses.py
+*.zip
+*.gz

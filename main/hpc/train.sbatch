@@ -7,9 +7,9 @@
 #SBATCH --time=24:00:00
 #SBATCH --mem=6GB
 #SBATCH --gres=gpu:1
-#SBATCH --job-name=bounce
-#SBATCH --output=slurm_train.out
-#SBATCH --error=slurm_train.err
+#SBATCH --job-name={JOB_NAME}
+#SBATCH --output={OUT_FILENAME}.out
+#SBATCH --error={OUT_FILENAME}.err
 #SBATCH --partition=aquila,gpu
 
 module purge

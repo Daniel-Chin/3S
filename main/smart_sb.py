@@ -1,6 +1,5 @@
 #!/bin/python3
 
-print('importing...')
 import os
 from datetime import datetime
 from subprocess import Popen
@@ -17,7 +16,6 @@ def getExpName(experiment_py_path):
                 return line.split(KEYWORD)[1]
 
 def main():
-    print('main...')
     args = ArgParser()
     exp_name = getExpName(args.exp_py_path)
 

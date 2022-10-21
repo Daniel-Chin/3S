@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cd ..
-python3 smart_sb.py
+python3 smart_sb.py %1

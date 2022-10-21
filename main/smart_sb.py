@@ -6,24 +6,29 @@ from datetime import datetime
 import importlib.util
 from subprocess import Popen
 
+from arg_parser import ArgParser
+
 SBATCH_FILENAME = 'auto.sbatch'
 
-def loadModule(module_path):
+def loadExperiment(experiment_py_path):
     # this func already kinda exists in torchWork. 
     # no idea how to optimize tho
     spec = importlib.util.spec_from_file_location(
-        'what is this str', module_path, 
+        "experiment", experiment_py_path, 
     )
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+    experiment = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(experiment)
+    return (
+        experiment.EXP_NAME, 
+        experiment.N_RAND_INITS, 
+        experiment.GROUPS, 
+        experiment, 
+    )
 
 def main():
     print('main...')
-    os.chdir('..')
-    from arg_parser import ArgParser
     args = ArgParser()
-    exp = loadModule(args.exp_py_path)
+    exp_name, _, _, _ = loadExperiment(args.exp_py_path)
 
     t = datetime.now().strftime('%Y_m%m_d%d@%H_%M_%S')
 
@@ -34,7 +39,7 @@ def main():
                 fout.write(line.replace(
                     '{OUT_FILENAME}', f'{t}_%j_%x', 
                 ).replace(
-                    '{JOB_NAME}', exp.EXP_NAME, 
+                    '{JOB_NAME}', exp_name, 
                 ).replace(
                     '{ARGS}', f'"{args.exp_py_path}"', 
                 ))

@@ -1,1 +1,1 @@
-tail -f slurm_*
+tail -f *.out *.err

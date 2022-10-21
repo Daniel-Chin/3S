@@ -11,13 +11,17 @@ import cv2
 from PIL import Image
 
 from shared import *
+from physics_shared import *
 from physics_bounce import *
 
 PATH = path.join(
-    '../datasets/bounce', 
-    'train', 
-    # 'validate', 
+    # '../datasets/bounce', 
+    '../datasets/bounce_leave_view', 
+    # 'train', 
+    'validate', 
 )
+
+REJECTABLE_START = 6
 
 # GIF_INTERVAL = 200
 
@@ -51,7 +55,7 @@ class BallViewer:
         self.reset()
     
     def reset(self):
-        self.trajectory = oneLegalRun(DT, SEQ_LEN)
+        self.trajectory = oneLegalRun(DT, SEQ_LEN, REJECTABLE_START)
         self.stage = 0
         self.frames = []
 

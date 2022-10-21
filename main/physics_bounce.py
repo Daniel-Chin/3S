@@ -5,7 +5,7 @@ import numpy as np
 from physics_shared import *
 
 __all__ = [
-    'initLegalBody', 'oneLegalRun', 
+    'initLegalBody', 'oneLegalRun', 'oneRun', 
     'BALL_RADIUS', 
 ]
 
@@ -42,34 +42,37 @@ def initLegalBody():
     while True:
         body = initBody()
         if body.position[2] < .5 + BALL_RADIUS:
-            raise RejectThisSampleException
+            continue
         return body    
 
-def oneRun(dt, n_frames):
+def oneRun(dt, n_frames, rejectable_start=np.inf):
     body = initLegalBody()
     trajectory: List[List[Body]] = []
-    for _ in range(n_frames):
+    for t in range(n_frames):
         trajectory.append([body.snapshot()])
         stepTime(dt, lambda x : stepFineTime(x, body))
-        verify(body)
+        try:
+            verify(body)
+        except RejectThisSampleException:
+            if t < rejectable_start:
+                raise
     return trajectory
 
 class RejectThisSampleException(Exception): pass
 
 def verify(body: Body):
     if np.linalg.norm(body.position[:2] - POSITION_MU[:2]) > 4:
-        print('rej xy')
-        raise RejectThisSampleException
+        raise RejectThisSampleException('rej xy')
     if not 0 <= body.position[2] < 4:
-        print('rej z')
-        raise RejectThisSampleException
+        raise RejectThisSampleException('rej z')
 
 def oneLegalRun(*a, **kw):
     # rejection sampling
     while True:
         try:
             trajectory = oneRun(*a, **kw)
-        except RejectThisSampleException:
+        except RejectThisSampleException as e:
+            print(e.args[0])
             continue
         else:
             print('Accept')

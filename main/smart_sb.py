@@ -1,6 +1,7 @@
 #!/bin/python3
 
 print('importing...')
+import os
 from datetime import datetime
 import importlib.util
 from subprocess import Popen
@@ -11,7 +12,7 @@ def loadModule(module_path):
     # this func already kinda exists in torchWork. 
     # no idea how to optimize tho
     spec = importlib.util.spec_from_file_location(
-        None, module_path, 
+        'what is this str', module_path, 
     )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -19,12 +20,14 @@ def loadModule(module_path):
 
 def main():
     print('main...')
-    agp = loadModule('../arg_parser.py')
+    os.chdir('..')
+    from arg_parser import ArgParser
+    args = ArgParser()
     exp = loadModule(args.exp_py_path)
 
-    args = agp.ArgParser()
     t = datetime.now().strftime('%Y_m%m_d%d@%H_%M_%S')
 
+    os.chdir('./hpc')
     with open('template.sbatch', 'r') as fin:
         with open(SBATCH_FILENAME, 'w') as fout:
             for line in fin:

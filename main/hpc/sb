@@ -1,0 +1,4 @@
+#!/bin/bash
+
+source activate danielTorch
+python smart_sb.py

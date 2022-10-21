@@ -6,6 +6,9 @@ from torchWork import loadExperiment
 from ..arg_parser import ArgParser
 
 def main():
+    with Popen(['conda', 'deactivate']) as p:
+        p.wait()
+
     args = ArgParser()
     (
         experiment_name, n_rand_inits, groups, experiment, 

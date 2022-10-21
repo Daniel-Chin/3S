@@ -6,8 +6,10 @@ from torchWork import loadExperiment
 from ..arg_parser import ArgParser
 
 def main():
+    print('deactivating...')
     with Popen(['conda', 'deactivate']) as p:
         p.wait()
+    print('deactivated')
 
     args = ArgParser()
     (

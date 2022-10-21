@@ -1,6 +1,5 @@
 #!/bin/python3
 
-import sys
 from subprocess import Popen
 from datetime import datetime
 

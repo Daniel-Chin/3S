@@ -19,9 +19,9 @@ def loadModule(module_path):
 
 def main():
     print('main...')
-    agp = loadModule('../arg_parser')
+    agp = loadModule('../arg_parser.py')
     exp = loadModule(args.exp_py_path)
-    
+
     args = agp.ArgParser()
     t = datetime.now().strftime('%Y_m%m_d%d@%H_%M_%S')
 

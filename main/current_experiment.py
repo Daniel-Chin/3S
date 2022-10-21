@@ -8,15 +8,15 @@ VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 3
 
-EXP_NAME = 'dataset_size'
+EXP_NAME = 'tf_duration'
 N_RAND_INITS = 2
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'train_set_size'
-        self.variable_value = hyperParams.train_set_size
+        self.variable_name = 'tf_duration'
+        self.variable_value = hyperParams.teacher_forcing_duration
     
     @lru_cache(1)
     def name(self):
@@ -61,7 +61,7 @@ hP.grad_clip = .03
 hP.optim_name = 'adam'
 hP.train_set_size = 256
 hP.image_loss = 'mse'
-hP.teacher_forcing_duration = 10000
+hP.teacher_forcing_duration = 20000
 hP.max_epoch = hP.teacher_forcing_duration
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
@@ -99,12 +99,12 @@ hP.rnn_width = 16
 hP.residual = True
 hP.vae_channels = [16, 32, 64]
 hP.deep_spread = False
-hP.batch_size = 64
+hP.batch_size = 256
 hP.grad_clip = .03
 hP.optim_name = 'adam'
-hP.train_set_size = 64
+hP.train_set_size = 256
 hP.image_loss = 'mse'
-hP.teacher_forcing_duration = 10000
+hP.teacher_forcing_duration = 30000
 hP.max_epoch = hP.teacher_forcing_duration
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
@@ -142,12 +142,12 @@ hP.rnn_width = 16
 hP.residual = True
 hP.vae_channels = [16, 32, 64]
 hP.deep_spread = False
-hP.batch_size = 16
+hP.batch_size = 256
 hP.grad_clip = .03
 hP.optim_name = 'adam'
-hP.train_set_size = 16
+hP.train_set_size = 256
 hP.image_loss = 'mse'
-hP.teacher_forcing_duration = 10000
+hP.teacher_forcing_duration = 40000
 hP.max_epoch = hP.teacher_forcing_duration
 hP.ready()
 GROUPS.append(MyExpGroup(hP))

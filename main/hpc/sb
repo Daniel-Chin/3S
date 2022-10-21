@@ -3,7 +3,7 @@
 echo activitng
 source activate danielTorch
 echo activited
-python smart_sb.py
+python3 smart_sb.py
 echo deactivitng
 conda deactivate
 echo deactivited

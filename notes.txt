@@ -299,12 +299,20 @@ next {
             most don't orbit. This is to prevent correlation between momentum! 
             i.e., enforcing orbiting will make the task harder. But maybe SPS will manage to disentangle anyways! 
     
-    ask: what incorrect transforms to use? 
+    what are some symmetry assumptions?
+        method 1: the theoretic perspective. study group theory
+        method 2: the engineering perspective. treat (trans, untrans) as matrix operations. Constrained operations correspond to different matric decompositions. e.g. QR decomposition gives rotation. 
+        
+        see `symmetry_transforms.py`
+    
+    
 }
 next {
     8/17
 }
 todo {
+    readjust epoch_interval !!!
+
     read 5 balls by zhang kun
     diffusion exp
         more cases. 4x4 matrix

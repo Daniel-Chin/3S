@@ -3,32 +3,23 @@
 print('importing...')
 import os
 from datetime import datetime
-import importlib.util
 from subprocess import Popen
 
 from arg_parser import ArgParser
 
 SBATCH_FILENAME = 'auto.sbatch'
 
-def loadExperiment(experiment_py_path):
-    # this func already kinda exists in torchWork. 
-    # no idea how to optimize tho
-    spec = importlib.util.spec_from_file_location(
-        "experiment", experiment_py_path, 
-    )
-    experiment = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(experiment)
-    return (
-        experiment.EXP_NAME, 
-        experiment.N_RAND_INITS, 
-        experiment.GROUPS, 
-        experiment, 
-    )
+def getExpName(experiment_py_path):
+    KEYWORD = 'EXP_NAME = '
+    with open(experiment_py_path, 'r') as f:
+        for line in f:
+            if line.startswith(KEYWORD):
+                return line.split(KEYWORD)[1]
 
 def main():
     print('main...')
     args = ArgParser()
-    exp_name, _, _, _ = loadExperiment(args.exp_py_path)
+    exp_name = getExpName(args.exp_py_path)
 
     t = datetime.now().strftime('%Y_m%m_d%d@%H_%M_%S')
 

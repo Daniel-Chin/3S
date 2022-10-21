@@ -82,7 +82,6 @@ class HyperParams(BaseHyperParams):
         self.OptimClass = {
             'adam': torch.optim.Adam, 
         }[self.optim_name]
-        self.symm.ready()
     
     def getTeacherForcingRate(self, epoch):
         try:

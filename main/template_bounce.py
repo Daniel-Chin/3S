@@ -42,12 +42,12 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
     ]), 
 ])
 hP.lr = 0.001
-hP.symm = SymmetryAssumption()
-hP.symm.latent_dim = 3
-hP.symm.rule = [
-    ((0, 2), [Translate(2, 1), Rotate(2)]), 
-    ((2, 3), [Trivial()]), 
-]
+hP.symm = SymmetryAssumption(
+    3, [
+        ([Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        ([Trivial()], {Slice(2, 3)}), 
+    ], 
+)
 hP.supervise_rnn = False
 hP.supervise_vae = False
 hP.variational_rnn = True

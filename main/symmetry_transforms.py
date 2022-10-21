@@ -1,4 +1,4 @@
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, List, Set, Tuple
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
@@ -6,14 +6,21 @@ import torch
 from torchWork import DEVICE
 
 __all__ = [
-    'Transform', 'TUT', 'Range', 
+    'Transform', 'TUT', 'Slice', 
     'Trivial', 'Translate', 'Rotate', 
     'SymmetryAssumption', 
 ]
 
 Transform = Callable[[torch.Tensor], torch.Tensor]
 TUT = Tuple[Transform, Transform]
-Range = Tuple[int, int]
+
+class Slice:
+    def __init__(self, start: int, stop: int) -> None:
+        self.start = start
+        self.stop = stop
+
+    def __hash__(self):
+        return hash(self.start) ^ hash(self.stop)
 
 class Group(metaclass=ABCMeta):
     @abstractmethod
@@ -63,41 +70,61 @@ class Rotate(Group):
             return (x @ unrotate)
         return transform, untransform
 
-class SymmetryAssumption:
-    def __init__(self) -> None:
-        self.latent_dim: int
-        self.rule: List[Tuple[Range, List[Group]]] = {}
+class Cattor:
+    def __init__(self, capacity: int) -> None:
+        self.capacity = capacity
+        self.buffer: List[Tuple[Slice, torch.Tensor]] = []
     
-    def ready(self):
-        acc = 0
-        for (start, stop), _ in self.rule:
-            assert start == acc
-            assert stop > start
-            acc = stop
-        assert acc == self.latent_dim
+    def eat(self, dim_slice: Slice, data: torch.Tensor):
+        self.buffer.append((dim_slice, data))
+    
+    def cat(self, dim: int):
+        self.buffer.sort(key = lambda x : x[0].start)
+        return torch.cat([
+            data for _, data in self.buffer
+        ], dim=dim)
+
+class SymmetryAssumption:
+    Instance = List[Tuple[List[TUT], Set[Slice]]]
+    
+    def __init__(
+        self, latent_dim: int, 
+        rule: List[Tuple[List[Group], Set[Slice]]], 
+    ) -> None:
+        self.latent_dim = latent_dim
+        self.rule = rule
+
+        dim_set = set()
+        for _, slice_set in self.rule:
+            for dim_slice in slice_set:
+                new_dim_set = set(range(dim_slice.start, dim_slice.stop))
+                assert not dim_set.intersection(new_dim_set)
+                dim_set.update(new_dim_set)
+        assert dim_set == set(range(self.latent_dim))
     
     def apply(
         self, x: torch.Tensor, /, 
-        instance: List[Tuple[Range, List[TUT]]], 
+        instance: Instance, 
         trans_or_untrans: int, 
     ): 
-        out = []
-        for (start, stop), tut_seq in instance:
-            x_slice = x[:, start:stop]
-            for tut in (
-                identity if trans_or_untrans == 0 else reversed
-            )(tut_seq):
-                f = tut[trans_or_untrans]
-                x_slice = f(x_slice)
-            out.append(x_slice)
-        return torch.cat(out, dim=1)
+        cattor = Cattor(self.latent_dim)
+        for tut_seq, slice_set in instance:
+            for dim_slice in slice_set:
+                x_slice = x[:, dim_slice.start : dim_slice.stop]
+                for tut in (
+                    identity if trans_or_untrans == 0 else reversed
+                )(tut_seq):
+                    f = tut[trans_or_untrans]
+                    x_slice = f(x_slice)
+                cattor.eat(dim_slice, x_slice)
+        return cattor.cat(dim=1)
     
     def sample(self) -> TUT:
         # instantiate
-        instance: List[Tuple[Range, List[TUT]]] = []
-        for dim_range, group_seq in self.rule:
+        instance: __class__.Instance = []
+        for group_seq, slice_set in self.rule:
             tut_seq: List[TUT] = []
-            instance.append((dim_range, tut_seq))
+            instance.append((tut_seq, slice_set))
             for group in group_seq:
                 tut_seq.append(group.sample())
         
@@ -110,13 +137,10 @@ class SymmetryAssumption:
         return trans, untrans
 
 def test(size=100):
-    symm = SymmetryAssumption()
-    symm.latent_dim = 3
-    symm.rule = [
-        ((0, 2), [Translate(2, 1), Rotate(2)]), 
-        ((2, 3), [Trivial()]), 
-    ]
-    symm.ready()
+    symm = SymmetryAssumption(3, [
+        ([Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        ([Trivial()], {Slice(2, 3)}), 
+    ])
 
     points = torch.randn((size, 3))
     trans, untrans = symm.sample()

@@ -1,4 +1,4 @@
 *.torchworklosslog
 *.pt
-*.gif
 *.gz
+*.avi

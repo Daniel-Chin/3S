@@ -6,7 +6,8 @@ __all__ = [
     'ENTIRE_DATASET_IN_DEVICE', 
     'SLOW_EVAL_EPOCH_INTERVAL', 
     
-    'HyperParams', 'torch2PIL', 'reparameterize', 
+    'HyperParams', 'torch2PIL', 'torch2np', 
+    'reparameterize', 
 ]
 
 from typing import Callable, List, Optional
@@ -101,11 +102,14 @@ class HyperParams(BaseHyperParams):
         finally:
             self.teacher_forcing_duration = saved
 
-def torch2PIL(torchImg: torch.Tensor):
-    return Image.fromarray((
+def torch2np(torchImg: torch.Tensor):
+    return (
         torchImg.cpu().detach().clamp(0, 1)
         .permute(1, 2, 0) * 255
-    ).round().numpy().astype(np.uint8), 'RGB')
+    ).round().numpy().astype(np.uint8)
+
+def torch2PIL(torchImg: torch.Tensor):
+    return Image.fromarray(torch2np(torchImg), 'RGB')
 
 def reparameterize(mu, log_var):
     std = torch.exp(0.5 * log_var)

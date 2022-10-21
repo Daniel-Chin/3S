@@ -139,7 +139,7 @@ def forward(
         lossTree, reconstructions.view(
             batch_size, SEQ_LEN, 
             IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
-        ), img_predictions, 
+        ), img_predictions, z, z_hat, 
         [
             ('mean_square_vrnn_std', mean_square_vrnn_std), 
             ('linear_proj_mse', linear_proj_mse)

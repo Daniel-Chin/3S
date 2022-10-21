@@ -1,18 +1,22 @@
 from os import path
-from typing import List, Dict
+from typing import Dict
 import inspect
 
 import torch
 import torch.utils.data
-from PIL import Image, ImageDraw
+import cv2
 from torchWork import Profiler, LossLogger, saveModels, HAS_CUDA
 from torchWork.utils import getGradNorm, getParams
+import numpy as np
 
 from shared import *
 from forward_pass import forward
 from vae import VAE
 from rnn import RNN
 from load_dataset import Dataset
+
+COL_PAD = 1
+Z_BAR_HEIGHT = 4
 
 def dataLoader(dataset, batch_size, set_size=None):
     n_batches = None
@@ -62,7 +66,7 @@ def oneEpoch(
         with profiler('train'):
             (
                 lossTree, reconstructions, img_predictions, 
-                extra_logs, 
+                z, z_hat, extra_logs, 
             ) = forward(
                 epoch, experiment, hParams, 
                 video_batch, traj_batch, 
@@ -112,7 +116,7 @@ def oneEpoch(
             with profiler('validate'):
                 (
                     lossTree, reconstructions, img_predictions, 
-                    extra_logs, 
+                    z, z_hat, extra_logs, 
                 ) = forward(
                     epoch, experiment, hParams, 
                     video_batch, traj_batch, 
@@ -135,13 +139,13 @@ def oneEpoch(
         if epoch % SLOW_EVAL_EPOCH_INTERVAL == 0:
             with profiler('save checkpoints'):
                 saveModels(models, epoch, save_path)
-            with profiler('gif'):
+            with profiler('avi'):
                 for name, dataset in [
                     ('train', trainSet), 
                     ('validate', validateSet), 
                 ]:
                     loader = dataLoader(dataset, 24)
-                    evalGIFs(
+                    evalAVIs(
                         epoch, save_path, name, 
                         experiment, hParams, *next(loader), 
                         vae, rnn, profiler, 
@@ -154,7 +158,7 @@ def oneEpoch(
             profiler.report()
     return True
 
-def evalGIFs(
+def evalAVIs(
     epoch, save_path, set_name, 
     experiment, hParams: HyperParams, 
     video_batch: torch.Tensor, traj_batch, 
@@ -163,50 +167,68 @@ def evalGIFs(
     n_datapoints = video_batch.shape[0]
     (
         lossTree, reconstructions, img_predictions, 
-        extra_logs, 
+        z, z_hat, extra_logs, 
     ) = forward(
         epoch, experiment, hParams, video_batch, traj_batch, 
         vae, rnn, profiler, True, 
     )
-    frames: List[Image.Image] = []
-    for t in range(SEQ_LEN):
-        frame = Image.new('RGB', (
-            RESOLUTION * n_datapoints, RESOLUTION * 3, 
-        ))
-        frames.append(frame)
-        imDraw = ImageDraw.Draw(frame)
-        for i in range(n_datapoints):
-            frame.paste(
-                torch2PIL(video_batch[i, t, :, :, :]), 
-                (i * RESOLUTION, 0 * RESOLUTION), 
-            )
-            frame.paste(
-                torch2PIL(reconstructions[i, t, :, :, :]), 
-                (i * RESOLUTION, 1 * RESOLUTION), 
-            )
-            if t >= hParams.rnn_min_context:
-                frame.paste(
-                    torch2PIL(img_predictions[
-                        i, t - hParams.rnn_min_context, :, :, :, 
-                    ]), 
-                    (i * RESOLUTION, 2 * RESOLUTION), 
-                )
-            else:
-                imDraw.line((
-                    (i + .2) * RESOLUTION, 2.2 * RESOLUTION, 
-                    (i + .8) * RESOLUTION, 2.8 * RESOLUTION, 
-                ), fill='white')
-                imDraw.line((
-                    (i + .2) * RESOLUTION, 2.8 * RESOLUTION, 
-                    (i + .8) * RESOLUTION, 2.2 * RESOLUTION, 
-                ), fill='white')
-
     filename = path.join(
-        save_path, f'visualize_{set_name}_epoch_{epoch}.gif', 
+        save_path, f'visualize_{set_name}_epoch_{epoch}.avi', 
     )
-    frames[0].save(
-        filename, 
-        save_all=True, append_images=frames[1:], 
-        duration=300, loop=0, 
+    col_width = RESOLUTION + COL_PAD
+    row_height = (
+        RESOLUTION + Z_BAR_HEIGHT * hParams.symm.latent_dim
     )
+    width = col_width * n_datapoints
+    height = 3 * row_height
+    out = cv2.VideoWriter(
+        filename, cv2.VideoWriter_fourcc(*'RGBA'), 
+        4, (width, height), 
+    )
+    for t in range(SEQ_LEN):
+        frame = np.zeros((width, height, 3), dtype=np.uint8)
+        for col_i in range(n_datapoints):
+            x = col_i * col_width
+            frame[x + RESOLUTION : x + col_width, :, :] = 255
+            for row_i, img in enumerate([
+                video_batch[col_i, t, :, :, :], 
+                reconstructions[col_i, t, :, :, :], 
+                img_predictions[
+                    col_i, t - hParams.rnn_min_context, :, :, :, 
+                ], 
+            ]):
+                y = row_i * row_height
+                if row_i < 2 or t >= hParams.rnn_min_context:
+                    frame[
+                        x : x + RESOLUTION, 
+                        y : y + RESOLUTION, :, 
+                    ] = torch2np(img)
+                    if row_i == 0:
+                        continue
+                    elif row_i == 1:
+                        _z: np.ndarray = z.numpy()
+                        _t = t
+                    elif row_i == 2:
+                        _z: np.ndarray = z_hat.numpy()
+                        _t = t - hParams.rnn_min_context
+                    y += RESOLUTION
+                    cursorX = (
+                        (_z[col_i, _t, :] + 2) * .25 * RESOLUTION
+                    ).round().astype(np.int16)
+                    for z_dim in range(hParams.symm.latent_dim):
+                        x0 = (cursorX[z_dim] - 1).clip(0, RESOLUTION)
+                        x1 = (cursorX[z_dim] + 1).clip(0, RESOLUTION)
+                        frame[
+                            x + x0 : x + x1, 
+                            y : y + Z_BAR_HEIGHT, :, 
+                        ] = 255
+                        y += Z_BAR_HEIGHT
+                else:
+                    frame[
+                        x : x + RESOLUTION, 
+                        y : y + row_height : 4, :, 
+                    ] = 255
+        out.write(frame.transpose([1, 0, 2]))
+    out.release()
+
     # print(f'Saved `{filename}`.')

@@ -1,4 +1,5 @@
 import argparse
+from os import path
 
 DEFAULT_EXP = './current_experiment.py'
 
@@ -12,3 +13,4 @@ class ArgParser:
         args = parser.parse_args()
 
         self.exp_py_path = args.exp_py_path
+        assert path.isfile(self.exp_py_path)

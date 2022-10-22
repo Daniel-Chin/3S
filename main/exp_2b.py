@@ -64,7 +64,7 @@ hP.grad_clip = .03
 hP.optim_name = 'adam'
 hP.train_set_size = 256
 hP.image_loss = 'mse'
-hP.teacher_forcing_duration = 30000
+hP.teacher_forcing_duration = 40000
 hP.max_epoch = hP.teacher_forcing_duration
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
@@ -108,7 +108,7 @@ hP.grad_clip = .03
 hP.optim_name = 'adam'
 hP.train_set_size = 256
 hP.image_loss = 'mse'
-hP.teacher_forcing_duration = 30000
+hP.teacher_forcing_duration = 40000
 hP.max_epoch = hP.teacher_forcing_duration
 hP.ready()
 GROUPS.append(MyExpGroup(hP))

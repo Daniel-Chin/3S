@@ -21,7 +21,7 @@ __all__ = [
 WIN_W = 320
 WIN_H = 320
 BACKGROUND = .6
-DRAW_GIRD = True
+DRAW_GIRD = False
 
 VIEW = np.array([-0.8, 0.8, -0.8, 0.8, 1.0, 100.0])  # 视景体的left/right/bottom/top/near/far六个面
 SCALE_K = np.array([1.0, 1.0, 1.0])  # 模型缩放比例

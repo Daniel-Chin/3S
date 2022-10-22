@@ -1,4 +1,3 @@
-from os import path
 import time
 from typing import List
 import json
@@ -21,7 +20,8 @@ __all__ = [
 
 WIN_W = 320
 WIN_H = 320
-DRAW_GIRD = False
+BACKGROUND = .6
+DRAW_GIRD = True
 
 VIEW = np.array([-0.8, 0.8, -0.8, 0.8, 1.0, 100.0])  # 视景体的left/right/bottom/top/near/far六个面
 SCALE_K = np.array([1.0, 1.0, 1.0])  # 模型缩放比例
@@ -59,8 +59,6 @@ class BallViewer(metaclass=ABCMeta):
         raise NotImplemented
 
     def loop(self):
-        if DRAW_GIRD:
-            self.drawGrid()
         if self.render_or_screenshot == 0:
             if self.running_mode is MODE_LOCATE:
                 self.locate_with_ball()
@@ -88,7 +86,7 @@ class BallViewer(metaclass=ABCMeta):
         
         self.render_or_screenshot = 1 - self.render_or_screenshot
     
-    def makeBall(self, x, y, z, r=1, color3f=(0, 1, 0)):
+    def makeBall(self, x, y, z, r=1, color3f=(0., 1., 0.)):
         glPushMatrix()
         glColor3f(* color3f)
         glTranslatef(x, y, z)
@@ -99,8 +97,8 @@ class BallViewer(metaclass=ABCMeta):
     
     def makeBodies(self, *bodies: Body):
         for body, color in zip(bodies, (
-            (0, 1, 0), 
-            (1, 0, 1), 
+            (0., 1., 0.), 
+            (1., 0., 1.), 
         )):
             self.makeBall(*body.position, self.ball_radius, color)
 
@@ -130,15 +128,23 @@ class BallViewer(metaclass=ABCMeta):
         raise NotImplemented
 
     def drawGrid(self):
-        glLineWidth(3)
-        glBegin(GL_LINES)
-        glColor4f(0.0, 0.0, 0.0, 1)  # 设置当前颜色为黑色不透明
-        for i in np.linspace(-15, 15, 19):
-            glVertex3f(i, -100, 0)
-            glVertex3f(i, +100, 0)
-            glVertex3f(-100, i, 0)
-            glVertex3f(+100, i, 0)
-        glEnd()
+        glLineWidth(2)
+        luminosity = .7
+        glColor3f(luminosity, luminosity, luminosity)
+        for x in np.linspace(-7.3, 6.81, 4):
+            for y in np.linspace(-6.53, 7.03, 4):
+                glBegin(GL_LINES)
+                glVertex3f(x, y, -100)
+                glVertex3f(x, y, +100)
+                glEnd()
+                glBegin(GL_LINES)
+                glVertex3f(x, -100, y)
+                glVertex3f(x, +100, y)
+                glEnd()
+                glBegin(GL_LINES)
+                glVertex3f(-100, x, y)
+                glVertex3f(+100, x, y)
+                glEnd()
 
     def initGlut(self):
         glutInit()
@@ -150,7 +156,7 @@ class BallViewer(metaclass=ABCMeta):
         glutCreateWindow('Ball Throwing Simulation')
 
         # 初始化画布
-        glClearColor(0.4, 0.4, 0.4, 1.0)  # 设置画布背景色。注意：这里必须是4个参数
+        glClearColor(BACKGROUND, BACKGROUND, BACKGROUND, 1.0)  # 设置画布背景色。注意：这里必须是4个参数
         glEnable(GL_DEPTH_TEST)  # 开启深度测试，实现遮挡关系
         glDepthFunc(GL_LEQUAL)  # 设置深度测试函数（GL_LEQUAL只是选项之一）-
         glEnable(GL_LIGHT0)  # 启用0号光源
@@ -168,6 +174,8 @@ class BallViewer(metaclass=ABCMeta):
 
     def draw(self):
         self.initRender()
+        if DRAW_GIRD:
+            self.drawGrid()
         glEnable(GL_LIGHTING)  # 启动光照
         self.loop()
         glDisable(GL_LIGHTING)  # 每次渲染后复位光照状态

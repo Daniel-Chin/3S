@@ -330,7 +330,7 @@ todo {
     symm assumption:
         just with SO we can play a lot
     think:
-        why can y axis be nice? run vae baseline. 
+        why can y axis be nice (linear)? run vae baseline. 
     try:
         rnn "only imagination", Will's results
     read 5 balls by zhang kun

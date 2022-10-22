@@ -11,7 +11,7 @@ from shared import torch2PIL
 from vae import VAE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-faster_sched_sampling_2022_Oct_20@15_28_39
+2022_m10_d22@01_27_00_tf_duration
 '''.strip())
 LOCK_EPOCH = None
 

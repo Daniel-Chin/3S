@@ -63,12 +63,11 @@ class VideoWriter:
         try:
             if poll is not None:
                 raise EOFError(f'ffmpeg exited with {poll}')
+            self.ffmpeg.stdin.write(img.tobytes())
         except (EOFError, BrokenPipeError):
             self.ffmpeg.reportCollectedOutErr()
             sys.stdout.flush()
             raise
-        else:
-            self.ffmpeg.stdin.write(img.tobytes())
 
 def videoEval(
     epoch, save_path, set_name, 

@@ -327,17 +327,18 @@ next {
         I think this precents collapse. RNN output is pulled to encoded z. rnn input may be encouraged to collapse, but at least not directly. 
         z pred loss is desirable because image loss is pixel based and may not directly pull z in the right direction. 
         exp: stop_grad z_loss
-}
-todo {
-    do challenge: out-of-frame coord extraction
-    orbiting dataset
-    two-body:
+    two-body dataset:
+        focus on orbiting motions. 
         reject empty frame
         reject y-z plane only motion
         3D z (CM fixed) first
-        wrong symm assumption! shared instance
-    symm assumption:
-        just with SO we can play a lot
+        fix wrong symm assumption! shared TUT instance
+    trying incorrect symm augs. 
+        Gus: just with SO(n) we have a lot to play with.
+        exp: wrong_assum
+}
+todo {
+    do challenge: out-of-frame coord extraction
     think:
         why can y axis be nice (linear)? run vae baseline. 
     try:
@@ -346,8 +347,6 @@ todo {
     diffusion exp
         more cases. 4x4 matrix
         yihuajiemu half
-    next step
-        try incorrect constraints
     test z pred loss
     test smaller dataset
 }

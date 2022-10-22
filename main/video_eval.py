@@ -2,11 +2,21 @@ from os import path
 import sys
 import subprocess as sp
 from contextlib import contextmanager
-from io import StringIO
 
 import cv2
 import numpy as np
 import torch
+try:
+    from async_std import PopenAsyncStd
+except ImportError as e:
+    module_name = str(e).split('No module named ', 1)[1].strip().strip('"\'')
+    if module_name in (
+        'async_std', 
+    ):
+        print(f'Missing module {module_name}. Please download at')
+        print(f'https://github.com/Daniel-Chin/Python_Lib')
+        input('Press Enter to quit...')
+    raise e
 
 from shared import *
 from forward_pass import forward
@@ -30,17 +40,12 @@ class VideoWriter:
             '-vcodec', 'libx265', '-pix_fmt', 'yuv420p', 
             '-crf', '24', 
         ]
-        # self.ff_out = StringIO()
-        self.ff_err = StringIO()
     
     @contextmanager
     def context(self, filename):
-        with sp.Popen(
+        with PopenAsyncStd(
             [*self.args, filename], stdin=sp.PIPE, 
-            stdout=sp.DEVNULL, 
-            stderr=sp.PIPE, 
         ) as self.ffmpeg:
-            self.in_context = True
             try:
                 yield self
             finally:
@@ -50,7 +55,6 @@ class VideoWriter:
                 ffmpeg.wait()
     
     def write(self, img):
-        self.ff_err.write(self.ffmpeg.stderr.read())
         img = cv2.resize(
             img, self.scaled_dims, 
             interpolation=cv2.INTER_NEAREST, 
@@ -58,19 +62,13 @@ class VideoWriter:
         poll = self.ffmpeg.poll()
         try:
             if poll is not None:
-                raise Exception(f'ffmpeg exited with {poll}')
-            self.ffmpeg.stdin.write(img.tobytes())
-        except BrokenPipeError:
-            self.ff_err.write(self.ffmpeg.stdout.read())
-            for io in (self.ff_err, ):
-                io.seek(0)
-                print()
-                print('ffmpeg std:')
-                print()
-                print(io.read())
-                print()
+                raise EOFError(f'ffmpeg exited with {poll}')
+        except (EOFError, BrokenPipeError):
+            self.ffmpeg.reportCollectedOutErr()
             sys.stdout.flush()
             raise
+        else:
+            self.ffmpeg.stdin.write(img.tobytes())
 
 def videoEval(
     epoch, save_path, set_name, 

@@ -37,7 +37,7 @@ class VideoWriter:
             '-s', f'{self.scaled_dims[0]}x{self.scaled_dims[1]}', 
             '-pixel_format', 'bgr24', '-f', 'rawvideo', 
             '-r', str(FPS), '-i', 'pipe:', 
-            '-vcodec', 'libx265', '-pix_fmt', 'yuv420p', 
+            '-vcodec', 'libx264', '-pix_fmt', 'yuv420p', 
             '-crf', '24', 
         ]
     

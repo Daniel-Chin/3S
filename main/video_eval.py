@@ -2,7 +2,6 @@ from os import path
 import sys
 import subprocess as sp
 from contextlib import contextmanager
-from io import StringIO
 
 import cv2
 import numpy as np
@@ -30,15 +29,17 @@ class VideoWriter:
             '-vcodec', 'libx265', '-pix_fmt', 'yuv420p', 
             '-crf', '24', 
         ]
-        self.ff_out = StringIO()
-        self.ff_err = StringIO()
+        # self.ff_out = StringIO()
+        # self.ff_err = StringIO()
     
     @contextmanager
     def context(self, filename):
         with sp.Popen(
             [*self.args, filename], stdin=sp.PIPE, 
-            stdout=self.ff_out, 
-            stderr=self.ff_err, 
+            # stdout=self.ff_out, 
+            # stderr=self.ff_err, 
+            stdout=sp.DEVNULL, 
+            stderr=sp.DEVNULL, 
         ) as self.ffmpeg:
             self.in_context = True
             try:
@@ -58,14 +59,14 @@ class VideoWriter:
         if poll is None:
             self.ffmpeg.stdin.write(img.tobytes())
         else:
-            for io in (self.ff_out, self.ff_err):
-                io.seek(0)
-                print()
-                print('ffmpeg std:')
-                print()
-                print(io.read())
-                print()
-            sys.stdout.flush()
+            # for io in (self.ff_out, self.ff_err):
+            #     io.seek(0)
+            #     print()
+            #     print('ffmpeg std:')
+            #     print()
+            #     print(io.read())
+            #     print()
+            # sys.stdout.flush()
             raise Exception(f'ffmpeg exited with {poll}')
 
 def videoEval(

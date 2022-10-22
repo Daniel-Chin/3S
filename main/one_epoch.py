@@ -194,24 +194,24 @@ def evalAVIs(
             frame[x + RESOLUTION : x + col_width, :, :] = 255
             y = 0
             for row_i, img in enumerate([
-                video_batch[col_i, t, :, :, :], 
-                reconstructions[col_i, t, :, :, :], 
-                img_predictions[
-                    col_i, t - hParams.rnn_min_context, :, :, :, 
-                ], 
+                video_batch, 
+                reconstructions, 
+                img_predictions, 
             ]):
                 if row_i < 2 or t >= hParams.rnn_min_context:
+                    if row_i == 0:
+                        _t = t
+                    elif row_i == 1:
+                        _z: np.ndarray = z.numpy()
+                        _t = t
+                    elif row_i == 2:
+                        _z: np.ndarray = z_hat.numpy()
+                        _t = t - hParams.rnn_min_context
                     frame[
                         x : x + RESOLUTION, 
                         y : y + RESOLUTION, :, 
-                    ] = torch2np(img)
+                    ] = torch2np(img[col_i, _t, :, :, :])
                     if row_i != 0:
-                        if row_i == 1:
-                            _z: np.ndarray = z.numpy()
-                            _t = t
-                        elif row_i == 2:
-                            _z: np.ndarray = z_hat.numpy()
-                            _t = t - hParams.rnn_min_context
                         _y = y + RESOLUTION
                         cursorX = (
                             (_z[col_i, _t, :] + 2) * .25 * RESOLUTION
@@ -225,10 +225,11 @@ def evalAVIs(
                             ] = 255
                             _y += Z_BAR_HEIGHT
                 else:
-                    frame[
-                        x : x + RESOLUTION, 
-                        y : y + row_heights[row_i] : 4, :, 
-                    ] = 255
+                    cv2.line(
+                        frame, (y - 1, x - 1), 
+                        (y + row_heights[row_i], x + RESOLUTION), 
+                        (255, 255, 255), 1, 
+                    )
                 y += row_heights[row_i]
         out.write(frame.transpose([1, 0, 2]))
     out.release()

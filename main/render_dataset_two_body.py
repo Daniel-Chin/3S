@@ -20,10 +20,13 @@ PATH = path.join(
     'validate', 
 )
 
+CENTER_OF_MASS_STATIONARY = True
+REJECTABLE_START = np.inf
+
 WIN_W = 320
 WIN_H = 320
 SPF = .1
-DT = .3
+DT = 1.5
 DRAW_GIRD = False
 
 MODE_LOCATE = 'locate'
@@ -31,8 +34,8 @@ MODE_OBV_ONLY = 'obv_only'
 MODE_MAKE_IMG = 'make_img'
 
 # RUNNING_MODE = MODE_LOCATE
-# RUNNING_MODE = MODE_OBV_ONLY
-RUNNING_MODE = MODE_MAKE_IMG
+RUNNING_MODE = MODE_OBV_ONLY
+# RUNNING_MODE = MODE_MAKE_IMG
 
 VIEW = np.array([-0.8, 0.8, -0.8, 0.8, 1.0, 100.0])  # 视景体的left/right/bottom/top/near/far六个面
 SCALE_K = np.array([1.0, 1.0, 1.0])  # 模型缩放比例
@@ -50,7 +53,11 @@ class BallViewer:
         self.reset()
     
     def reset(self):
-        self.trajectory, _ = oneLegalRun(DT, SEQ_LEN, 7)
+        self.trajectory, _ = oneLegalRun(
+            DT, SEQ_LEN, 
+            CENTER_OF_MASS_STATIONARY, REJECTABLE_START, 
+            EYE, 
+        )
         self.stage = 0
         self.frames = []
 

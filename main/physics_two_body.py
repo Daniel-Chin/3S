@@ -14,14 +14,20 @@ __all__ = [
 ]
 
 POSITION_STD = 1
-VELOCITY_STD = 1
+VELOCITY_STD = .3
 G = 1
-BALL_RADIUS = .5
+BALL_RADIUS = .8
 VIEW_RADIUS = 7
+OCCLUSION_THRES = .998
 
-class EmptyFrameException(Exception): pass
-class CollisionException(Exception): pass
-class RejectThisSampleException(Exception): pass
+class Reject(Exception): pass
+class StrongRejection(Reject): pass
+
+class EmptyFrameException(Reject): pass
+
+class CollisionException(StrongRejection): pass
+class OccludedException(StrongRejection): pass
+class AngularVelocityTooLarge(StrongRejection): pass
 
 def stepFineTime(a: Body, b: Body, /, dt: float):
     # O(2n) = O(n). Readability first. 
@@ -33,53 +39,72 @@ def stepFineTime(a: Body, b: Body, /, dt: float):
         self.velocity += dt * force
         self.position += dt * self.velocity
 
-def initBodies():
-    bodies: List[Body] = []
-    for _ in range(2):
-        body = Body()
-        bodies.append(body)
-        body.position = np.random.normal(
-            0, POSITION_STD, 3, 
-        )
-        body.velocity = np.random.normal(
-            0, VELOCITY_STD, 3, 
-        )
-    return bodies
+def toUnit(x: np.ndarray, /):
+    return x / np.linalg.norm(x)
 
-def oneRun(dt: float, n_frames: int, rejectable_start: int):
-    bodies = initBodies()
+def initBodies(center_of_mass_stationary: bool):
+    assert center_of_mass_stationary
+
+    body = Body()
+    body.position = np.random.normal(
+        0, POSITION_STD, 3, 
+    )
+    body.velocity = np.random.normal(
+        0, VELOCITY_STD, 3, 
+    )
+    position_unit = toUnit(body.position)
+    normal_to_sphere = np.dot(
+        body.velocity, position_unit
+    ) * position_unit
+    body.velocity -= normal_to_sphere   # make it tangent
+
+    otherBody = Body()
+    otherBody.position = - body.position
+    otherBody.velocity = - body.velocity
+    return body, otherBody
+
+def oneRun(
+    dt: float, n_frames: int, 
+    center_of_mass_stationary: bool, 
+    rejectable_start: int, eye_pos, 
+):
+    bodies = initBodies(center_of_mass_stationary)
     trajectory: List[List[Body]] = []
     acc = 0
     for t in range(n_frames):
         trajectory.append([x.snapshot() for x in bodies])
         stepTime(dt, lambda x : stepFineTime(*bodies, x))
         try:
-            verify(bodies)
+            verify(bodies, eye_pos)
         except EmptyFrameException:
             if t < rejectable_start:
-                raise RejectThisSampleException
+                raise
             else:
                 acc += 1
-        except CollisionException:
-            raise RejectThisSampleException
     return trajectory, acc
 
-def verify(bodies: List[Body]):
-    for body in bodies:
-        if np.linalg.norm(body.position) > VIEW_RADIUS:
-            raise EmptyFrameException
+def verify(bodies: List[Body], eye_pos: np.ndarray):
     if np.linalg.norm(
         bodies[0].position - bodies[1].position
     ) < 2 * BALL_RADIUS:
         raise CollisionException
+    
+    displace = [b.position - eye_pos for b in bodies]
+    unit_displace = [x / np.linalg.norm(x) for x in displace]
+    if np.dot(*unit_displace) > OCCLUSION_THRES:
+        raise OccludedException
+    
+    for body in bodies:
+        if np.linalg.norm(body.position) > VIEW_RADIUS:
+            raise EmptyFrameException
 
 def oneLegalRun(*a, **kw):
     # rejection sampling
     while True:
         try:
             trajectory, n_empty = oneRun(*a, **kw)
-        except RejectThisSampleException:
-            print('rej')
+        except Reject as e:
+            print('rej:', repr(e))
             continue
         else:
             print('Accept')

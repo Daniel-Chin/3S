@@ -1,0 +1,5 @@
+we may actually need 40K. 
+
+Discussions:
+    pred quality: all alike. 
+    disentanglement: slower sched samp leads to better results. 

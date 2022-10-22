@@ -98,10 +98,10 @@ def videoEval(
                         if row_i == 0:
                             _t = t
                         elif row_i == 1:
-                            _z: np.ndarray = z.numpy()
+                            _z: np.ndarray = z.cpu().numpy()
                             _t = t
                         elif row_i == 2:
-                            _z: np.ndarray = z_hat.numpy()
+                            _z: np.ndarray = z_hat.cpu().numpy()
                             _t = t - hParams.rnn_min_context
                         frame[
                             x : x + RESOLUTION, 

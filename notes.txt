@@ -323,6 +323,10 @@ next {
     2022_m10_d22@01_27_00_tf_duration
         we need 40k sched samp. 
         See plots.pdf
+        
+        see evalDecoder
+        height axis is sometimes not height. 
+        when it's height, it's divided into two regions, one representing "unsure prediction" (blurry). The two regions are connected where the ball touches the ground, which is the only reasonable snitching plane in the z space, when your uncond prior is gaussian. 
     idea: z pred loss may need to stop grad from encoder. 
         I think this precents collapse. RNN output is pulled to encoded z. rnn input may be encouraged to collapse, but at least not directly. 
         z pred loss is desirable because image loss is pixel based and may not directly pull z in the right direction. 
@@ -336,11 +340,14 @@ next {
     trying incorrect symm augs. 
         Gus: just with SO(n) we have a lot to play with.
         exp: wrong_assum
+    exp: vae_baseline
+        research question: why can y axis be nice (linear)?
+        Logically, VAE should be able to have nice linearity. 
+        Let's see. 
+        If still confused, next: 1d ball dataset. exclude disentanglement from the picture, and only test linearity. 
 }
 todo {
     do challenge: out-of-frame coord extraction
-    think:
-        why can y axis be nice (linear)? run vae baseline. 
     try:
         rnn "only imagination", Will's results
     read 5 balls by zhang kun

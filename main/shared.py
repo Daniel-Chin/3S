@@ -48,6 +48,7 @@ class HyperParams(BaseHyperParams):
 
         self.rnn_width: int = None
         self.residual: bool = None
+        self.jepa_stop_grad_encoder: bool = True
         self.vae_channels: List[int] = None
         self.deep_spread: bool = None
 

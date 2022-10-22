@@ -9,7 +9,7 @@ VALIDATE_SET_PATH = '../datasets/two_body/validate'
 VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 6
 
-EXP_NAME = 'two_body'
+EXP_NAME = 'test'
 N_RAND_INITS = 2
 
 class MyExpGroup(ExperimentGroup):
@@ -56,7 +56,6 @@ hP.rnn_min_context = 4
 hP.rnn_min_context = 19 # skips rnn
 hP.rnn_width = 16
 hP.residual = True
-hP.jepa_stop_grad_encoder = True
 hP.vae_channels = [32, 32, 64]
 hP.deep_spread = False
 hP.batch_size = 256

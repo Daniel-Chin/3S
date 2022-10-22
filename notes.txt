@@ -319,6 +319,15 @@ next {
     
     when repr augmentation DoF < z DoF, rnn can smuggle info past the augmentation. e.g. when you apply the SAME 2D translation to two balls in the same system (z has 4d), the augmentation is equivalent to one 2D transformation to 2d of the 4d z. 
 }
+10/22 {
+    2022_m10_d22@01_27_00_tf_duration
+        we need 40k sched samp. 
+        See plots.pdf
+    idea: z pred loss may need to stop grad from encoder. 
+        I think this precents collapse. RNN output is pulled to encoded z. rnn input may be encouraged to collapse, but at least not directly. 
+        z pred loss is desirable because image loss is pixel based and may not directly pull z in the right direction. 
+        exp: stop_grad z_loss
+}
 todo {
     do challenge: out-of-frame coord extraction
     orbiting dataset

@@ -120,7 +120,10 @@ def forward(
     z_hat = flat_z_hat.view(
         batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
     )
-    z_loss = F.mse_loss(z_hat, z[:, min_context:, :])
+    _z = z[:, min_context:, :]
+    if hParams.jepa_stop_grad_encoder:
+        _z = _z.detach()
+    z_loss = F.mse_loss(z_hat, _z)
     if hParams.supervise_rnn:
         lossTree.supervise.rnn = z_loss.cpu()
     else:

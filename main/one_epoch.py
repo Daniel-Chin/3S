@@ -4,19 +4,15 @@ import inspect
 
 import torch
 import torch.utils.data
-import cv2
 from torchWork import Profiler, LossLogger, saveModels, HAS_CUDA
 from torchWork.utils import getGradNorm, getParams
-import numpy as np
 
 from shared import *
 from forward_pass import forward
 from vae import VAE
 from rnn import RNN
 from load_dataset import Dataset
-
-COL_PAD = 1
-Z_BAR_HEIGHT = 4
+from video_eval import videoEval
 
 def dataLoader(dataset, batch_size, set_size=None):
     n_batches = None
@@ -139,13 +135,13 @@ def oneEpoch(
         if epoch % SLOW_EVAL_EPOCH_INTERVAL == 0:
             with profiler('save checkpoints'):
                 saveModels(models, epoch, save_path)
-            with profiler('avi'):
+            with profiler('video eval'):
                 for name, dataset in [
                     ('train', trainSet), 
                     ('validate', validateSet), 
                 ]:
                     loader = dataLoader(dataset, 24)
-                    evalAVIs(
+                    videoEval(
                         epoch, save_path, name, 
                         experiment, hParams, *next(loader), 
                         vae, rnn, profiler, 
@@ -157,81 +153,3 @@ def oneEpoch(
         with profiler('report'):
             profiler.report()
     return True
-
-def evalAVIs(
-    epoch, save_path, set_name, 
-    experiment, hParams: HyperParams, 
-    video_batch: torch.Tensor, traj_batch, 
-    vae, rnn, profiler, 
-):
-    n_datapoints = video_batch.shape[0]
-    (
-        lossTree, reconstructions, img_predictions, 
-        z, z_hat, extra_logs, 
-    ) = forward(
-        epoch, experiment, hParams, video_batch, traj_batch, 
-        vae, rnn, profiler, True, 
-    )
-    filename = path.join(
-        save_path, f'visualize_{set_name}_epoch_{epoch}.avi', 
-    )
-    col_width = RESOLUTION + COL_PAD
-    row_heights = (
-        RESOLUTION + 1, 
-        RESOLUTION + Z_BAR_HEIGHT * hParams.symm.latent_dim, 
-        RESOLUTION + Z_BAR_HEIGHT * hParams.symm.latent_dim, 
-    )
-    width = col_width * n_datapoints
-    height = sum(row_heights)
-    out = cv2.VideoWriter(
-        filename, cv2.VideoWriter_fourcc(*'RGBA'), 
-        4, (width, height), 
-    )
-    for t in range(SEQ_LEN):
-        frame = np.zeros((width, height, 3), dtype=np.uint8)
-        for col_i in range(n_datapoints):
-            x = col_i * col_width
-            frame[x + RESOLUTION : x + col_width, :, :] = 255
-            y = 0
-            for row_i, img in enumerate([
-                video_batch, 
-                reconstructions, 
-                img_predictions, 
-            ]):
-                if row_i < 2 or t >= hParams.rnn_min_context:
-                    if row_i == 0:
-                        _t = t
-                    elif row_i == 1:
-                        _z: np.ndarray = z.numpy()
-                        _t = t
-                    elif row_i == 2:
-                        _z: np.ndarray = z_hat.numpy()
-                        _t = t - hParams.rnn_min_context
-                    frame[
-                        x : x + RESOLUTION, 
-                        y : y + RESOLUTION, :, 
-                    ] = torch2np(img[col_i, _t, :, :, :])
-                    if row_i != 0:
-                        _y = y + RESOLUTION
-                        cursorX = (
-                            (_z[col_i, _t, :] + 2) * .25 * RESOLUTION
-                        ).round().astype(np.int16)
-                        for z_dim in range(hParams.symm.latent_dim):
-                            x0 = (cursorX[z_dim] - 1).clip(0, RESOLUTION)
-                            x1 = (cursorX[z_dim] + 1).clip(0, RESOLUTION)
-                            frame[
-                                x + x0 : x + x1, 
-                                _y : _y + Z_BAR_HEIGHT, :, 
-                            ] = 255
-                            _y += Z_BAR_HEIGHT
-                else:
-                    cv2.line(
-                        frame, (y - 1, x - 1), 
-                        (y + row_heights[row_i], x + RESOLUTION), 
-                        (255, 255, 255), 1, 
-                    )
-                y += row_heights[row_i]
-        out.write(frame.transpose([1, 0, 2]))
-    out.release()
-
-    # print(f'Saved `{filename}`.')

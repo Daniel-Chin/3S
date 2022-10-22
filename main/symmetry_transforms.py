@@ -18,6 +18,9 @@ class Slice:
     def __init__(self, start: int, stop: int) -> None:
         self.start = start
         self.stop = stop
+    
+    def __repr__(self) -> str:
+        return f'{self.start}:{self.stop}'
 
     def __hash__(self):
         return hash(self.start) ^ hash(self.stop)
@@ -33,11 +36,17 @@ def identity(x):
 class Trivial(Group):   # The Trivial Group
     def sample(self) -> TUT:
         return identity, identity
+    
+    def __repr__(self) -> str:
+        return 'I()'
 
 class Translate(Group):
     def __init__(self, n_dim: int, std: float) -> None:
         self.n_dim = n_dim
         self.std = std
+    
+    def __repr__(self) -> str:
+        return f'T({self.n_dim}, {self.std})'
 
     def sample(self) -> TUT:
         '''
@@ -57,6 +66,9 @@ class Rotate(Group):
     def __init__(self, n_dim: int) -> None:
         self.n_dim = n_dim
     
+    def __repr__(self) -> str:
+        return f'R({self.n_dim})'
+
     def sample(self) -> TUT:
         A = torch.randn(
             (self.n_dim, self.n_dim), 
@@ -101,6 +113,9 @@ class SymmetryAssumption:
                 assert not dim_set.intersection(new_dim_set)
                 dim_set.update(new_dim_set)
         assert dim_set == set(range(self.latent_dim))
+    
+    def __repr__(self) -> str:
+        return f'<symm {self.rule}>'
     
     def apply(
         self, x: torch.Tensor, /, 

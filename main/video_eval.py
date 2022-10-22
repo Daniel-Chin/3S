@@ -50,7 +50,7 @@ class VideoWriter:
                 ffmpeg.wait()
     
     def write(self, img):
-        self.ff_err.write(self.ffmpeg.stdout.read())
+        self.ff_err.write(self.ffmpeg.stderr.read())
         img = cv2.resize(
             img, self.scaled_dims, 
             interpolation=cv2.INTER_NEAREST, 

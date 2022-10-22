@@ -16,8 +16,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'rnn_width'
-        self.variable_value = hyperParams.rnn_width
+        self.variable_name = 'vae_channels'
+        self.variable_value = hyperParams.vae_channels
     
     @lru_cache(1)
     def name(self):
@@ -29,7 +29,7 @@ hP = HyperParams()
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
-    LossWeightTree('predict', 1, [
+    LossWeightTree('predict', 0, [
         LossWeightTree('z', 0, None), 
         LossWeightTree('image', 1, None), 
     ]), 
@@ -53,9 +53,10 @@ hP.variational_rnn = True
 hP.vvrnn = False
 hP.vvrnn_static = -25
 hP.rnn_min_context = 4
+hP.rnn_min_context = 19 # skips rnn
 hP.rnn_width = 16
 hP.residual = True
-hP.vae_channels = [16, 32, 64]
+hP.vae_channels = [32, 32, 64]
 hP.deep_spread = False
 hP.batch_size = 256
 hP.grad_clip = .03
@@ -72,7 +73,7 @@ hP = HyperParams()
 hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
-    LossWeightTree('predict', 1, [
+    LossWeightTree('predict', 0, [
         LossWeightTree('z', 0, None), 
         LossWeightTree('image', 1, None), 
     ]), 
@@ -96,7 +97,8 @@ hP.variational_rnn = True
 hP.vvrnn = False
 hP.vvrnn_static = -25
 hP.rnn_min_context = 4
-hP.rnn_width = 32
+hP.rnn_min_context = 19 # skips rnn
+hP.rnn_width = 16
 hP.residual = True
 hP.vae_channels = [16, 32, 64]
 hP.deep_spread = False

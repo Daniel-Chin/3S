@@ -1,7 +1,8 @@
 from os import path
+import sys
 import subprocess as sp
-from functools import lru_cache
 from contextlib import contextmanager
+from io import StringIO
 
 import cv2
 import numpy as np
@@ -16,11 +17,7 @@ Z_BAR_HEIGHT = 3
 VIDEO_SCALE = 2
 FPS = 4
 
-@lru_cache(1)
-def VideoWriter(width, height):
-    return _VideoWriter(width, height)
-
-class _VideoWriter:
+class VideoWriter:
     def __init__(self, width, height) -> None:
         self.scaled_dims = (
             width * VIDEO_SCALE, height * VIDEO_SCALE, 
@@ -33,12 +30,15 @@ class _VideoWriter:
             '-vcodec', 'libx265', '-pix_fmt', 'yuv420p', 
             '-crf', '24', 
         ]
+        self.ff_out = StringIO()
+        self.ff_err = StringIO()
     
     @contextmanager
     def context(self, filename):
         with sp.Popen(
-            [*self.args, filename], 
-            stdin=sp.PIPE, stdout=sp.DEVNULL, stderr=sp.DEVNULL, 
+            [*self.args, filename], stdin=sp.PIPE, 
+            stdout=self.ff_out, 
+            stderr=self.ff_err, 
         ) as self.ffmpeg:
             self.in_context = True
             try:
@@ -54,7 +54,19 @@ class _VideoWriter:
             img, self.scaled_dims, 
             interpolation=cv2.INTER_NEAREST, 
         )
-        self.ffmpeg.stdin.write(img.tobytes())
+        poll = self.ffmpeg.poll()
+        if poll is None:
+            self.ffmpeg.stdin.write(img.tobytes())
+        else:
+            for io in (self.ff_out, self.ff_err):
+                io.seek(0)
+                print()
+                print('ffmpeg std:')
+                print()
+                print(io.read())
+                print()
+            sys.stdout.flush()
+            raise Exception(f'ffmpeg exited with {poll}')
 
 def videoEval(
     epoch, save_path, set_name, 

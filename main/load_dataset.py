@@ -58,6 +58,7 @@ class Dataset(torch.utils.data.Dataset):
         os.chdir(prev_cwd)
 
         if device is not None:
+            print('Moving dataset to GPU...', flush=True)
             video_set = video_set.to(device)
             label_set = label_set.to(device)
 

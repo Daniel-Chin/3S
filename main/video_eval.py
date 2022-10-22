@@ -2,6 +2,7 @@ from os import path
 import sys
 import subprocess as sp
 from contextlib import contextmanager
+from io import StringIO
 
 import cv2
 import numpy as np
@@ -30,16 +31,14 @@ class VideoWriter:
             '-crf', '24', 
         ]
         # self.ff_out = StringIO()
-        # self.ff_err = StringIO()
+        self.ff_err = StringIO()
     
     @contextmanager
     def context(self, filename):
         with sp.Popen(
             [*self.args, filename], stdin=sp.PIPE, 
-            # stdout=self.ff_out, 
-            # stderr=self.ff_err, 
             stdout=sp.DEVNULL, 
-            stderr=sp.DEVNULL, 
+            stderr=sp.PIPE, 
         ) as self.ffmpeg:
             self.in_context = True
             try:
@@ -51,23 +50,27 @@ class VideoWriter:
                 ffmpeg.wait()
     
     def write(self, img):
+        self.ff_err.write(self.ffmpeg.stdout.read())
         img = cv2.resize(
             img, self.scaled_dims, 
             interpolation=cv2.INTER_NEAREST, 
         )
         poll = self.ffmpeg.poll()
-        if poll is None:
+        try:
+            if poll is not None:
+                raise Exception(f'ffmpeg exited with {poll}')
             self.ffmpeg.stdin.write(img.tobytes())
-        else:
-            # for io in (self.ff_out, self.ff_err):
-            #     io.seek(0)
-            #     print()
-            #     print('ffmpeg std:')
-            #     print()
-            #     print(io.read())
-            #     print()
-            # sys.stdout.flush()
-            raise Exception(f'ffmpeg exited with {poll}')
+        except BrokenPipeError:
+            self.ff_err.write(self.ffmpeg.stdout.read())
+            for io in (self.ff_err, ):
+                io.seek(0)
+                print()
+                print('ffmpeg std:')
+                print()
+                print(io.read())
+                print()
+            sys.stdout.flush()
+            raise
 
 def videoEval(
     epoch, save_path, set_name, 

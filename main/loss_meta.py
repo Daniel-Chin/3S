@@ -1,10 +1,14 @@
 print('loss_meta...')
 import sys
+import os
 saved_stdout = sys.stdout
-with open('temp.txt', 'w') as f:
+TEMP = 'temp.txt'
+with open(TEMP, 'w') as f:
     sys.stdout = f
     from torchWork import *
     sys.stdout = saved_stdout
+os.remove(TEMP)
+
 AbstractLossNode = loss_tree.AbstractLossNode
 
 def main():

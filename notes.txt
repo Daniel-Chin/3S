@@ -315,6 +315,7 @@ next {
     
     loss observations
         image pred loss ~ .0007 means predicting a blur
+            (but sometimes balls with faithful but imprecise movements)
         linear proj MSE <0.2 means kinda good
     
     when repr augmentation DoF < z DoF, rnn can smuggle info past the augmentation. e.g. when you apply the SAME 2D translation to two balls in the same system (z has 4d), the augmentation is equivalent to one 2D transformation to 2d of the 4d z. 
@@ -345,6 +346,25 @@ next {
         Logically, VAE should be able to have nice linearity. 
         Let's see. 
         If still confused, next: 1d ball dataset. exclude disentanglement from the picture, and only test linearity. 
+}
+10/23 {
+    2022_m10_d22@22_52_53_two_body
+        self recon is good for both vae sizes. 
+        Thoughts: Over-paramed VAE may be OKAY. 
+            SPS should be able to regularize. 
+            Big VAE shouldn't be nearly as harmful as big RNN. 
+            Allowing big VAE. 
+        Note to self:
+            when doing two-body experiments, always remember to check evalDecoder! It's dangerous to think linearity metrics are enough - maybe two body solution is not linear in the first place. 
+    2022_m10_d22@23_59_29_stop_grad
+    2022_m10_d23@00_02_01_z_loss
+        grad going into RNN also makes it collapse. It even make vae collapse. 
+        Trying again with smaller weights. 
+        If again collapses, try detach the encoder from RNN input too. 
+        if smaller weights work, 
+            compare stop vs not stop
+            also consider detaching encoder. 
+        exp: z_loss
 }
 todo {
     do challenge: out-of-frame coord extraction

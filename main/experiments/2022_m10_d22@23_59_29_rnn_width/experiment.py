@@ -30,8 +30,8 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
     LossWeightTree('predict', 1, [
-        LossWeightTree('z', .005, None), 
-        LossWeightTree('image', 1, None), 
+        LossWeightTree('z', .5, None), 
+        LossWeightTree('image', .5, None), 
     ]), 
     LossWeightTree('supervise', 0, [
         LossWeightTree('rnn', 0, None), 
@@ -56,7 +56,7 @@ hP.vvrnn_static = -25
 hP.rnn_min_context = 4
 hP.rnn_width = 16
 hP.residual = True
-hP.jepa_stop_grad_encoder = False
+hP.jepa_stop_grad_encoder = True
 hP.vae_channels = [16, 32, 64]
 hP.deep_spread = False
 hP.batch_size = 256
@@ -75,8 +75,8 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
     LossWeightTree('predict', 1, [
-        LossWeightTree('z', .005, None), 
-        LossWeightTree('image', 1, None), 
+        LossWeightTree('z', .5, None), 
+        LossWeightTree('image', .5, None), 
     ]), 
     LossWeightTree('supervise', 0, [
         LossWeightTree('rnn', 0, None), 
@@ -101,7 +101,7 @@ hP.vvrnn_static = -25
 hP.rnn_min_context = 4
 hP.rnn_width = 14
 hP.residual = True
-hP.jepa_stop_grad_encoder = False
+hP.jepa_stop_grad_encoder = True
 hP.vae_channels = [16, 32, 64]
 hP.deep_spread = False
 hP.batch_size = 256
@@ -120,8 +120,8 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
     LossWeightTree('predict', 1, [
-        LossWeightTree('z', .005, None), 
-        LossWeightTree('image', 1, None), 
+        LossWeightTree('z', .5, None), 
+        LossWeightTree('image', .5, None), 
     ]), 
     LossWeightTree('supervise', 0, [
         LossWeightTree('rnn', 0, None), 
@@ -146,7 +146,7 @@ hP.vvrnn_static = -25
 hP.rnn_min_context = 4
 hP.rnn_width = 12
 hP.residual = True
-hP.jepa_stop_grad_encoder = False
+hP.jepa_stop_grad_encoder = True
 hP.vae_channels = [16, 32, 64]
 hP.deep_spread = False
 hP.batch_size = 256
@@ -165,8 +165,8 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
     LossWeightTree('predict', 1, [
-        LossWeightTree('z', .005, None), 
-        LossWeightTree('image', 1, None), 
+        LossWeightTree('z', .5, None), 
+        LossWeightTree('image', .5, None), 
     ]), 
     LossWeightTree('supervise', 0, [
         LossWeightTree('rnn', 0, None), 
@@ -191,7 +191,7 @@ hP.vvrnn_static = -25
 hP.rnn_min_context = 4
 hP.rnn_width = 8
 hP.residual = True
-hP.jepa_stop_grad_encoder = False
+hP.jepa_stop_grad_encoder = True
 hP.vae_channels = [16, 32, 64]
 hP.deep_spread = False
 hP.batch_size = 256

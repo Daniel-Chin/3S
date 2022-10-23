@@ -1,0 +1,4 @@
+Incorrect dirname. 
+Bug fixed. 
+CHanged z loss weights. 
+To re run. 

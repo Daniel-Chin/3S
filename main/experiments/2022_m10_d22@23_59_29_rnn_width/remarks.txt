@@ -1,0 +1,2 @@
+Failed. 
+I used new ideas about z pred loss too soon. I increased z pred loss weight before exp results. 

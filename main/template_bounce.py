@@ -30,8 +30,8 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
     LossWeightTree('predict', 1, [
-        LossWeightTree('z', .5, None), 
-        LossWeightTree('image', .5, None), 
+        LossWeightTree('z', .005, None), 
+        LossWeightTree('image', 1, None), 
     ]), 
     LossWeightTree('supervise', 0, [
         LossWeightTree('rnn', 0, None), 

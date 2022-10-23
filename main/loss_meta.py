@@ -7,7 +7,10 @@ with open(TEMP, 'w') as f:
     sys.stdout = f
     from torchWork import *
     sys.stdout = saved_stdout
-os.remove(TEMP)
+try:
+    os.remove(TEMP)
+except FileNotFoundError:
+    pass    # if multiple processes are running
 
 AbstractLossNode = loss_tree.AbstractLossNode
 

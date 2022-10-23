@@ -140,6 +140,6 @@ def videoEval(
                             (255, 255, 255), 1, 
                         )
                     y += row_heights[row_i]
-            vid.write(frame.transpose([1, 0, 2]))
+            vid.write(frame)
 
     # print(f'Saved `{filename}`.')

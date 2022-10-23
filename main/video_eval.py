@@ -119,7 +119,7 @@ def videoEval(
                         frame[
                             x : x + RESOLUTION, 
                             y : y + RESOLUTION, :, 
-                        ] = torch2np(img[col_i, _t, :, :, :])
+                        ] = torch2np(img[col_i, _t, :, :, :].transpose((1, 0, 2)))
                         if row_i != 0:
                             _y = y + RESOLUTION
                             cursorX = (
@@ -140,6 +140,6 @@ def videoEval(
                             (255, 255, 255), 1, 
                         )
                     y += row_heights[row_i]
-            vid.write(frame)
+            vid.write(frame.transpose((1, 0, 2)))
 
     # print(f'Saved `{filename}`.')

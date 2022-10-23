@@ -119,7 +119,7 @@ def videoEval(
                         frame[
                             x : x + RESOLUTION, 
                             y : y + RESOLUTION, :, 
-                        ] = torch2np(img[col_i, _t, :, :, :].transpose((1, 0, 2)))
+                        ] = torch2np(img[col_i, _t, :, :, :]).transpose((1, 0, 2))
                         if row_i != 0:
                             _y = y + RESOLUTION
                             cursorX = (

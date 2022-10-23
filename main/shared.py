@@ -103,7 +103,7 @@ class HyperParams(BaseHyperParams):
         finally:
             self.teacher_forcing_duration = saved
 
-def torch2np(torchImg: torch.Tensor):
+def torch2np(torchImg: torch.Tensor) -> np.ndarray:
     return (
         torchImg.cpu().detach().clamp(0, 1)
         .permute(1, 2, 0) * 255

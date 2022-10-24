@@ -1,4 +1,5 @@
 import random
+from typing import Callable
 
 import torch
 import torch.nn.functional as F
@@ -69,6 +70,79 @@ def forward(
     
     # rnn forward pass
     min_context = hParams.rnn_min_context
+    if (
+        require_img_predictions
+        or hParams.lossWeightTree['predict']['image'] != 0
+    ):
+        flat_z_hat, r_flat_z_hat, log_var = rnnForward(
+            rnn, z_transed, untrans, 
+            batch_size, hParams, epoch, profiler, 
+        )
+        with profiler('good'):
+            flat_predictions = vae.decode(r_flat_z_hat)
+        img_predictions = flat_predictions.view(
+            batch_size, SEQ_LEN - min_context, 
+            IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
+        )
+        with profiler('good'):
+            lossTree.predict.image = hParams.imgCriterion(
+                img_predictions, 
+                video_batch[:, min_context:, :, :, :], 
+            ).cpu()
+    else:
+        img_predictions = torch.zeros((
+            batch_size, RESOLUTION, RESOLUTION, 
+            IMG_N_CHANNELS, 
+        ))
+
+    if (
+        hParams.lossWeightTree['predict']['z'] != 0
+        or hParams.supervise_rnn
+    ):
+        if hParams.jepa_stop_grad_encoder:
+            flat_z_hat, r_flat_z_hat, log_var = rnnForward(
+                rnn, z_transed.detach(), untrans, 
+                batch_size, hParams, epoch, profiler, 
+            )
+        z_hat = flat_z_hat.view(
+            batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
+        )
+        _z = z[:, min_context:, :]
+        if hParams.jepa_stop_grad_encoder:
+            _z = _z.detach()
+        z_loss = F.mse_loss(z_hat, _z)
+        if hParams.supervise_rnn:
+            lossTree.supervise.rnn = z_loss.cpu()
+        else:
+            lossTree.predict.z = z_loss.cpu()
+
+    mean_square_vrnn_std = torch.exp(
+        0.5 * log_var
+    ).norm(2).cpu() ** 2 / batch_size
+
+    with profiler('eval_linearity'):
+        linear_proj_mse = projectionMSE(
+            mu, flat_traj_batch, 
+        )
+    
+    return (
+        lossTree, reconstructions.view(
+            batch_size, SEQ_LEN, 
+            IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
+        ), img_predictions, z, z_hat, 
+        [
+            ('mean_square_vrnn_std', mean_square_vrnn_std), 
+            ('linear_proj_mse', linear_proj_mse)
+        ], 
+    )
+
+def rnnForward(
+    rnn: RNN, 
+    z_transed, untrans: Callable[[torch.Tensor], torch.Tensor], 
+    batch_size, hParams: HyperParams, epoch, 
+    profiler, 
+):
+    min_context = hParams.rnn_min_context
     teacher_rate = hParams.getTeacherForcingRate(epoch)
     z_hat_transed = torch.zeros((
         batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
@@ -91,60 +165,10 @@ def forward(
                 rnn.stepTime(z_transed    [:, global_t, :])
             else:
                 rnn.stepTime(z_hat_transed[:,        t, :])
-    flat_z_hat = untrans(z_hat_transed.view(
+    flat_z_hat_transed = z_hat_transed.view(
         -1, hParams.symm.latent_dim, 
-    ))
+    )
     flat_log_var = log_var.view(-1, hParams.symm.latent_dim)
-    r_flat_z_hat = reparameterize(flat_z_hat, flat_log_var)
-    if (
-        not require_img_predictions and 
-        hParams.lossWeightTree['predict']['image'] == 0
-    ):
-        img_predictions = torch.zeros((
-            batch_size, RESOLUTION, RESOLUTION, 
-            IMG_N_CHANNELS, 
-        ))
-    else:
-        with profiler('good'):
-            flat_predictions = vae.decode(r_flat_z_hat)
-        img_predictions = flat_predictions.view(
-            batch_size, SEQ_LEN - min_context, 
-            IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
-        )
-        with profiler('good'):
-            lossTree.predict.image = hParams.imgCriterion(
-                img_predictions, 
-                video_batch[:, min_context:, :, :, :], 
-            ).cpu()
-
-    z_hat = flat_z_hat.view(
-        batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
-    )
-    _z = z[:, min_context:, :]
-    if hParams.jepa_stop_grad_encoder:
-        _z = _z.detach()
-    z_loss = F.mse_loss(z_hat, _z)
-    if hParams.supervise_rnn:
-        lossTree.supervise.rnn = z_loss.cpu()
-    else:
-        lossTree.predict.z = z_loss.cpu()
-
-    mean_square_vrnn_std = torch.exp(
-        0.5 * log_var
-    ).norm(2).cpu() ** 2 / batch_size
-
-    with profiler('eval_linearity'):
-        linear_proj_mse = projectionMSE(
-            mu, flat_traj_batch, 
-        )
-    
-    return (
-        lossTree, reconstructions.view(
-            batch_size, SEQ_LEN, 
-            IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
-        ), img_predictions, z, z_hat, 
-        [
-            ('mean_square_vrnn_std', mean_square_vrnn_std), 
-            ('linear_proj_mse', linear_proj_mse)
-        ], 
-    )
+    return untrans(flat_z_hat_transed), untrans(reparameterize(
+        flat_z_hat_transed, flat_log_var, 
+    )), log_var

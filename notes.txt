@@ -360,11 +360,22 @@ next {
     2022_m10_d23@00_02_01_z_loss
         grad going into RNN also makes it collapse. It even make vae collapse. 
         Trying again with smaller weights. 
-        If again collapses, try detach the encoder from RNN input too. 
+        If again collapses, try detaching the encoder from RNN input too. 
         if smaller weights work, 
             compare stop vs not stop
             also consider detaching encoder. 
         exp: z_loss
+}
+10/24 {
+    2022_m10_d24@00_37_26_z_loss
+        non-zero z loss leads to self-recon collapse. 
+            Consider the gradient on the vae. We have already detached the encoder from ground truth when computing z loss. The only difference between zero z loss and non-zero z loss is with the gradient on the encoder as input to RNN. Therefore, JEPA also collapses the input encoder. next exp: detach. 
+            more experiments: remove img pred loss? also detach encoder from input for img pred? 
+            exp: z_loss
+    2022_m10_d24@00_37_29_vae_baseline
+        VAE (contra. AE) can indeed significantly encourage continuous z - coord mapping. Not disentangled, not linear, but continuous. Furthermore, it is not only continuous, but uniform-density. Interestingly, continuous + uniform density + (dim=1) => linearity. Maybe this is why we don't augment ball height but it performs well. 
+        next exp: remove kld from symm training, see if height is messed up. 
+        exp: ball_height
 }
 todo {
     do challenge: out-of-frame coord extraction
@@ -376,6 +387,7 @@ todo {
         yihuajiemu half
     test z pred loss
     test smaller dataset
+    test kld weight = 0
 }
 archive {
     有些结， 升一维就能解开。 暂时升一维， 等会儿降回来？

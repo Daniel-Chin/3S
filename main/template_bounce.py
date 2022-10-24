@@ -70,6 +70,9 @@ template.teacher_forcing_duration = 40000
 template.max_epoch = template.teacher_forcing_duration
 template.ready()
 
+# modifying template
+# template.xxx = xxx
+
 # hP = template.copy()
 # hP.xxx = xxx
 # hP.ready()

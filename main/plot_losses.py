@@ -6,7 +6,7 @@ from torchWork.experiment_control import EXPERIMENT_PY_FILENAME
 
 fig = plotLosses(
     path.join('./experiments/', '''
-2022_m10_d24@00_37_29_vae_baseline
+2022_m10_d24@19_18_52_only_imagine
 '''.strip(), EXPERIMENT_PY_FILENAME), 
     [
         # LossType('validate', 'loss_root.supervise.vae'), 
@@ -20,8 +20,9 @@ fig = plotLosses(
         LossType('validate', 'loss_root.self_recon'), 
 
         # LossType('train',    'loss_root.predict.z'), 
+        LossType('validate', 'loss_root.predict.z'), 
         # LossType('train',    'loss_root.predict.image'), 
-        # LossType('validate', 'loss_root.predict.image'), 
+        LossType('validate', 'loss_root.predict.image'), 
 
         # LossType('train',    'linear_proj_mse'), 
         LossType('validate', 'linear_proj_mse'), 

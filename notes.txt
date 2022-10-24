@@ -379,8 +379,12 @@ next {
     2022_m10_d24@16_11_51_no_kld
         even without kld, ball height is linear! 
         Strange! I don't have a hypothesis, but next exp: supervise x and y and let AE learn z (i.e. ball height). 
+        exp: supvise_xy
 
         observation: rnn_min_context = 4 does not contain initial bounce. this way, to know where the ground is, model has to accurately perceive the size of the ball. We should try increasing rnn_min_context. 
+    2022_m10_d24@19_18_52_only_imagine
+        this is to replicate Will's result with audio training where RNN never sees ground-truth z or image and is only trained to be symm-self-consistent. 
+        There is no magical results.  
 }
 todo {
     do challenge: out-of-frame coord extraction

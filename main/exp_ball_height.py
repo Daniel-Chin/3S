@@ -16,7 +16,7 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'kld weight'
+        self.variable_name = 'kld_weight'
         self.variable_value = hyperParams.lossWeightTree[
             'kld'
         ].weight

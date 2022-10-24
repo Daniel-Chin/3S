@@ -153,7 +153,7 @@ class SymmetryAssumption:
         return trans, untrans
     
     def copy(self):
-        other = __class__(
+        return __class__(
             self.latent_dim, 
             deepcopy(self.rule), 
         )

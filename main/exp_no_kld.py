@@ -9,7 +9,7 @@ VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 3
 
-EXP_NAME = 'ball_height'
+EXP_NAME = 'no_kld'
 N_RAND_INITS = 3
 
 class MyExpGroup(ExperimentGroup):

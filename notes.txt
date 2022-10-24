@@ -375,7 +375,7 @@ next {
     2022_m10_d24@00_37_29_vae_baseline
         VAE (contra. AE) can indeed significantly encourage continuous z - coord mapping. Not disentangled, not linear, but continuous. Furthermore, it is not only continuous, but uniform-density. Interestingly, continuous + uniform density + (dim=1) => linearity. Maybe this is why we don't augment ball height but it performs well. 
         next exp: remove kld from symm training, see if height is messed up. 
-        exp: ball_height
+        exp: no_kld
 }
 todo {
     do challenge: out-of-frame coord extraction

@@ -89,4 +89,4 @@ hP.rnn_min_context = 7
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 0
+assert len(GROUPS) == 4

@@ -18,7 +18,7 @@ def forward(
     video_batch: torch.Tensor, traj_batch: torch.Tensor, 
     vae: VAE, rnn: RNN, 
     profiler: torchWork.Profiler, 
-    require_img_predictions: bool = True, 
+    require_img_predictions_and_z_hat: bool = True, 
 ):
     batch_size = video_batch.shape[0]
     lossTree = Loss_root()
@@ -82,12 +82,15 @@ def forward(
     # rnn forward pass
     min_context = hParams.rnn_min_context
     if (
-        require_img_predictions
+        require_img_predictions_and_z_hat
         or hParams.lossWeightTree['predict']['image'].weight != 0
     ):
         flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
             rnn, z_transed, untrans, 
             batch_size, hParams, epoch, profiler, 
+        )
+        z_hat_aug = flat_z_hat_aug.view(
+            batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
         )
         with profiler('good'):
             flat_predictions = vae.decode(r_flat_z_hat_aug)
@@ -115,13 +118,13 @@ def forward(
                 rnn, z_transed.detach(), untrans, 
                 batch_size, hParams, epoch, profiler, 
             )
-        z_hat = flat_z_hat_aug.view(
+        z_hat_aug = flat_z_hat_aug.view(
             batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
         )
         _z = z[:, min_context:, :]
         if hParams.jepa_stop_grad_encoder:
             _z = _z.detach()
-        z_loss = F.mse_loss(z_hat, _z)
+        z_loss = F.mse_loss(z_hat_aug, _z)
         if hParams.supervise_rnn:
             lossTree.supervise.rnn = z_loss.cpu()
         else:
@@ -154,7 +157,7 @@ def forward(
         lossTree, reconstructions.view(
             batch_size, SEQ_LEN, 
             IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
-        ), img_predictions, z, z_hat, 
+        ), img_predictions, z, z_hat_aug, 
         [
             ('mean_square_vrnn_std', mean_square_vrnn_std), 
             ('linear_proj_mse', linear_proj_mse)

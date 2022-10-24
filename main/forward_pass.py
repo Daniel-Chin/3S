@@ -45,23 +45,26 @@ def forward(
     
     if hParams.supervise_vae:
         if hParams.supervise_vae_only_xy:
-            _slice = slice(0, 2)
+            my_slice = slice(0, 2)
             to_decode = torch.cat((
                 flat_traj_batch[:, :2], 
                 flat_z[:, 2:], 
             ), dim=1)
         else:
-            _slice = slice(0, 3)
+            my_slice = slice(0, 3)
             to_decode = flat_traj_batch
+        my_z_hat = flat_z[:, my_slice]
+        my_z = flat_traj_batch[:, my_slice]
         lossTree.supervise.vae.encode = F.mse_loss(
-            flat_z[:, _slice], flat_traj_batch[:, _slice], 
+            my_z_hat.contiguous(), my_z.contiguous(), 
+            # pyTorch bug? 
         ).cpu()
         with profiler('good'):
             synthesis = vae.decode(to_decode)
             lossTree.supervise.vae.decode = hParams.imgCriterion(
                 synthesis, flat_video_batch, 
             ).cpu()
-        del _slice, to_decode
+        del my_slice, to_decode, my_z_hat, my_z
 
     if not hParams.variational_rnn:
         flat_z = mu

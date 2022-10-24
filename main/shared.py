@@ -48,7 +48,7 @@ class HyperParams(BaseHyperParams):
 
         self.rnn_width: int = None
         self.residual: bool = None
-        self.jepa_stop_grad_encoder: bool = True
+        self.jepa_stop_grad_encoder: bool = None
         self.vae_channels: List[int] = None
         self.deep_spread: bool = None
 
@@ -65,6 +65,20 @@ class HyperParams(BaseHyperParams):
         self.imgCriterion: Callable[
             [torch.Tensor, torch.Tensor], torch.Tensor, 
         ] = None
+
+        self.fillDefaults()
+    
+    def fillDefaults(self):
+        '''
+        This is necessary when wewant to load old 
+        experiments (with less hyper params) without 
+        checking out old commits.  
+        The default values should guarantee old behaviors.  
+        '''
+        if self.jepa_stop_grad_encoder is None:
+            self.jepa_stop_grad_encoder = False
+        if 'symm_self_consistency' not in self.lossWeightTree:
+            self.lossWeightTree['symm_self_consistency'] = 0
     
     def ready(self):
         assert self.supervise_rnn == (

@@ -40,6 +40,7 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
             LossWeightTree('decode', 0, None), 
         ]), 
     ]), 
+    LossWeightTree('symm_self_consistency', 0, None), 
 ])
 hP.lr = 0.001
 hP.symm = SymmetryAssumption(

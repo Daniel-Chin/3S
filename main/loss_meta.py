@@ -29,6 +29,7 @@ def main():
                 'decode', 
             ]), 
         ]), 
+        'symm_self_consistency', 
     ])
     with open('losses.py', 'w') as f:
         loss_tree.writeCode(f, absLossRoot)

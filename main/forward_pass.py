@@ -133,7 +133,7 @@ def forward(
         )
         lossTree.symm_self_consistency = F.mse_loss(
             flat_z_hat_aug, flat_z_hat, 
-        )
+        ).cpu()
 
     with profiler('eval_linearity'):
         linear_proj_mse = projectionMSE(

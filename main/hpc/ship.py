@@ -5,6 +5,8 @@ from os import path
 
 def main():
     os.chdir('../experiments')
+    os.system('git status')
+    print('Make sure working tree is clean!!!')
     print('(Enter empty string to begin.)')
     exps = []
     while True:
@@ -21,17 +23,17 @@ def main():
     else:
         if input('Do all? y/n: ').lower == 'y':
             doAll()
-
-def commitPush():
+        else:
+            print('did nothing.')
+            return
     os.system('git commit -m "auto commit exp"')
     os.system('git push')
 
 def tar(name):
-    os.system(f'tar -vczf "{name}.tar.gz" "{name}"')
+    os.system(f'tar -czf "{name}.tar.gz" "{name}"')
 
 def doAll():
     os.system('git add .')
-    commitPush()
     list_dir = os.listdir()
     all_gz = set()
     all_dir = set()
@@ -56,7 +58,6 @@ def doAll():
 
 def doOne(exp_dir_name: str):
     os.system('git add ' + exp_dir_name)
-    commitPush()
     tar(exp_dir_name)
 
 main()

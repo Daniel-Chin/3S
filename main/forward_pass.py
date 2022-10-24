@@ -11,6 +11,7 @@ from losses import Loss_root
 from vae import VAE
 from rnn import RNN
 from linearity_metric import projectionMSE
+from symmetry_transforms import identity
 
 def forward(
     epoch, experiment, hParams: HyperParams, 
@@ -74,12 +75,12 @@ def forward(
         require_img_predictions
         or hParams.lossWeightTree['predict']['image'] != 0
     ):
-        flat_z_hat, r_flat_z_hat, log_var = rnnForward(
+        flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
             rnn, z_transed, untrans, 
             batch_size, hParams, epoch, profiler, 
         )
         with profiler('good'):
-            flat_predictions = vae.decode(r_flat_z_hat)
+            flat_predictions = vae.decode(r_flat_z_hat_aug)
         img_predictions = flat_predictions.view(
             batch_size, SEQ_LEN - min_context, 
             IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
@@ -100,11 +101,11 @@ def forward(
         or hParams.supervise_rnn
     ):
         if hParams.jepa_stop_grad_encoder:
-            flat_z_hat, r_flat_z_hat, log_var = rnnForward(
+            flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
                 rnn, z_transed.detach(), untrans, 
                 batch_size, hParams, epoch, profiler, 
             )
-        z_hat = flat_z_hat.view(
+        z_hat = flat_z_hat_aug.view(
             batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
         )
         _z = z[:, min_context:, :]
@@ -119,6 +120,20 @@ def forward(
     mean_square_vrnn_std = torch.exp(
         0.5 * log_var
     ).norm(2).cpu() ** 2 / batch_size
+
+    if (
+        hParams.lossWeightTree['symm_self_consistency'] != 0
+    ):
+        assert not hParams.jepa_stop_grad_encoder
+        # As long as we are replicating Will's results, 
+        # stopping grad would make VAE truly untouched. 
+        flat_z_hat, r_flat_z_hat, log_var = rnnForward(
+            rnn, z, identity, 
+            batch_size, hParams, epoch, profiler, 
+        )
+        lossTree.symm_self_consistency = F.mse_loss(
+            flat_z_hat_aug, flat_z_hat, 
+        )
 
     with profiler('eval_linearity'):
         linear_proj_mse = projectionMSE(

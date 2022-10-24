@@ -71,23 +71,26 @@ template.teacher_forcing_duration = 40000
 template.max_epoch = template.teacher_forcing_duration
 template.ready()
 
+# Modifying template
+template.jepa_stop_grad_encoder = False
+
 hP = template.copy()
-hP.lossWeightTree['symm_self_consistency'] = 1
+hP.lossWeightTree['symm_self_consistency'].weight = 1
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.lossWeightTree['symm_self_consistency'] = .1
+hP.lossWeightTree['symm_self_consistency'].weight = .1
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.lossWeightTree['symm_self_consistency'] = .01
+hP.lossWeightTree['symm_self_consistency'].weight = .01
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.lossWeightTree['symm_self_consistency'] = .001
+hP.lossWeightTree['symm_self_consistency'].weight = .001
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 

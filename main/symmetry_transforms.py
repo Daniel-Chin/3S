@@ -1,5 +1,6 @@
 from typing import Callable, List, Set, Tuple
 from abc import ABCMeta, abstractmethod
+from copy import deepcopy
 
 import numpy as np
 import torch
@@ -150,6 +151,12 @@ class SymmetryAssumption:
             return self.apply(x, instance, 1)
         
         return trans, untrans
+    
+    def copy(self):
+        other = __class__(
+            self.latent_dim, 
+            deepcopy(self.rule), 
+        )
 
 def test(size=100):
     symm = SymmetryAssumption(3, [

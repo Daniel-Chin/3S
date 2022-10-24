@@ -104,10 +104,8 @@ def forward(
                 video_batch[:, min_context:, :, :, :], 
             ).cpu()
     else:
-        img_predictions = torch.zeros((
-            batch_size, RESOLUTION, RESOLUTION, 
-            IMG_N_CHANNELS, 
-        ))
+        img_predictions = None
+        z_hat_aug = None
 
     if (
         hParams.lossWeightTree['predict']['z'].weight != 0

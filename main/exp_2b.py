@@ -67,7 +67,6 @@ template.image_loss = 'mse'
 template.teacher_forcing_duration = 40000
 template.max_epoch = template.teacher_forcing_duration
 template.ready()
-GROUPS.append(MyExpGroup(template))
 
 # Modifying template
 template.lossWeightTree['predict']['z'].weight = 0

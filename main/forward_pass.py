@@ -73,7 +73,7 @@ def forward(
     min_context = hParams.rnn_min_context
     if (
         require_img_predictions
-        or hParams.lossWeightTree['predict']['image'] != 0
+        or hParams.lossWeightTree['predict']['image'].weight != 0
     ):
         flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
             rnn, z_transed, untrans, 
@@ -97,7 +97,7 @@ def forward(
         ))
 
     if (
-        hParams.lossWeightTree['predict']['z'] != 0
+        hParams.lossWeightTree['predict']['z'].weight != 0
         or hParams.supervise_rnn
     ):
         if hParams.jepa_stop_grad_encoder:
@@ -122,7 +122,7 @@ def forward(
     ).norm(2).cpu() ** 2 / batch_size
 
     if (
-        hParams.lossWeightTree['symm_self_consistency'] != 0
+        hParams.lossWeightTree['symm_self_consistency'].weight != 0
     ):
         assert not hParams.jepa_stop_grad_encoder
         # As long as we are replicating Will's results, 

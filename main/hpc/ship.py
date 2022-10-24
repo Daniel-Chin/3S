@@ -4,6 +4,7 @@ import os
 from os import path
 
 def main():
+    os.chdir('../experiments')
     print('(Enter empty string to begin.)')
     exps = []
     while True:
@@ -14,7 +15,6 @@ def main():
             exps.append(op)
         else:
             print('Not a dir. ')
-    os.chdir('../experiments')
     if exps:
         for exp in exps:
             doOne(exp)

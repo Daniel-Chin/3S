@@ -67,6 +67,7 @@ class HyperParams(BaseHyperParams):
         ] = None
 
         self.fillDefaults()
+        self.copy: Callable[[], __class__]
     
     def fillDefaults(self):
         '''
@@ -98,6 +99,14 @@ class HyperParams(BaseHyperParams):
         self.OptimClass = {
             'adam': torch.optim.Adam, 
         }[self.optim_name]
+    
+    def copyOneParam(self, k: str, v):
+        if k == 'imgCriterion':
+            return v
+        if k == 'symm':
+            assert isinstance(v, SymmetryAssumption)
+            return v.copy()
+        return super().copyOneParam(k, v)
     
     def getTeacherForcingRate(self, epoch):
         try:

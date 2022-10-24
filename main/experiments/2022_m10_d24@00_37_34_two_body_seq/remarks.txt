@@ -1,2 +1,5 @@
 collapsed. 
 next, Trying to remove z loss.
+
+rnn_width=16 seems to self-recon without collapse. 
+Coincidence? 

@@ -51,6 +51,7 @@ template.symm = SymmetryAssumption(
 )
 template.supervise_rnn = False
 template.supervise_vae = False
+template.supervise_vae_only_xy = False
 template.variational_rnn = True
 template.vvrnn = False
 template.vvrnn_static = -25

@@ -66,7 +66,6 @@ class HyperParams(BaseHyperParams):
             [torch.Tensor, torch.Tensor], torch.Tensor, 
         ] = None
 
-        self.fillDefaults()
         self.copy: Callable[[], __class__]
     
     def fillDefaults(self):
@@ -102,10 +101,10 @@ class HyperParams(BaseHyperParams):
     
     def copyOneParam(self, k: str, v):
         if k == 'imgCriterion':
-            return v
+            return True, v
         if k == 'symm':
             assert isinstance(v, SymmetryAssumption)
-            return v.copy()
+            return True, v.copy()
         return super().copyOneParam(k, v)
     
     def getTeacherForcingRate(self, epoch):

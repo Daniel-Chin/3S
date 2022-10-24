@@ -66,8 +66,6 @@ class HyperParams(BaseHyperParams):
             [torch.Tensor, torch.Tensor], torch.Tensor, 
         ] = None
 
-        self.copy: Callable[[], __class__]
-    
     def fillDefaults(self):
         '''
         This is necessary when wewant to load old 

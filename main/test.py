@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_supvise_xy.py
+exp_supvise_vae.py
 '''.strip()
 # op = input('Which exp? ')
 

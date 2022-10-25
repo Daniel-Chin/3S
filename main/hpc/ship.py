@@ -10,13 +10,14 @@ def main():
     print('(Enter empty string to begin.)')
     exps = []
     while True:
-        op = input('exp_dir_name = ')
+        op = input('exp_dir_name = ').strip(' /\\\n')
         if op == '':
             break
         if path.isdir(op):
             exps.append(op)
         else:
             print('Not a dir. ')
+    print('start...')
     if exps:
         for exp in exps:
             doOne(exp)

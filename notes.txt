@@ -397,6 +397,17 @@ next {
     2022_m10_d25@00_24_32_min_context
         the most onconclusive results one can expect...
         Larger exp. 
+    2022_m10_d24@23_57_39_two_body_nozl
+        Look at the pred videos of rnn_width=48_rand_1. 
+        Many predicitons look convincing to the eyes, but incorrect. They fail to get the correct distance between the balls and the camera. Currently the model can only use ball size. That's hard. What to do, Gus? 
+
+        check evalDecoder. 
+        model largely assumes stationary CM. 
+
+        observation:
+        why does it always use the first three dims? coincidence? 
+
+        next: 1, use 3-d Z. 2, use non-orbit dataset. 
 }
 todo {
     do challenge: out-of-frame coord extraction

@@ -4,13 +4,13 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/two_body/train'
-VALIDATE_SET_PATH = '../datasets/two_body/validate'
+TRAIN_SET_PATH    = '../datasets/two_body_no_orbit/train'
+VALIDATE_SET_PATH = '../datasets/two_body_no_orbit/validate'
 VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 6
 
 EXP_NAME = 'two_body_nozl'
-N_RAND_INITS = 3
+N_RAND_INITS = 2
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -44,8 +44,8 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    3, [
-        ([Translate(3, 1), Rotate(3)], {Slice(0, 3)}), 
+    6, [
+        ([Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
     ], 
 )
 template.supervise_rnn = False
@@ -82,4 +82,9 @@ hP.rnn_width = 32
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 2
+hP = template.copy()
+hP.rnn_width = 48
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+assert len(GROUPS) == 3

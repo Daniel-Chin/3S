@@ -10,7 +10,7 @@ VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 6
 
 EXP_NAME = 'two_body_nozl'
-N_RAND_INITS = 3
+N_RAND_INITS = 2
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -44,8 +44,8 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    3, [
-        ([Translate(3, 1), Rotate(3)], {Slice(0, 3)}), 
+    6, [
+        ([Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
     ], 
 )
 template.supervise_rnn = False
@@ -70,7 +70,6 @@ template.ready()
 
 # Modifying template
 template.lossWeightTree['predict']['z'].weight = 0
-#  SHOULD WE HAVE Z LOSS ????
 
 hP = template.copy()
 hP.rnn_width = 16
@@ -82,4 +81,9 @@ hP.rnn_width = 32
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 2
+hP = template.copy()
+hP.rnn_width = 48
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+assert len(GROUPS) == 3

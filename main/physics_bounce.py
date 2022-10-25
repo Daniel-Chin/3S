@@ -49,13 +49,13 @@ def oneRun(dt, n_frames, rejectable_start=np.inf):
     body = initLegalBody()
     trajectory: List[List[Body]] = []
     for t in range(n_frames):
-        trajectory.append([body.snapshot()])
-        stepTime(dt, lambda x : stepFineTime(x, body))
         try:
             verify(body)
         except RejectThisSampleException:
             if t < rejectable_start:
                 raise
+        trajectory.append([body.snapshot()])
+        stepTime(dt, lambda x : stepFineTime(x, body))
     return trajectory
 
 class RejectThisSampleException(Exception): pass

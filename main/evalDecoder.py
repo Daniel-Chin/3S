@@ -11,7 +11,7 @@ from shared import torch2PIL
 from vae import VAE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m10_d25@00_24_32_min_context
+2022_m10_d22@23_59_29_rnn_width
 '''.strip())
 LOCK_EPOCH = None
 
@@ -42,7 +42,7 @@ class TestUI:
                 command=lambda value, index=i : (
                     self.onSliderUpdate(value, index)
                 ),
-                from_=- RADIUS, to=+ RADIUS,
+                from_=+ RADIUS, to=- RADIUS,
                 resolution=0.01, tickinterval=TICK_INTERVAL, 
                 length=600,
             )

@@ -4,7 +4,7 @@ from shared import *
 
 def projectionMSE(X: torch.Tensor, Y: torch.Tensor):
     # A better method is to pad 1. I didn't know that! 
-    Y /= Y.std(dim=0)
+    Y = Y / Y.std(dim=0)
 
     X_mean = X.mean(dim=0)
     X_centered = X - X_mean 

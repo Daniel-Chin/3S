@@ -53,11 +53,10 @@ def forward(
         else:
             my_slice = slice(0, 3)
             to_decode = flat_traj_batch
-        my_z_hat = flat_z[:, my_slice]
-        my_z = flat_traj_batch[:, my_slice]
+        my_z_hat = flat_z.clone()[:, my_slice]
+        my_z = flat_traj_batch.clone()[:, my_slice]
         lossTree.supervise.vae.encode = F.mse_loss(
-            my_z_hat.contiguous(), my_z.contiguous(), 
-            # pyTorch bug? 
+            my_z_hat, my_z, 
         ).cpu()
         with profiler('good'):
             synthesis = vae.decode(to_decode)

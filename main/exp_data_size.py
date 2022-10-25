@@ -98,4 +98,4 @@ hP.train_set_size = 1024
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 0
+assert len(GROUPS) == 5

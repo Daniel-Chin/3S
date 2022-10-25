@@ -10,7 +10,7 @@ VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 3
 
 EXP_NAME = 'z_loss'
-N_RAND_INITS = 2
+N_RAND_INITS = 1
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -27,12 +27,12 @@ class MyExpGroup(ExperimentGroup):
 
 GROUPS = []
 
-hP = HyperParams()
-hP.lossWeightTree = LossWeightTree('total', 1, [
+template = HyperParams()
+template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
     LossWeightTree('predict', 1, [
-        LossWeightTree('z', 0, None), 
+        LossWeightTree('z', None, None), 
         LossWeightTree('image', 1, None), 
     ]), 
     LossWeightTree('supervise', 0, [
@@ -42,121 +42,82 @@ hP.lossWeightTree = LossWeightTree('total', 1, [
             LossWeightTree('decode', 0, None), 
         ]), 
     ]), 
+    LossWeightTree('symm_self_consistency', 0, None), 
 ])
-hP.lr = 0.001
-hP.symm = SymmetryAssumption(
+template.lr = 0.001
+template.symm = SymmetryAssumption(
     3, [
         ([Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
         ([Trivial()], {Slice(2, 3)}), 
     ], 
 )
-hP.supervise_rnn = False
-hP.supervise_vae = False
-hP.variational_rnn = True
-hP.vvrnn = False
-hP.vvrnn_static = -25
-hP.rnn_min_context = 4
-hP.rnn_width = 16
-hP.residual = True
-hP.jepa_stop_grad_encoder = True
-hP.vae_channels = [16, 32, 64]
-hP.deep_spread = False
-hP.batch_size = 256
-hP.grad_clip = .03
-hP.optim_name = 'adam'
-hP.train_set_size = 256
-hP.image_loss = 'mse'
-hP.teacher_forcing_duration = 40000
-hP.max_epoch = hP.teacher_forcing_duration
+template.supervise_rnn = False
+template.supervise_vae = False
+template.supervise_vae_only_xy = False
+template.variational_rnn = True
+template.vvrnn = False
+template.vvrnn_static = -25
+template.rnn_min_context = 4
+template.rnn_width = 16
+template.residual = True
+template.jepa_stop_grad_encoder = True
+template.vae_channels = [16, 32, 64]
+template.deep_spread = False
+template.batch_size = 256
+template.grad_clip = .03
+template.optim_name = 'adam'
+template.train_set_size = 256
+template.image_loss = 'mse'
+template.teacher_forcing_duration = 40000
+template.max_epoch = template.teacher_forcing_duration
+template.ready()
+
+# modifying template
+# template.xxx = xxx
+
+hP = template.copy()
+hP.lossWeightTree['predict']['z'] = 0
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
-
-hP = HyperParams()
-hP.lossWeightTree = LossWeightTree('total', 1, [
-    LossWeightTree('self_recon', 1, None), 
-    LossWeightTree('kld', 1e-5, None), 
-    LossWeightTree('predict', 1, [
-        LossWeightTree('z', .005, None), 
-        LossWeightTree('image', 1, None), 
-    ]), 
-    LossWeightTree('supervise', 0, [
-        LossWeightTree('rnn', 0, None), 
-        LossWeightTree('vae', 0, [
-            LossWeightTree('encode', 0, None), 
-            LossWeightTree('decode', 0, None), 
-        ]), 
-    ]), 
-])
-hP.lr = 0.001
-hP.symm = SymmetryAssumption(
-    3, [
-        ([Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
-        ([Trivial()], {Slice(2, 3)}), 
-    ], 
-)
-hP.supervise_rnn = False
-hP.supervise_vae = False
-hP.variational_rnn = True
-hP.vvrnn = False
-hP.vvrnn_static = -25
-hP.rnn_min_context = 4
-hP.rnn_width = 16
-hP.residual = True
-hP.jepa_stop_grad_encoder = True
-hP.vae_channels = [16, 32, 64]
-hP.deep_spread = False
-hP.batch_size = 256
-hP.grad_clip = .03
-hP.optim_name = 'adam'
-hP.train_set_size = 256
-hP.image_loss = 'mse'
-hP.teacher_forcing_duration = 40000
-hP.max_epoch = hP.teacher_forcing_duration
+hP = template.copy()
+hP.lossWeightTree['predict']['z'] = 0.005
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
-
-hP = HyperParams()
-hP.lossWeightTree = LossWeightTree('total', 1, [
-    LossWeightTree('self_recon', 1, None), 
-    LossWeightTree('kld', 1e-5, None), 
-    LossWeightTree('predict', 1, [
-        LossWeightTree('z', .01, None), 
-        LossWeightTree('image', 1, None), 
-    ]), 
-    LossWeightTree('supervise', 0, [
-        LossWeightTree('rnn', 0, None), 
-        LossWeightTree('vae', 0, [
-            LossWeightTree('encode', 0, None), 
-            LossWeightTree('decode', 0, None), 
-        ]), 
-    ]), 
-])
-hP.lr = 0.001
-hP.symm = SymmetryAssumption(
-    3, [
-        ([Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
-        ([Trivial()], {Slice(2, 3)}), 
-    ], 
-)
-hP.supervise_rnn = False
-hP.supervise_vae = False
-hP.variational_rnn = True
-hP.vvrnn = False
-hP.vvrnn_static = -25
-hP.rnn_min_context = 4
-hP.rnn_width = 16
-hP.residual = True
-hP.jepa_stop_grad_encoder = True
-hP.vae_channels = [16, 32, 64]
-hP.deep_spread = False
-hP.batch_size = 256
-hP.grad_clip = .03
-hP.optim_name = 'adam'
-hP.train_set_size = 256
-hP.image_loss = 'mse'
-hP.teacher_forcing_duration = 40000
-hP.max_epoch = hP.teacher_forcing_duration
+hP = template.copy()
+hP.lossWeightTree['predict']['z'] = 0.01
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.lossWeightTree['predict']['z'] = 0.02
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.lossWeightTree['predict']['z'] = 0.05
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.lossWeightTree['predict']['z'] = 0.1
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.lossWeightTree['predict']['z'] = 0.2
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.lossWeightTree['predict']['z'] = 0.5
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.lossWeightTree['predict']['z'] = 1
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+assert len(GROUPS) == 0

@@ -386,6 +386,15 @@ next {
         this is to replicate Will's result with audio training where RNN never sees ground-truth z or image and is only trained to be symm-self-consistent. 
         There is no magical results.  
 }
+10/25 {
+    2022_m10_d24@15_28_41_z_loss
+        We have now detached both encoders. 
+        It seems to work! less collapse. 
+        Using evalDecoder shows: z loss is essential! weight=0 leads to poor results. 
+        Question: does this kind of z loss help? 
+        Question: Could the optimal weight be > 0.01?
+        Next: A larger exp. 
+}
 todo {
     do challenge: out-of-frame coord extraction
     try:

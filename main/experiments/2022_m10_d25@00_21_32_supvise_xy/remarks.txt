@@ -1,0 +1,2 @@
+What happened???
+Let's do a sup_vae baseline first. Maybe for longer epochs. 

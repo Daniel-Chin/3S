@@ -76,48 +76,48 @@ template.ready()
 # template.xxx = xxx
 
 hP = template.copy()
-hP.lossWeightTree['predict']['z'] = 0
+hP.lossWeightTree['predict']['z'].weight = 0
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.lossWeightTree['predict']['z'] = 0.005
+hP.lossWeightTree['predict']['z'].weight = 0.005
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.lossWeightTree['predict']['z'] = 0.01
+hP.lossWeightTree['predict']['z'].weight = 0.01
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.lossWeightTree['predict']['z'] = 0.02
+hP.lossWeightTree['predict']['z'].weight = 0.02
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.lossWeightTree['predict']['z'] = 0.05
+hP.lossWeightTree['predict']['z'].weight = 0.05
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.lossWeightTree['predict']['z'] = 0.1
+hP.lossWeightTree['predict']['z'].weight = 0.1
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.lossWeightTree['predict']['z'] = 0.2
+hP.lossWeightTree['predict']['z'].weight = 0.2
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.lossWeightTree['predict']['z'] = 0.5
+hP.lossWeightTree['predict']['z'].weight = 0.5
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.lossWeightTree['predict']['z'] = 1
+hP.lossWeightTree['predict']['z'].weight = 1
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 0
+assert len(GROUPS) == 9

@@ -11,7 +11,7 @@ from shared import torch2PIL
 from vae import VAE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m10_d22@23_59_29_rnn_width
+2022_m10_d24@23_57_39_two_body_nozl
 '''.strip())
 LOCK_EPOCH = None
 

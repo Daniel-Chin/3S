@@ -11,13 +11,14 @@ from render_dataset_shared import *
 from physics_bounce import *
 
 PATH = path.join(
-    # '../datasets/bounce', 
-    '../datasets/bounce_leave_view', 
-    # 'train', 
-    'validate', 
+    '../datasets/bounce', 
+    # '../datasets/bounce_leave_view', 
+    'train', 
+    # 'validate', 
 )
 
-REJECTABLE_START = 6
+# REJECTABLE_START = 6
+REJECTABLE_START = np.inf
 
 SPF = .2
 DT = .15

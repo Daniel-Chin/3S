@@ -89,4 +89,14 @@ hP.rnn_min_context = 7
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 4
+hP = template.copy()
+hP.rnn_min_context = 8
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.rnn_min_context = 9
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+assert len(GROUPS) == 6

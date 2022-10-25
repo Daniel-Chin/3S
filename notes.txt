@@ -394,6 +394,9 @@ next {
         Question: does this kind of z loss help? 
         Question: Could the optimal weight be > 0.01?
         Next: A larger exp. 
+    2022_m10_d25@00_24_32_min_context
+        the most onconclusive results one can expect...
+        Larger exp. 
 }
 todo {
     do challenge: out-of-frame coord extraction

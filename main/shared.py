@@ -101,6 +101,8 @@ class HyperParams(BaseHyperParams):
         }[self.optim_name]
     
     def copyOneParam(self, k: str, v):
+        if v is None:
+            return True, None
         if k == 'imgCriterion':
             return True, v
         if k == 'symm':

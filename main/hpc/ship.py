@@ -31,6 +31,7 @@ def main():
     os.system('git push')
 
 def tar(name):
+    print('taring', name, '...')
     os.system(f'tar -czf "{name}.tar.gz" "{name}"')
 
 def doAll():

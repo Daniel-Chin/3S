@@ -1,0 +1,3 @@
+I broke the vaolidation set. 
+Redo. 
+Seemingly, dataset size >= 256 is better. 

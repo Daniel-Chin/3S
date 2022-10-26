@@ -16,8 +16,10 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'dataset_size'
-        self.variable_value = hyperParams.train_set_size
+        self.variable_name = 'symm,dataset_size'
+        self.variable_value = (
+            hyperParams.symm, hyperParams.train_set_size, 
+        )
     
     @lru_cache(1)
     def name(self):
@@ -43,12 +45,7 @@ template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('symm_self_consistency', 0, None), 
 ])
 template.lr = 0.001
-template.symm = SymmetryAssumption(
-    3, [
-        ([Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
-        ([Trivial()], {Slice(2, 3)}), 
-    ], 
-)
+template.symm = None
 template.supervise_rnn = False
 template.supervise_vae = False
 template.supervise_vae_only_xy = False
@@ -73,29 +70,45 @@ template.ready()
 # modifying template
 # template.xxx = xxx
 
-hP = template.copy()
-hP.train_set_size = 64
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
+ours = template.copy()
+ours.symm = SymmetryAssumption(
+    3, [
+        ([Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        ([Trivial()], {Slice(2, 3)}), 
+    ], 
+)
 
-hP = template.copy()
-hP.train_set_size = 128
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
+baseline = template.copy()
+baseline.symm = SymmetryAssumption(
+    3, [
+        ([Trivial()], {Slice(0, 3)}), 
+    ], 
+)
 
-hP = template.copy()
-hP.train_set_size = 256
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
+for x in (ours, baseline):
+    hP = x.copy()
+    hP.train_set_size = 64
+    hP.ready()
+    GROUPS.append(MyExpGroup(hP))
 
-hP = template.copy()
-hP.train_set_size = 512
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
+    # hP = x.copy()
+    # hP.train_set_size = 128
+    # hP.ready()
+    # GROUPS.append(MyExpGroup(hP))
 
-hP = template.copy()
-hP.train_set_size = 1024
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
+    hP = x.copy()
+    hP.train_set_size = 256
+    hP.ready()
+    GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 5
+    # hP = x.copy()
+    # hP.train_set_size = 512
+    # hP.ready()
+    # GROUPS.append(MyExpGroup(hP))
+
+    hP = x.copy()
+    hP.train_set_size = 1024
+    hP.ready()
+    GROUPS.append(MyExpGroup(hP))
+
+assert len(GROUPS) == 2 * 3

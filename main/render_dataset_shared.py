@@ -153,7 +153,7 @@ class BallViewer(metaclass=ABCMeta):
 
         glutInitWindowSize(WIN_W, WIN_H)
         glutInitWindowPosition(300, 50)
-        glutCreateWindow('Ball Throwing Simulation')
+        glutCreateWindow('Rendering dataset...')
 
         # 初始化画布
         glClearColor(BACKGROUND, BACKGROUND, BACKGROUND, 1.0)  # 设置画布背景色。注意：这里必须是4个参数

@@ -11,13 +11,15 @@ from render_dataset_shared import *
 from physics_two_body import *
 
 PATH = path.join(
-    '../datasets/two_body', 
+    # '../datasets/two_body', 
+    '../datasets/two_body_no_orbit', 
     # 'train', 
     'validate', 
 )
 
-CENTER_OF_MASS_STATIONARY = True
-REJECTABLE_START = np.inf
+CENTER_OF_MASS_STATIONARY = False
+# REJECTABLE_START = np.inf
+REJECTABLE_START = 7
 
 SPF = .1
 DT = 1.5

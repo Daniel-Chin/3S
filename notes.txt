@@ -412,6 +412,12 @@ next {
         AE, with x and y supervised, can learn perfect z (i.e. ball height). 
         This is why we don't need to augment z! 
 }
+10/26 {
+    2022_m10_d25@20_14_47_two_body_nozl
+        check evalDecoder! 
+            They like to use rotation as coords. 
+            Smaller RNN seems better. (insignificant)
+}
 todo {
     do challenge: out-of-frame coord extraction
     try:

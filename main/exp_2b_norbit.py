@@ -9,7 +9,7 @@ VALIDATE_SET_PATH = '../datasets/two_body_no_orbit/validate'
 VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 6
 
-EXP_NAME = 'two_body_nozl'
+EXP_NAME = 'two_body_norbit'
 N_RAND_INITS = 2
 
 class MyExpGroup(ExperimentGroup):

@@ -43,25 +43,26 @@ def toUnit(x: np.ndarray, /):
     return x / np.linalg.norm(x)
 
 def initBodies(center_of_mass_stationary: bool):
-    assert center_of_mass_stationary
+    bodies = [Body(), Body()]
+    for body in bodies:
+        body.position = np.random.normal(
+            0, POSITION_STD, 3, 
+        )
+        body.velocity = np.random.normal(
+            0, VELOCITY_STD, 3, 
+        )
+    del body
+    if center_of_mass_stationary:
+        self, other = bodies
+        position_unit = toUnit(self.position)
+        normal_to_sphere = np.dot(
+            self.velocity, position_unit
+        ) * position_unit
+        self.velocity -= normal_to_sphere   # make it tangent
 
-    body = Body()
-    body.position = np.random.normal(
-        0, POSITION_STD, 3, 
-    )
-    body.velocity = np.random.normal(
-        0, VELOCITY_STD, 3, 
-    )
-    position_unit = toUnit(body.position)
-    normal_to_sphere = np.dot(
-        body.velocity, position_unit
-    ) * position_unit
-    body.velocity -= normal_to_sphere   # make it tangent
-
-    otherBody = Body()
-    otherBody.position = - body.position
-    otherBody.velocity = - body.velocity
-    return body, otherBody
+        other.position = - self.position
+        other.velocity = - self.velocity
+    return bodies
 
 def oneRun(
     dt: float, n_frames: int, 
@@ -72,8 +73,6 @@ def oneRun(
     trajectory: List[List[Body]] = []
     acc = 0
     for t in range(n_frames):
-        trajectory.append([x.snapshot() for x in bodies])
-        stepTime(dt, lambda x : stepFineTime(*bodies, x))
         try:
             verify(bodies, eye_pos)
         except EmptyFrameException:
@@ -81,6 +80,8 @@ def oneRun(
                 raise
             else:
                 acc += 1
+        trajectory.append([x.snapshot() for x in bodies])
+        stepTime(dt, lambda x : stepFineTime(*bodies, x))
     return trajectory, acc
 
 def verify(bodies: List[Body], eye_pos: np.ndarray):

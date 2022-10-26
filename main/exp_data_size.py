@@ -18,7 +18,8 @@ class MyExpGroup(ExperimentGroup):
 
         self.variable_name = 'symm,dataset_size'
         self.variable_value = (
-            hyperParams.symm, hyperParams.train_set_size, 
+            'yes' if hyperParams.symm is ours.symm else 'no', 
+            hyperParams.train_set_size, 
         )
     
     @lru_cache(1)

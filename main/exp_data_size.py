@@ -91,24 +91,24 @@ for x in (ours, baseline):
     hP.ready()
     GROUPS.append(MyExpGroup(hP))
 
-    # hP = x.copy()
-    # hP.train_set_size = 128
-    # hP.ready()
-    # GROUPS.append(MyExpGroup(hP))
+    hP = x.copy()
+    hP.train_set_size = 128
+    hP.ready()
+    GROUPS.append(MyExpGroup(hP))
 
     hP = x.copy()
     hP.train_set_size = 256
     hP.ready()
     GROUPS.append(MyExpGroup(hP))
 
-    # hP = x.copy()
-    # hP.train_set_size = 512
-    # hP.ready()
-    # GROUPS.append(MyExpGroup(hP))
+    hP = x.copy()
+    hP.train_set_size = 512
+    hP.ready()
+    GROUPS.append(MyExpGroup(hP))
 
     hP = x.copy()
     hP.train_set_size = 1024
     hP.ready()
     GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 2 * 3
+assert len(GROUPS) == 2 * 5

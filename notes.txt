@@ -408,6 +408,9 @@ next {
         why does it always use the first three dims? coincidence? 
 
         next: 1, use 3-d Z. 2, use non-orbit dataset. 
+    2022_m10_d25@00_21_32_supvise_xy
+        AE, with x and y supervised, can learn perfect z (i.e. ball height). 
+        This is why we don't need to augment z! 
 }
 todo {
     do challenge: out-of-frame coord extraction

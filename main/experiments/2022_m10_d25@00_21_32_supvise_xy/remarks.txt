@@ -1,2 +1,2 @@
 What happened???
-Let's do a sup_vae baseline first. Maybe for longer epochs. 
+Ohhh! Z mean is [0, 6, 2] or something. 

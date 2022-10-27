@@ -16,8 +16,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.WHAT
+        self.variable_name = 'grad_clip'
+        self.variable_value = hyperParams.grad_clip
     
     @lru_cache(1)
     def name(self):

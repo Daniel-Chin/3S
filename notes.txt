@@ -428,9 +428,14 @@ next {
         解耦不是很成功。
         out-of-frame z 也是 nonsense.
         see rand_1, which 解耦稍好， 但 out-of-frame z is nonsense.
+    2022_m10_d27@13_42_53_rnn_width
+        怎么现在解耦成功几率这么低...
+        results are inconclusive. 
+        Wait after dataset experiment, and do a bigger one. 
 }
 todo {
     read 5 balls by zhang kun
+        after Friday
     diffusion exp
         more cases. 4x4 matrix
         yihuajiemu half

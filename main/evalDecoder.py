@@ -6,12 +6,13 @@ import torch
 from torchWork import loadExperiment, DEVICE
 from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModels
 from PIL import ImageTk
+from PIL.Image import Resampling
 
 from shared import torch2PIL
 from vae import VAE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m10_d24@23_57_39_two_body_nozl
+2022_m10_d25@13_58_55_min_context
 '''.strip())
 LOCK_EPOCH = None
 
@@ -55,7 +56,7 @@ class TestUI:
         # print(self.z)
         self.sliders[index].set(value)
         img = decode(self.vae, self.z)
-        img = img.resize((350, 350))
+        img = img.resize((350, 350), resample=Resampling.NEAREST)
         self.photo = ImageTk.PhotoImage(img)
         self.label.config(image=self.photo)
 

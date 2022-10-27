@@ -327,7 +327,7 @@ next {
         
         see evalDecoder
         height axis is sometimes not height. 
-        when it's height, it's divided into two regions, one representing "unsure prediction" (blurry). The two regions are connected where the ball touches the ground, which is the only reasonable snitching plane in the z space, when your uncond prior is gaussian. 
+        when it's height, it's divided into two regions, one representing "unsure prediction" (blurry). The two regions are connected where the ball touches the ground, which is the only reasonable stitching plane in the z space, when your uncond prior is gaussian. 
     idea: z pred loss may need to stop grad from encoder. 
         I think this precents collapse. RNN output is pulled to encoded z. rnn input may be encouraged to collapse, but at least not directly. 
         z pred loss is desirable because image loss is pixel based and may not directly pull z in the right direction. 
@@ -424,16 +424,16 @@ next {
     2022_m10_d25@14_07_02_z_loss
         虽然我相信 z loss 大有益处， 但实验结果表明没有任何区别。
         干掉。
+    2022_m10_d27@13_42_56_leave_view
+        解耦不是很成功。
+        out-of-frame z 也是 nonsense.
+        see rand_1, which 解耦稍好， 但 out-of-frame z is nonsense.
 }
 todo {
-    do challenge: out-of-frame coord extraction
-    try:
-        rnn "only imagination", Will's results
     read 5 balls by zhang kun
     diffusion exp
         more cases. 4x4 matrix
         yihuajiemu half
-    test z pred loss
     test smaller dataset
     test kld weight = 0
 }

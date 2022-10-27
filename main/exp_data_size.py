@@ -59,7 +59,7 @@ template.residual = True
 template.jepa_stop_grad_encoder = True
 template.vae_channels = [16, 32, 64]
 template.deep_spread = False
-template.batch_size = 256
+template.batch_size = None
 template.grad_clip = .03
 template.optim_name = 'adam'
 template.train_set_size = None
@@ -89,26 +89,31 @@ baseline.symm = SymmetryAssumption(
 for x in (ours, baseline):
     hP = x.copy()
     hP.train_set_size = 64
+    hP.batch_size = hP.train_set_size
     hP.ready()
     GROUPS.append(MyExpGroup(hP))
 
     hP = x.copy()
     hP.train_set_size = 128
+    hP.batch_size = hP.train_set_size
     hP.ready()
     GROUPS.append(MyExpGroup(hP))
 
     hP = x.copy()
     hP.train_set_size = 256
+    hP.batch_size = hP.train_set_size
     hP.ready()
     GROUPS.append(MyExpGroup(hP))
 
     hP = x.copy()
     hP.train_set_size = 512
+    hP.batch_size = hP.train_set_size
     hP.ready()
     GROUPS.append(MyExpGroup(hP))
 
     hP = x.copy()
     hP.train_set_size = 1024
+    hP.batch_size = hP.train_set_size
     hP.ready()
     GROUPS.append(MyExpGroup(hP))
 

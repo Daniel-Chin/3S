@@ -12,7 +12,7 @@ from current_experiment import MyExpGroup
 from linearity_metric import projectionMSE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-z_loss_2022_Oct_19_03;58;34
+2022_m10_d25@14_09_43_dataset_size
 '''.strip())
 LOCK_EPOCH = None
 

@@ -6,7 +6,7 @@ from torchWork.experiment_control import EXPERIMENT_PY_FILENAME
 
 fig = plotLosses(
     path.join('./experiments/', '''
-2022_m10_d24@23_57_39_two_body_nozl
+2022_m10_d25@14_07_02_z_loss
 '''.strip(), EXPERIMENT_PY_FILENAME), 
     [
         # LossType('validate', 'loss_root.supervise.vae'), 

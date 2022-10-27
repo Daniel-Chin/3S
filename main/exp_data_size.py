@@ -87,31 +87,36 @@ baseline.symm = SymmetryAssumption(
 )
 
 for x in (ours, baseline):
-    hP = x.copy()
+    hP = template.copy()
+    hP.symm = x.symm
     hP.train_set_size = 64
     hP.batch_size = hP.train_set_size
     hP.ready()
     GROUPS.append(MyExpGroup(hP))
 
-    hP = x.copy()
+    hP = template.copy()
+    hP.symm = x.symm
     hP.train_set_size = 128
     hP.batch_size = hP.train_set_size
     hP.ready()
     GROUPS.append(MyExpGroup(hP))
 
-    hP = x.copy()
+    hP = template.copy()
+    hP.symm = x.symm
     hP.train_set_size = 256
     hP.batch_size = hP.train_set_size
     hP.ready()
     GROUPS.append(MyExpGroup(hP))
 
-    hP = x.copy()
+    hP = template.copy()
+    hP.symm = x.symm
     hP.train_set_size = 512
     hP.batch_size = hP.train_set_size
     hP.ready()
     GROUPS.append(MyExpGroup(hP))
 
-    hP = x.copy()
+    hP = template.copy()
+    hP.symm = x.symm
     hP.train_set_size = 1024
     hP.batch_size = hP.train_set_size
     hP.ready()

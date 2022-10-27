@@ -30,7 +30,7 @@ template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
     LossWeightTree('predict', 1, [
-        LossWeightTree('z', .005, None), 
+        LossWeightTree('z', 0, None), 
         LossWeightTree('image', 1, None), 
     ]), 
     LossWeightTree('supervise', 0, [
@@ -57,7 +57,7 @@ template.vvrnn_static = -25
 template.rnn_min_context = 4
 template.rnn_width = 16
 template.residual = True
-template.jepa_stop_grad_encoder = True
+template.jepa_stop_grad_encoder = False
 template.vae_channels = [16, 32, 64]
 template.deep_spread = False
 template.batch_size = 256

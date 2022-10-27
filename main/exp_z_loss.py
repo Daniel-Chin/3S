@@ -9,8 +9,8 @@ VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 3
 
-EXP_NAME = 'z_loss'
-N_RAND_INITS = 1
+EXP_NAME = 'z_loss_nostop'
+N_RAND_INITS = 3
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -60,7 +60,7 @@ template.vvrnn_static = -25
 template.rnn_min_context = 4
 template.rnn_width = 16
 template.residual = True
-template.jepa_stop_grad_encoder = True
+template.jepa_stop_grad_encoder = False
 template.vae_channels = [16, 32, 64]
 template.deep_spread = False
 template.batch_size = 256
@@ -81,43 +81,13 @@ hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
+hP.lossWeightTree['predict']['z'].weight = 0.002
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
 hP.lossWeightTree['predict']['z'].weight = 0.005
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
-hP = template.copy()
-hP.lossWeightTree['predict']['z'].weight = 0.01
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-hP = template.copy()
-hP.lossWeightTree['predict']['z'].weight = 0.02
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-hP = template.copy()
-hP.lossWeightTree['predict']['z'].weight = 0.05
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-hP = template.copy()
-hP.lossWeightTree['predict']['z'].weight = 0.1
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-hP = template.copy()
-hP.lossWeightTree['predict']['z'].weight = 0.2
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-hP = template.copy()
-hP.lossWeightTree['predict']['z'].weight = 0.5
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-hP = template.copy()
-hP.lossWeightTree['predict']['z'].weight = 1
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-assert len(GROUPS) == 9
+assert len(GROUPS) == 3

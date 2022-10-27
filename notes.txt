@@ -418,6 +418,13 @@ next {
             They like to use rotation as coords. 
             Smaller RNN seems better. (insignificant)
 }
+10/27 {
+    2022_m10_d25@13_58_55_min_context
+        rnn_min_context = 4 is pretty much GOOD ENOUGH. 
+    2022_m10_d25@14_07_02_z_loss
+        虽然我相信 z loss 大有益处， 但实验结果表明没有任何区别。
+        干掉。
+}
 todo {
     do challenge: out-of-frame coord extraction
     try:

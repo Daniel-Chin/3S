@@ -154,13 +154,14 @@ def forward(
         )
     
     return (
-        lossTree, reconstructions.view(
+        lossTree, reconstructions.detach().view(
             batch_size, SEQ_LEN, 
             IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
-        ), img_predictions, z, z_hat_aug, 
+        ), img_predictions.detach(), 
+        z.detach(), z_hat_aug.detach(), 
         [
-            ('mean_square_vrnn_std', mean_square_vrnn_std), 
-            ('linear_proj_mse', linear_proj_mse)
+            ('mean_square_vrnn_std', mean_square_vrnn_std.detach()), 
+            ('linear_proj_mse', linear_proj_mse.detach())
         ], 
     )
 

@@ -10,7 +10,7 @@ from torchWork.utils import getGradNorm, getParams
 from shared import *
 from forward_pass import forward
 from vae import VAE
-from rnn import RNN
+from rnn import PredRNN, EnergyRNN
 from load_dataset import Dataset
 from video_eval import videoEval
 
@@ -43,7 +43,8 @@ def oneEpoch(
         return False
     with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
         vae: VAE = models['vae']
-        rnn: RNN = models['rnn']
+        predRnn: PredRNN = models['predRnn']
+        energyRnn: EnergyRNN = models['energyRnn']
 
         trainLoader    = dataLoader(
             trainSet,    hParams.batch_size, hParams.train_set_size, 
@@ -53,7 +54,8 @@ def oneEpoch(
         )
 
         vae.train()
-        rnn.train()
+        predRnn.train()
+        energyRnn.train()
         if HAS_CUDA:
             torch.cuda.synchronize()    # just for profiling
     for batch_i, (video_batch, traj_batch) in enumerate(
@@ -66,7 +68,7 @@ def oneEpoch(
             ) = forward(
                 epoch, experiment, hParams, 
                 video_batch, traj_batch, 
-                vae, rnn, profiler, False, 
+                vae, predRnn, energyRnn, profiler, False, 
             )
             if HAS_CUDA:
                 torch.cuda.synchronize()    # just for profiling
@@ -104,7 +106,8 @@ def oneEpoch(
 
     with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
         vae.eval()
-        rnn.eval()
+        predRnn.eval()
+        energyRnn.eval()
     with torch.no_grad(), hParams.eval():
         for batch_i, (video_batch, traj_batch) in enumerate(
             validateLoader, 
@@ -116,7 +119,7 @@ def oneEpoch(
                 ) = forward(
                     epoch, experiment, hParams, 
                     video_batch, traj_batch, 
-                    vae, rnn, profiler, False, 
+                    vae, predRnn, energyRnn, profiler, False, 
                 )
                 if HAS_CUDA:
                     torch.cuda.synchronize()    # just for profiling
@@ -144,7 +147,7 @@ def oneEpoch(
                     videoEval(
                         epoch, save_path, name, 
                         experiment, hParams, *next(loader), 
-                        vae, rnn, profiler, 
+                        vae, predRnn, energyRnn, profiler, 
                     )
     
     if epoch % 32 == 0:

@@ -8,7 +8,7 @@ from shared import *
 from load_dataset import Dataset
 from one_epoch import oneEpoch
 from vae import VAE
-from rnn import RNN
+from rnn import PredRNN, EnergyRNN
 from arg_parser import ArgParser
 
 def main():
@@ -40,7 +40,8 @@ def main():
     )
     runExperiment(args.exp_py_path, oneEpoch, {
         'vae': VAE, 
-        'rnn': RNN, 
+        'predRnn': PredRNN, 
+        'energyRnn': EnergyRNN, 
     }, trainSet, validateSet)
 
 main()

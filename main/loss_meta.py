@@ -22,6 +22,7 @@ def main():
             'z', 
             'image', 
         ]), 
+        'seq_energy', 
         AbstractLossNode('supervise', [
             'rnn', 
             AbstractLossNode('vae', [

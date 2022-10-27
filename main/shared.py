@@ -76,10 +76,12 @@ class HyperParams(BaseHyperParams):
         '''
         if self.jepa_stop_grad_encoder is None:
             self.jepa_stop_grad_encoder = False
-        if 'symm_self_consistency' not in self.lossWeightTree:
-            self.lossWeightTree['symm_self_consistency'] = 0
         if self.supervise_vae_only_xy is None:
             self.supervise_vae_only_xy = False
+        if 'symm_self_consistency' not in self.lossWeightTree:
+            self.lossWeightTree['symm_self_consistency'].weight = 0
+        if 'seq_energy' not in self.lossWeightTree:
+            self.lossWeightTree['seq_energy'].weight = 0
     
     def ready(self):
         assert self.supervise_rnn == (

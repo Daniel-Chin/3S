@@ -4,20 +4,22 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/two_body/train'
-VALIDATE_SET_PATH = '../datasets/two_body/validate'
+TRAIN_SET_PATH    = '../datasets/bounce/train'
+VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
-ACTUAL_DIM = 6
+ACTUAL_DIM = 3
 
-EXP_NAME = ...
-N_RAND_INITS = ...
+EXP_NAME = 'energy'
+N_RAND_INITS = 1
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.WHAT
+        self.variable_name = 'loss_weight'
+        self.variable_value = hyperParams.lossWeightTree[
+            'seq_energy'
+        ]
     
     @lru_cache(1)
     def name(self):
@@ -29,7 +31,7 @@ template = HyperParams()
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
-    LossWeightTree('seq_energy', 0, None), 
+    LossWeightTree('seq_energy', None, None), 
     LossWeightTree('predict', 1, [
         LossWeightTree('z', 0, None), 
         LossWeightTree('image', 1, None), 
@@ -45,8 +47,9 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    6, [
-        ([Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
+    3, [
+        ([Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        ([Trivial()], {Slice(2, 3)}), 
     ], 
 )
 template.supervise_rnn = False
@@ -73,9 +76,24 @@ template.ready()
 # modifying template
 # template.xxx = xxx
 
-# hP = template.copy()
-# hP.xxx = xxx
-# hP.ready()
-# GROUPS.append(MyExpGroup(hP))
+hP = template.copy()
+hP.lossWeightTree['seq_energy'].weight = .1
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 0
+hP = template.copy()
+hP.lossWeightTree['seq_energy'].weight = .3
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.lossWeightTree['seq_energy'].weight = 1
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.lossWeightTree['seq_energy'].weight = 3
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+assert len(GROUPS) == 4

@@ -1,5 +1,5 @@
 import random
-from typing import Callable
+from typing import Callable, List
 
 import torch
 import torch.nn.functional as F
@@ -9,14 +9,14 @@ from torchWork import DEVICE
 from shared import *
 from losses import Loss_root
 from vae import VAE
-from rnn import RNN
+from rnn import PredRNN, EnergyRNN
 from linearity_metric import projectionMSE
 from symmetry_transforms import identity
 
 def forward(
     epoch, experiment, hParams: HyperParams, 
     video_batch: torch.Tensor, traj_batch: torch.Tensor, 
-    vae: VAE, rnn: RNN, 
+    vae: VAE, predRnn: PredRNN, energyRnn: EnergyRNN, 
     profiler: torchWork.Profiler, 
     require_img_predictions_and_z_hat: bool = True, 
 ):
@@ -83,12 +83,14 @@ def forward(
     
     # rnn forward pass
     min_context = hParams.rnn_min_context
+
+    # predict image
     if (
         require_img_predictions_and_z_hat
         or hParams.lossWeightTree['predict']['image'].weight != 0
     ):
         flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
-            rnn, z_transed, untrans, 
+            predRnn, z_transed, untrans, 
             batch_size, hParams, epoch, profiler, 
         )
         z_hat_aug = flat_z_hat_aug.view(
@@ -109,13 +111,14 @@ def forward(
         img_predictions = None
         z_hat_aug = None
 
+    # predict z
     if (
         hParams.lossWeightTree['predict']['z'].weight != 0
         or hParams.supervise_rnn
     ):
         if hParams.jepa_stop_grad_encoder:
             flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
-                rnn, z_transed.detach(), untrans, 
+                predRnn, z_transed.detach(), untrans, 
                 batch_size, hParams, epoch, profiler, 
             )
         z_hat_aug = flat_z_hat_aug.view(
@@ -134,6 +137,7 @@ def forward(
         0.5 * log_var
     ).norm(2).cpu() ** 2 / batch_size
 
+    # symm_self_consistency
     if (
         hParams.lossWeightTree['symm_self_consistency'].weight != 0
     ):
@@ -141,12 +145,37 @@ def forward(
         # As long as we are replicating Will's results, 
         # stopping grad would make VAE truly untouched. 
         flat_z_hat, r_flat_z_hat, log_var = rnnForward(
-            rnn, z, identity, 
+            predRnn, z, identity, 
             batch_size, hParams, epoch, profiler, 
         )
         lossTree.symm_self_consistency = F.mse_loss(
             flat_z_hat_aug, flat_z_hat, 
         ).cpu()
+
+    # seq energy
+    if (
+        hParams.lossWeightTree['seq_energy'].weight != 0
+    ):
+        noise = torch.randn_like(z_transed)
+        energies: List[torch.Tensor] = []
+        for seq in z_transed, noise:
+            energy = torch.zeros((
+                batch_size, SEQ_LEN - min_context, 
+            ), device=DEVICE)
+            energyRnn.zeroHidden(batch_size, DEVICE)
+            for t in range(SEQ_LEN):
+                energyRnn.stepTime(seq[:, t, :])
+                if t >= min_context:
+                    energy[:, t - min_context] = energyRnn.projHead(
+                        energyRnn.hidden, 
+                    )[:, 0]
+            energies.append(energy)
+        data_energy, noise_energy = energies
+        # hinge loss
+        lossTree.seq_energy = (
+            2 + data_energy.clamp(min=-1).mean().cpu()
+            -  noise_energy.clamp(max=+1).mean().cpu()
+        )
 
     with profiler('eval_linearity'):
         linear_proj_mse = projectionMSE(
@@ -166,7 +195,7 @@ def forward(
     )
 
 def rnnForward(
-    rnn: RNN, 
+    rnn: PredRNN, 
     z_transed, untrans: Callable[[torch.Tensor], torch.Tensor], 
     batch_size, hParams: HyperParams, epoch, 
     profiler, 

@@ -157,7 +157,7 @@ def forward(
         hParams.lossWeightTree['seq_energy'].weight != 0
     ):
         noise = torch.randn((
-            8 * batch_size, SEQ_LEN, hParams.symm.latent_dim, 
+            64 * batch_size, SEQ_LEN, hParams.symm.latent_dim, 
         ), device=DEVICE)
         energies: List[torch.Tensor] = []
         for seq in z_transed, noise:

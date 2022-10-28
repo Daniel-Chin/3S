@@ -53,3 +53,4 @@ motivation: 人在试图预测的时候， min context = 4 时一次弹跳都没
     the energy loss is near 0, but disentanglement is bad. 
         fake data too fake? GAN? 
         RNN is too storng? 
+    要不要在数据点周围加噪？

@@ -18,7 +18,7 @@ from vae import VAE
 from template_bounce import MyExpGroup
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m10_d27@13_22_30_z_loss_nostop
+2022_m10_d27@18_20_46_grad_clip
 '''.strip())
 LOCK_EPOCH = None
 
@@ -118,8 +118,8 @@ class UI:
         self.z[index] = value
         # print(self.z)
         self.sliders[index].set(value)
-        for col_i, vae_col in enumerate(self.vaes):
-            for row_i, vae in enumerate(vae_col):
+        for row_i, vae_row in enumerate(self.vaes):
+            for col_i, vae in enumerate(vae_row):
                 img = decode(vae, self.z)
                 img = img.resize((
                     IMG_SIZE, IMG_SIZE, 

@@ -5,6 +5,12 @@ conclusion: it does stop collapse, but doesn't help RL.
     2022_m10_d24@00_37_26_z_loss
     2022_m10_d24@15_28_41_z_loss
     2022_m10_d25@14_07_02_z_loss
+    
+    TODO
+    calc equivalent z loss weight as xuanjie's training
+    vary K
+        make fig 8
+            K = 0 1 4
 
 research question: why can height axis be nice (linear)?
 做了 VAE baseline
@@ -30,9 +36,14 @@ motivation: 人在试图预测的时候， min context = 4 时一次弹跳都没
     No: ask about ball size
     Look at the pred videos of rnn_width=48_rand_1. 
     Many predicitons look convincing to the eyes, but incorrect. They fail to get the correct distance between the balls and the camera. Currently the model can only use ball size. That's hard. What to do, Gus? 
+    Gus: it's fine
 
     check evalDecoder. 
     model largely assumes stationary CM. 
+    
+    TODO 
+    enable dataset "review". save initial cond
+    6D dataset: stationary but random CM
 
 2022_m10_d25@20_14_47_two_body_nozl
     check evalDecoder! 

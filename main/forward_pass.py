@@ -162,7 +162,7 @@ def forward(
         energies: List[torch.Tensor] = []
         for seq in z_transed, noise:
             energy = torch.zeros((
-                batch_size, SEQ_LEN - min_context, 
+                seq.shape[0], SEQ_LEN - min_context, 
             ), device=DEVICE)
             energyRnn.zeroHidden(seq.shape[0], DEVICE)
             for t in range(SEQ_LEN):

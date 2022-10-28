@@ -9,15 +9,15 @@ VALIDATE_SET_PATH = '../datasets/two_body_no_orbit/validate'
 VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 6
 
-EXP_NAME = 'two_body_norbit'
+EXP_NAME = 'vae_two_body_norbit'
 N_RAND_INITS = 2
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'rnn_width'
-        self.variable_value = hyperParams.rnn_width
+        self.variable_name = 'vae_channels'
+        self.variable_value = hyperParams.vae_channels
     
     @lru_cache(1)
     def name(self):
@@ -58,7 +58,7 @@ template.rnn_min_context = 4
 template.rnn_width = 16
 template.residual = True
 template.jepa_stop_grad_encoder = False
-template.vae_channels = [16, 32, 64]
+template.vae_channels = None
 template.deep_spread = False
 template.batch_size = 256
 template.grad_clip = .03
@@ -69,21 +69,18 @@ template.teacher_forcing_duration = 40000
 template.max_epoch = template.teacher_forcing_duration
 template.ready()
 
-# Modifying template
-template.vae_channels = ???
-
 hP = template.copy()
-hP.rnn_width = 16
+hP.vae_channels = [16, 32, 64]
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.rnn_width = 32
+hP.vae_channels = [32, 32, 64]
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.rnn_width = 48
+hP.vae_channels = [32, 64, 64]
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 

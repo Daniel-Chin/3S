@@ -164,7 +164,7 @@ def forward(
             energy = torch.zeros((
                 batch_size, SEQ_LEN - min_context, 
             ), device=DEVICE)
-            energyRnn.zeroHidden(batch_size, DEVICE)
+            energyRnn.zeroHidden(seq.shape[0], DEVICE)
             for t in range(SEQ_LEN):
                 energyRnn.stepTime(seq[:, t, :])
                 if t >= min_context:

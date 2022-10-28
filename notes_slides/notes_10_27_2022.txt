@@ -39,6 +39,11 @@ motivation: 人在试图预测的时候， min context = 4 时一次弹跳都没
     They like to use rotation as coords. 
     Smaller RNN seems better. (insignificant)
 
+然后我试了 六维z non-robiting 双体， 结果 VAE 不能 self recon 了。 正在调大。
+
+2022_m10_d27@13_42_53_wrong_assum
+    evalDecoder
+
 2022_m10_d27@13_42_56_leave_view
     解耦不是很成功。
     out-of-frame z 也是 nonsense.

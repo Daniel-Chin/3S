@@ -433,6 +433,11 @@ next {
         results are inconclusive. 
         Wait after dataset experiment, and do a bigger one. 
 }
+10/28 {
+    2022_m10_d27@13_42_53_wrong_assum
+        wrong symm assum makes it fail, even SO3...
+        evalDecoder. 
+}
 todo {
     read 5 balls by zhang kun
         after Friday

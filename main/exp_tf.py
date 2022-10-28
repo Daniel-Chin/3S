@@ -78,6 +78,7 @@ TFs = [*range(10000, 40001, 5000)]
 for tf in TFs:
     hP = template.copy()
     hP.teacher_forcing_duration = tf
+    hP.max_epoch = hP.teacher_forcing_duration
     hP.ready()
     GROUPS.append(MyExpGroup(hP))
 

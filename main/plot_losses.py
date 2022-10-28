@@ -4,10 +4,12 @@ from matplotlib import pyplot as plt
 from torchWork.plot_losses import plotLosses, LossType
 from torchWork.experiment_control import EXPERIMENT_PY_FILENAME
 
+EXP_PATH = path.join('./experiments/', '''
+2022_m10_d27@13_42_53_rnn_width
+'''.strip())
+
 fig = plotLosses(
-    path.join('./experiments/', '''
-2022_m10_d25@14_07_02_z_loss
-'''.strip(), EXPERIMENT_PY_FILENAME), 
+    path.join(EXP_PATH, EXPERIMENT_PY_FILENAME), 
     [
         # LossType('validate', 'loss_root.supervise.vae'), 
         # LossType('validate', 'loss_root.supervise.rnn'), 
@@ -31,4 +33,5 @@ fig = plotLosses(
     which_legend=0, linewidth=1, 
 )
 
+plt.savefig(path.join(EXP_PATH, 'auto_plot_loss.pdf'))
 plt.show()

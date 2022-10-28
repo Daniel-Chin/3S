@@ -1,6 +1,11 @@
 from os import path
 import tkinter as tk
 from typing import List
+try:
+    from ctypes import windll
+    windll.shcore.SetProcessDpiAwareness(1)
+except ImportError:
+    pass    # not Windows
 
 import torch
 from torchWork import loadExperiment, DEVICE
@@ -12,12 +17,12 @@ from shared import torch2PIL
 from vae import VAE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m10_d25@14_07_02_z_loss
+2022_m10_d27@13_42_53_rnn_width
 '''.strip())
 LOCK_EPOCH = None
 
 RADIUS = 2
-TICK_INTERVAL = 0.1
+TICK_INTERVAL = .5
 
 class TestUI:
     def __init__(self, vae, group_name, latent_dim):
@@ -44,10 +49,11 @@ class TestUI:
                     self.onSliderUpdate(value, index)
                 ),
                 from_=+ RADIUS, to=- RADIUS,
-                resolution=0.01, tickinterval=TICK_INTERVAL, 
-                length=600,
+                resolution=0.01, 
+                tickinterval=TICK_INTERVAL if i == 0 else 0, 
+                length=2000, width=100, sliderlength=100,
             )
-            slider.pack(side=tk.LEFT)
+            slider.pack(side=tk.LEFT, padx=10)
             self.sliders.append(slider)
 
     def onSliderUpdate(self, value, index):
@@ -56,7 +62,7 @@ class TestUI:
         # print(self.z)
         self.sliders[index].set(value)
         img = decode(self.vae, self.z)
-        img = img.resize((350, 350), resample=Resampling.NEAREST)
+        img = img.resize((1500, 1500), resample=Resampling.NEAREST)
         self.photo = ImageTk.PhotoImage(img)
         self.label.config(image=self.photo)
 
@@ -64,9 +70,9 @@ def decode(vae: VAE, z: torch.Tensor):
     recon = vae.decode(z.unsqueeze(0))
     return torch2PIL(recon[0, :, :, :])
 
-def main():
+def main(experiment_path, lock_epoch):
     exp_name, n_rand_inits, groups, experiment = loadExperiment(path.join(
-        EXPERIMENT_PATH, EXPERIMENT_PY_FILENAME, 
+        experiment_path, EXPERIMENT_PY_FILENAME, 
     ))
     print(f'{exp_name = }')
     for group in groups:
@@ -74,11 +80,18 @@ def main():
         group.hyperParams.print(depth=1)
         for rand_init_i in range(n_rand_inits):
             print(f'{rand_init_i = }')
-            vae = loadLatestModels(EXPERIMENT_PATH, group, rand_init_i, dict(
+            vae = loadLatestModels(experiment_path, group, rand_init_i, dict(
                 vae=VAE, 
-            ), LOCK_EPOCH)['vae']
+            ), lock_epoch)['vae']
             vae.eval()
             test_ui = TestUI(vae, group.name(), group.hyperParams.symm.latent_dim)
-            test_ui.win.mainloop()
+            try:
+                test_ui.win.mainloop()
+            finally:
+                try:
+                    test_ui.win.destroy()
+                except tk.TclError:
+                    pass
 
-main()
+if __name__ == '__main__':
+    main(EXPERIMENT_PATH, LOCK_EPOCH)

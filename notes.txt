@@ -444,6 +444,8 @@ next {
             RNN is too storng? 
     2022_m10_d27@13_22_30_z_loss_nostop
         z loss is unecessary. 
+    2022_m10_d27@18_20_46_grad_clip
+        grad did not explode. We should use clip=1
 }
 todo {
     evalDecoder: show a matrix of recon images. 

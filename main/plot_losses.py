@@ -5,7 +5,7 @@ from torchWork.plot_losses import plotLosses, LossType
 from torchWork.experiment_control import EXPERIMENT_PY_FILENAME
 
 EXP_PATH = path.join('./experiments/', '''
-2022_m10_d27@13_42_53_rnn_width
+2022_m10_d27@18_20_46_grad_clip
 '''.strip())
 
 fig = plotLosses(
@@ -25,6 +25,8 @@ fig = plotLosses(
         # LossType('validate', 'loss_root.predict.z'), 
         # LossType('train',    'loss_root.predict.image'), 
         LossType('validate', 'loss_root.predict.image'), 
+
+        # LossType('validate', 'loss_root.seq_energy'), 
 
         # LossType('train',    'linear_proj_mse'), 
         LossType('validate', 'linear_proj_mse'), 

@@ -29,9 +29,9 @@ template = HyperParams()
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
-    LossWeightTree('predict', 1, [
+    LossWeightTree('predict', 0, [
         LossWeightTree('z', 0, None), 
-        LossWeightTree('image', 1, None), 
+        LossWeightTree('image', 0, None), 
     ]), 
     LossWeightTree('supervise', 0, [
         LossWeightTree('rnn', 0, None), 
@@ -54,7 +54,8 @@ template.supervise_vae_only_xy = False
 template.variational_rnn = True
 template.vvrnn = False
 template.vvrnn_static = -25
-template.rnn_min_context = 4
+template.rnn_min_context = 19
+# skip rnn
 template.rnn_width = 16
 template.residual = True
 template.jepa_stop_grad_encoder = False

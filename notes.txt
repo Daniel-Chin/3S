@@ -437,6 +437,11 @@ next {
     2022_m10_d27@13_42_53_wrong_assum
         wrong symm assum makes it fail, even SO3...
         evalDecoder. 
+    2022_m10_d27@15_30_51_energy
+        Forgot to turn of prediction loss !?!? redo. 
+        Also, the energy loss is near 0, but disentanglement is bad. 
+            fake data too fake? GAN? 
+            RNN is too storng? 
 }
 todo {
     read 5 balls by zhang kun

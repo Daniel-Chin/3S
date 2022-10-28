@@ -32,9 +32,9 @@ template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
     LossWeightTree('seq_energy', None, None), 
-    LossWeightTree('predict', 1, [
+    LossWeightTree('predict', 0, [
         LossWeightTree('z', 0, None), 
-        LossWeightTree('image', 1, None), 
+        LossWeightTree('image', 0, None), 
     ]), 
     LossWeightTree('supervise', 0, [
         LossWeightTree('rnn', 0, None), 

@@ -1,5 +1,5 @@
 import random
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 import torch
 import torch.nn.functional as F
@@ -185,16 +185,21 @@ def forward(
         )
     
     return (
-        lossTree, reconstructions.detach().view(
+        lossTree, tryDetach(reconstructions).view(
             batch_size, SEQ_LEN, 
             IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
-        ), img_predictions.detach(), 
-        z.detach(), z_hat_aug.detach(), 
+        ), tryDetach(img_predictions), 
+        tryDetach(z), tryDetach(z_hat_aug), 
         [
             ('mean_square_vrnn_std', mean_square_vrnn_std.detach()), 
             ('linear_proj_mse', linear_proj_mse.detach())
         ], 
     )
+
+def tryDetach(x: Optional[torch.Tensor], /):
+    if x is None:
+        return None
+    return x.detach()
 
 def rnnForward(
     rnn: PredRNN, 

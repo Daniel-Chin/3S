@@ -9,15 +9,15 @@ VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 3
 
-EXP_NAME = 'grad_clip'
-N_RAND_INITS = 2
+EXP_NAME = 'tf_time'
+N_RAND_INITS = 1
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'grad_clip'
-        self.variable_value = hyperParams.grad_clip
+        self.variable_name = 'tf_time'
+        self.variable_value = hyperParams.teacher_forcing_duration
     
     @lru_cache(1)
     def name(self):
@@ -63,30 +63,22 @@ template.jepa_stop_grad_encoder = False
 template.vae_channels = [16, 32, 64]
 template.deep_spread = False
 template.batch_size = 256
-template.grad_clip = None
+template.grad_clip = 1
 template.optim_name = 'adam'
 template.train_set_size = 256
 template.image_loss = 'mse'
-template.teacher_forcing_duration = 40000
+template.teacher_forcing_duration = None
 template.max_epoch = template.teacher_forcing_duration
 template.ready()
 
 # modifying template
 # template.xxx = xxx
 
-hP = template.copy()
-hP.grad_clip = .03
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
+TFs = [*range(10000, 40001, 5000)]
+for tf in TFs:
+    hP = template.copy()
+    hP.teacher_forcing_duration = tf
+    hP.ready()
+    GROUPS.append(MyExpGroup(hP))
 
-hP = template.copy()
-hP.grad_clip = .3
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-hP = template.copy()
-hP.grad_clip = 1
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-assert len(GROUPS) == 3
+assert len(GROUPS) == len(TFs)

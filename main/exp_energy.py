@@ -16,10 +16,10 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'loss_weight'
-        self.variable_value = hyperParams.lossWeightTree[
+        self.variable_name = 'loss_weight,noise_std'
+        self.variable_value = (hyperParams.lossWeightTree[
             'seq_energy'
-        ]
+        ], hyperParams.energy_noise_std)
     
     @lru_cache(1)
     def name(self):
@@ -31,7 +31,10 @@ template = HyperParams()
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
-    LossWeightTree('seq_energy', None, None), 
+    LossWeightTree('seq_energy', None, [
+        LossWeightTree('real', 1, None), 
+        LossWeightTree('fake', 1, None), 
+    ]), 
     LossWeightTree('predict', 0, [
         LossWeightTree('z', 0, None), 
         LossWeightTree('image', 0, None), 
@@ -76,24 +79,10 @@ template.ready()
 # modifying template
 # template.xxx = xxx
 
-hP = template.copy()
-hP.lossWeightTree['seq_energy'].weight = .1
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-hP = template.copy()
-hP.lossWeightTree['seq_energy'].weight = .3
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-hP = template.copy()
-hP.lossWeightTree['seq_energy'].weight = 1
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-hP = template.copy()
-hP.lossWeightTree['seq_energy'].weight = 3
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-assert len(GROUPS) == 4
+for std in (1, .1, .03):
+    for w in (.3, 1):
+        hP = template.copy()
+        hP.lossWeightTree['seq_energy'].weight = w
+        hP.energy_noise_std = std
+        hP.ready()
+        GROUPS.append(MyExpGroup(hP))

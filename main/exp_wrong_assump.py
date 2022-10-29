@@ -30,6 +30,10 @@ template = HyperParams()
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
+    LossWeightTree('seq_energy', 0, [
+        LossWeightTree('real', 0, None), 
+        LossWeightTree('fake', 0, None), 
+    ]), 
     LossWeightTree('predict', 1, [
         LossWeightTree('z', 0, None), 
         LossWeightTree('image', 1, None), 

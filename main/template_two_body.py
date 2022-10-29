@@ -29,7 +29,10 @@ template = HyperParams()
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1, None), 
     LossWeightTree('kld', 1e-5, None), 
-    LossWeightTree('seq_energy', 0, None), 
+    LossWeightTree('seq_energy', 0, [
+        LossWeightTree('real', 0, None), 
+        LossWeightTree('fake', 0, None), 
+    ]), 
     LossWeightTree('predict', 1, [
         LossWeightTree('z', 0, None), 
         LossWeightTree('image', 1, None), 
@@ -56,6 +59,7 @@ template.variational_rnn = True
 template.vvrnn = False
 template.vvrnn_static = -25
 template.rnn_min_context = 4
+template.energy_noise_std = 1
 template.rnn_width = 16
 template.residual = True
 template.jepa_stop_grad_encoder = False

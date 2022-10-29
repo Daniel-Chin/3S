@@ -156,9 +156,13 @@ def forward(
     if (
         hParams.lossWeightTree['seq_energy'].weight != 0
     ):
+        RATIO = 64
         noise = torch.randn((
-            64 * batch_size, SEQ_LEN, hParams.symm.latent_dim, 
-        ), device=DEVICE)
+            RATIO * batch_size, SEQ_LEN, hParams.symm.latent_dim, 
+        ), device=DEVICE) * hParams.energy_noise_std
+        for i in range(RATIO):
+            # Maybe in-place is faster, maybe batch op is faster...
+            noise[i * RATIO : (i+1) * RATIO, :, :] += z_transed.detach()
         energies: List[torch.Tensor] = []
         for seq in z_transed, noise:
             energy = torch.zeros((
@@ -174,9 +178,11 @@ def forward(
             energies.append(energy)
         data_energy, noise_energy = energies
         # hinge loss
-        lossTree.seq_energy = (
-            2 + data_energy.clamp(min=-1).mean().cpu()
-            -  noise_energy.clamp(max=+1).mean().cpu()
+        lossTree.seq_energy.real = (
+            1 +  data_energy.clamp(min=-1).mean().cpu()
+        )
+        lossTree.seq_energy.fake = (
+            1 - noise_energy.clamp(max=+1).mean().cpu()
         )
 
     with profiler('eval_linearity'):

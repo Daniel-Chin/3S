@@ -46,6 +46,7 @@ class HyperParams(BaseHyperParams):
         self.vvrnn: bool = None
         self.vvrnn_static: float = None
         self.rnn_min_context: int = None
+        self.energy_noise_std: float = None
 
         self.rnn_width: int = None
         self.residual: bool = None
@@ -78,10 +79,15 @@ class HyperParams(BaseHyperParams):
             self.jepa_stop_grad_encoder = False
         if self.supervise_vae_only_xy is None:
             self.supervise_vae_only_xy = False
+        if self.energy_noise_std is None:
+            self.energy_noise_std = 1
         if 'symm_self_consistency' not in self.lossWeightTree:
             self.lossWeightTree['symm_self_consistency'].weight = 0
         if 'seq_energy' not in self.lossWeightTree:
-            self.lossWeightTree['seq_energy'].weight = 0
+            self.lossWeightTree['seq_energy'] = LossWeightTree('seq_energy', 0, [
+                LossWeightTree('real', 0, None), 
+                LossWeightTree('fake', 0, None), 
+            ])
     
     def ready(self):
         assert self.supervise_rnn == (

@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=48:00:00
 #SBATCH --mem=6GB
-#SBATCH --gres=gpu:3090:1
+#SBATCH --gres=gpu:1
 #SBATCH --job-name={JOB_NAME}
 #SBATCH --output={OUT_FILENAME}.out
 #SBATCH --error={OUT_FILENAME}.err

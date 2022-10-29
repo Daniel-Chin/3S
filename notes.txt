@@ -459,6 +459,9 @@ next {
         Damn! Intuitively, such low-dim (3D) z space should be easy to fill with noise. 
         Comapred with diffusion tho, maybe higher dim is actually better. 
         next: try adding noise to data. 
+    2022_m10_d28@18_49_52_tf_time
+        evalEncoder: we may still need 40K even when grad_clip is 1 >> .03. 
+        still, let's do another exp. 
 }
 todo {
     evalDecoder: show a matrix of recon images. 

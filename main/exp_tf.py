@@ -77,7 +77,7 @@ template.ready()
 # modifying template
 # template.xxx = xxx
 
-TFs = [*range(10000, 40001, 5000)]
+TFs = [*range(20000, 50001, 2000)]
 for tf in TFs:
     hP = template.copy()
     hP.teacher_forcing_duration = tf

@@ -10,7 +10,7 @@ def main():
     print('(Enter empty string to begin.)')
     exps = []
     while True:
-        op = input('exp_dir_name = ').strip(' /\\\n')
+        op = input('exp_dir_name = ').lstrip('#').strip(' /\\\n')
         if op == '':
             break
         if path.isdir(op):

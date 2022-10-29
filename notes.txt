@@ -447,6 +447,19 @@ next {
     2022_m10_d27@18_20_46_grad_clip
         grad did not explode. We should use clip=1
 }
+10/29 {
+    2022_m10_d27@13_56_47_dataset_size
+        maybe even dataset size = 64 works! 
+        For any conclusion, we do need fig 8. 
+    2022_m10_d28@13_21_17_vae_two_body_norbit
+        overfit very fast, and loss minima have bad recon. 
+        I'm not sure what to do. Trying bigger VAE. 
+    2022_m10_d28@13_46_57_energy
+        energy loss is low, RL is bad. 
+        Damn! Intuitively, such low-dim (3D) z space should be easy to fill with noise. 
+        Comapred with diffusion tho, maybe higher dim is actually better. 
+        next: try adding noise to data. 
+}
 todo {
     evalDecoder: show a matrix of recon images. 
     calc equivalent z loss weight as xuanjie's training

@@ -63,21 +63,21 @@ template.jepa_stop_grad_encoder = False
 template.vae_channels = None
 template.deep_spread = False
 template.batch_size = 256
-template.grad_clip = 1
+template.grad_clip = .03
 template.optim_name = 'adam'
 template.train_set_size = 256
 template.image_loss = 'mse'
-template.teacher_forcing_duration = 7000
+template.teacher_forcing_duration = 40000
 template.max_epoch = template.teacher_forcing_duration
 template.ready()
 
 hP = template.copy()
-hP.vae_channels = [64, 128, 128]
+hP.vae_channels = [16, 32, 64]
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.vae_channels = [64, 64, 64]
+hP.vae_channels = [32, 32, 64]
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 

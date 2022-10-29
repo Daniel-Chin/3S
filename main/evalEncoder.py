@@ -12,7 +12,7 @@ from template_bounce import MyExpGroup
 from linearity_metric import projectionMSE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m10_d27@13_22_30_z_loss_nostop
+2022_m10_d28@13_46_57_energy
 '''.strip())
 LOCK_EPOCH = None
 
@@ -56,8 +56,9 @@ def main(experiment_path, lock_epoch):
             marker='o', markersize=10, 
         )
     plt.ylabel('Linear projection MSE (↓)')
-    plt.xlabel = group.variable_name
+    plt.xlabel(group.variable_name)
     plt.xticks(X, [g.variable_value for g in groups])
+    plt.suptitle(exp_name)
     plt.savefig(path.join(experiment_path, 'auto_eval_encoder.pdf'))
     plt.show()
 

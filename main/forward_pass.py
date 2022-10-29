@@ -84,54 +84,57 @@ def forward(
     # rnn forward pass
     min_context = hParams.rnn_min_context
 
-    # predict image
-    if (
-        require_img_predictions_and_z_hat
-        or hParams.lossWeightTree['predict']['image'].weight != 0
-    ):
-        flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
-            predRnn, z_transed, untrans, 
-            batch_size, hParams, epoch, profiler, 
-        )
-        z_hat_aug = flat_z_hat_aug.view(
-            batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
-        )
-        with profiler('good'):
-            flat_predictions = vae.decode(r_flat_z_hat_aug)
-        img_predictions = flat_predictions.view(
-            batch_size, SEQ_LEN - min_context, 
-            IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
-        )
-        with profiler('good'):
-            lossTree.predict.image = hParams.imgCriterion(
-                img_predictions, 
-                video_batch[:, min_context:, :, :, :], 
-            ).cpu()
-    else:
-        img_predictions = None
-        z_hat_aug = None
-
-    # predict z
-    if (
-        hParams.lossWeightTree['predict']['z'].weight != 0
-        or hParams.supervise_rnn
-    ):
-        if hParams.jepa_stop_grad_encoder:
+    lossTree.predict.image = torch.tensor(0, dtype=torch.float)
+    lossTree.predict.z     = torch.tensor(0, dtype=torch.float)
+    for _ in range(hParams.K):
+        # predict image
+        if (
+            require_img_predictions_and_z_hat
+            or hParams.lossWeightTree['predict']['image'].weight != 0
+        ):
             flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
-                predRnn, z_transed.detach(), untrans, 
+                predRnn, z_transed, untrans, 
                 batch_size, hParams, epoch, profiler, 
             )
-        z_hat_aug = flat_z_hat_aug.view(
-            batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
-        )
-        _z = z[:, min_context:, :]
-        if hParams.jepa_stop_grad_encoder:
-            _z = _z.detach()
-        z_loss = F.mse_loss(z_hat_aug, _z)
-        if hParams.supervise_rnn:
-            lossTree.supervise.rnn = z_loss.cpu()
+            z_hat_aug = flat_z_hat_aug.view(
+                batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
+            )
+            with profiler('good'):
+                flat_predictions = vae.decode(r_flat_z_hat_aug)
+            img_predictions = flat_predictions.view(
+                batch_size, SEQ_LEN - min_context, 
+                IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
+            )
+            with profiler('good'):
+                lossTree.predict.image += hParams.imgCriterion(
+                    img_predictions, 
+                    video_batch[:, min_context:, :, :, :], 
+                ).cpu()
         else:
-            lossTree.predict.z = z_loss.cpu()
+            img_predictions = None
+            z_hat_aug = None
+
+        # predict z
+        if (
+            hParams.lossWeightTree['predict']['z'].weight != 0
+            or hParams.supervise_rnn
+        ):
+            if hParams.jepa_stop_grad_encoder:
+                flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
+                    predRnn, z_transed.detach(), untrans, 
+                    batch_size, hParams, epoch, profiler, 
+                )
+            z_hat_aug = flat_z_hat_aug.view(
+                batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
+            )
+            _z = z[:, min_context:, :]
+            if hParams.jepa_stop_grad_encoder:
+                _z = _z.detach()
+            z_loss = F.mse_loss(z_hat_aug, _z)
+            if hParams.supervise_rnn:
+                lossTree.supervise.rnn = z_loss.cpu()
+            else:
+                lossTree.predict.z += z_loss.cpu()
 
     mean_square_vrnn_std = torch.exp(
         0.5 * log_var

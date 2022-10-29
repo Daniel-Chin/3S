@@ -464,11 +464,12 @@ next {
         still, let's do another exp. 
 }
 todo {
-    evalDecoder: show a matrix of recon images. 
     calc equivalent z loss weight as xuanjie's training
     vary K (aug ratio)
         make fig 8 in paper
             K = 0 1 4
+        exp_k
+        exp_data_size
     enable dataset "review last seq". how? save initial cond
     6D twobody dataset: 
         currently, CM is random and moves. Wrong.

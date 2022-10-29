@@ -33,6 +33,7 @@ class HyperParams(BaseHyperParams):
         super().__init__()
 
         self.symm: SymmetryAssumption = None
+        self.K: int = 1
         
         self.I: int = None
         self.T: int = None

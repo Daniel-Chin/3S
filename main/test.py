@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_energy.py
+exp_k.py
 '''.strip()
 # op = input('Which exp? ')
 

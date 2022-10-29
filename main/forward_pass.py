@@ -162,7 +162,9 @@ def forward(
         ), device=DEVICE) * hParams.energy_noise_std
         for i in range(RATIO):
             # Maybe in-place is faster, maybe batch op is faster...
-            noise[i * RATIO : (i+1) * RATIO, :, :] += z_transed.detach()
+            noise[
+                i * batch_size : (i+1) * batch_size, :, :, 
+            ] += z_transed.detach()
         energies: List[torch.Tensor] = []
         for seq in z_transed, noise:
             energy = torch.zeros((

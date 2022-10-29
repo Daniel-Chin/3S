@@ -18,7 +18,7 @@ from vae import VAE
 from template_bounce import MyExpGroup
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m10_d27@13_22_30_z_loss_nostop
+2022_m10_d28@13_46_57_energy
 '''.strip())
 LOCK_EPOCH = None
 

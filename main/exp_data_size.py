@@ -10,7 +10,7 @@ VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 3
 
 EXP_NAME = 'dataset_size'
-N_RAND_INITS = 2
+N_RAND_INITS = 10
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -37,7 +37,7 @@ template.lossWeightTree = LossWeightTree('total', 1, [
         LossWeightTree('fake', 0, None), 
     ]), 
     LossWeightTree('predict', 1, [
-        LossWeightTree('z', .005, None), 
+        LossWeightTree('z', 0, None), 
         LossWeightTree('image', 1, None), 
     ]), 
     LossWeightTree('supervise', 0, [
@@ -91,39 +91,10 @@ baseline.symm = SymmetryAssumption(
 )
 
 for x in (ours, baseline):
-    hP = template.copy()
-    hP.symm = x.symm
-    hP.train_set_size = 64
-    hP.batch_size = min(512, hP.train_set_size)
-    hP.ready()
-    GROUPS.append(MyExpGroup(hP))
-
-    hP = template.copy()
-    hP.symm = x.symm
-    hP.train_set_size = 128
-    hP.batch_size = min(512, hP.train_set_size)
-    hP.ready()
-    GROUPS.append(MyExpGroup(hP))
-
-    hP = template.copy()
-    hP.symm = x.symm
-    hP.train_set_size = 256
-    hP.batch_size = min(512, hP.train_set_size)
-    hP.ready()
-    GROUPS.append(MyExpGroup(hP))
-
-    hP = template.copy()
-    hP.symm = x.symm
-    hP.train_set_size = 512
-    hP.batch_size = min(512, hP.train_set_size)
-    hP.ready()
-    GROUPS.append(MyExpGroup(hP))
-
-    hP = template.copy()
-    hP.symm = x.symm
-    hP.train_set_size = 1024
-    hP.batch_size = min(512, hP.train_set_size)
-    hP.ready()
-    GROUPS.append(MyExpGroup(hP))
-
-assert len(GROUPS) == 2 * 5
+    for s in (32, 64, 128, 256, 1024):
+        hP = template.copy()
+        hP.symm = x.symm
+        hP.train_set_size = s
+        hP.batch_size = min(512, hP.train_set_size)
+        hP.ready()
+        GROUPS.append(MyExpGroup(hP))

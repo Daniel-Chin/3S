@@ -12,7 +12,7 @@ from template_bounce import MyExpGroup
 from linearity_metric import projectionMSE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m10_d28@18_49_52_tf_time
+2022_m10_d29@15_32_18_tf_time
 '''.strip())
 LOCK_EPOCH = None
 
@@ -41,9 +41,10 @@ def main(experiment_path, lock_epoch):
         group.hyperParams.print(depth=1)
         for rand_init_i in range(n_rand_inits):
             print(f'{rand_init_i = }')
-            vae: VAE = loadLatestModels(experiment_path, group, rand_init_i, dict(
+            epoch, models = loadLatestModels(experiment_path, group, rand_init_i, dict(
                 vae=VAE, 
-            ), lock_epoch)['vae']
+            ), lock_epoch)
+            vae: VAE = models['vae']
             vae.eval()
             with torch.no_grad():
                 Z, _ = vae.encode(image_set)

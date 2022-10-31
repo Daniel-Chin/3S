@@ -39,6 +39,7 @@ class VideoWriter:
             '-r', str(FPS), '-i', 'pipe:', 
             '-vcodec', 'libx264', '-pix_fmt', 'yuv420p', 
             '-crf', '24', 
+            '-y', 
         ]
     
     @contextmanager

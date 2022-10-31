@@ -152,7 +152,6 @@ def oneEpoch(
     
     if epoch % 32 == 0:
         print(group_name, 'epoch', epoch, 'finished.')
-    if trainer_id == 0:
-        with profiler('report'):
-            profiler.report()
+    with profiler('report'):
+        profiler.report()
     return True

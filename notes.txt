@@ -463,6 +463,12 @@ next {
         evalEncoder: we may still need 40K even when grad_clip is 1 >> .03. 
         still, let's do another exp. 
 }
+10/31 {
+    2022_m10_d29@14_00_43_tf_time
+        evalEncoder
+        解耦成功率咋这么低？
+        我只能说, tf_time=40K seems optimal. 
+}
 todo {
     calc equivalent z loss weight as xuanjie's training
     vary K (aug ratio)

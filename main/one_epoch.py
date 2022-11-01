@@ -56,8 +56,6 @@ def oneEpoch(
         vae.train()
         predRnn.train()
         energyRnn.train()
-        if HAS_CUDA:
-            torch.cuda.synchronize()    # just for profiling
     for batch_i, (video_batch, traj_batch) in enumerate(
         trainLoader, 
     ):
@@ -70,31 +68,21 @@ def oneEpoch(
                 video_batch, traj_batch, 
                 vae, predRnn, energyRnn, profiler, False, 
             )
-            if HAS_CUDA:
-                torch.cuda.synchronize()    # just for profiling
         with profiler('sum loss'):
             total_loss = lossTree.sum(
                 hParams.lossWeightTree, epoch, 
             )
-            if HAS_CUDA:
-                torch.cuda.synchronize()    # just for profiling
         with profiler('good', 'backward'):
             optim.zero_grad()
             total_loss.backward()
-            if HAS_CUDA:
-                torch.cuda.synchronize()    # just for profiling
         with profiler('grad norm'):
             params = getParams(optim)
             grad_norm = getGradNorm(params)
             torch.nn.utils.clip_grad_norm_(
                 params, hParams.grad_clip, 
             )
-            if HAS_CUDA:
-                torch.cuda.synchronize()    # just for profiling
         with profiler('good', 'step'):
             optim.step()
-            if HAS_CUDA:
-                torch.cuda.synchronize()    # just for profiling
         with profiler('log losses'):
             lossLogger.eat(
                 epoch, batch_i, True, profiler, 
@@ -121,8 +109,6 @@ def oneEpoch(
                     video_batch, traj_batch, 
                     vae, predRnn, energyRnn, profiler, False, 
                 )
-                if HAS_CUDA:
-                    torch.cuda.synchronize()    # just for profiling
             with profiler('log losses'):
                 lossLogger.eat(
                     epoch, batch_i, False, profiler, 

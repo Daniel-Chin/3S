@@ -32,8 +32,6 @@ def forward(
     )
 
     # vae forward pass
-    if HAS_CUDA:
-        torch.cuda.synchronize()    # just for profiling
     with profiler('good'):
         mu, log_var = vae.encode(flat_video_batch)
         flat_z = reparameterize(mu, log_var)
@@ -101,18 +99,12 @@ def forward(
             z_hat_aug = flat_z_hat_aug.view(
                 batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
             )
-            if HAS_CUDA:
-                torch.cuda.synchronize()    # just for profiling
             with profiler('good'):
                 flat_predictions = vae.decode(r_flat_z_hat_aug)
-                if HAS_CUDA:
-                    torch.cuda.synchronize()    # just for profiling
             img_predictions = flat_predictions.view(
                 batch_size, SEQ_LEN - min_context, 
                 IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
             )
-            if HAS_CUDA:
-                torch.cuda.synchronize()    # just for profiling
             with profiler('good'):
                 lossTree.predict.image += hParams.imgCriterion(
                     img_predictions, 
@@ -238,8 +230,6 @@ def rnnForward(
     if hParams.vvrnn_static is not None:
         log_var *= hParams.vvrnn_static
     rnn.zeroHidden(batch_size, DEVICE)
-    if HAS_CUDA:
-        torch.cuda.synchronize()    # just for profiling
     with profiler('good'):
         for global_t in range(min_context):
             rnn.stepTime(z_transed[:, global_t, :])
@@ -252,8 +242,6 @@ def rnnForward(
                 rnn.stepTime(z_transed    [:, global_t, :])
             else:
                 rnn.stepTime(z_hat_transed[:,        t, :])
-        if HAS_CUDA:
-            torch.cuda.synchronize()    # just for profiling
     flat_z_hat_transed = z_hat_transed.view(
         -1, hParams.symm.latent_dim, 
     )

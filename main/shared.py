@@ -52,6 +52,7 @@ class HyperParams(BaseHyperParams):
         self.rnn_width: int = None
         self.residual: bool = None
         self.jepa_stop_grad_encoder: bool = None
+        self.dropout: float = None
         self.vae_channels: List[int] = None
         self.deep_spread: bool = None
 
@@ -82,6 +83,8 @@ class HyperParams(BaseHyperParams):
             self.supervise_vae_only_xy = False
         if self.energy_noise_std is None:
             self.energy_noise_std = 1
+        if self.dropout is None:
+            self.dropout = 0.0
         if 'symm_self_consistency' not in self.lossWeightTree:
             self.lossWeightTree['symm_self_consistency'].weight = 0
         if 'seq_energy' not in self.lossWeightTree:

@@ -12,6 +12,7 @@ class PredRNN(nn.Module):
             nn.Linear(hidden_dim + hyperParams.symm.latent_dim, hidden_dim), 
             nn.Tanh(), 
         )
+        self.dropout = nn.Dropout(hyperParams.dropout)
         
         self.projHead = nn.Linear(hidden_dim, hyperParams.symm.latent_dim)
         if hyperParams.vvrnn:
@@ -34,7 +35,7 @@ class PredRNN(nn.Module):
         `z` is (BATCH_SIZE, SEQ_LEN, latent_dim). 
         '''
         output = self.updateHidden(torch.cat((
-            self.hidden, z_t, 
+            self.dropout(self.hidden), z_t, 
         ), dim=1))
         if self.hParams.residual:
             self.hidden = self.hidden + output

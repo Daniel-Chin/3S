@@ -4,20 +4,20 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/two_body/train'
-VALIDATE_SET_PATH = '../datasets/two_body/validate'
+TRAIN_SET_PATH    = '../datasets/bounce/train'
+VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
-ACTUAL_DIM = 6
+ACTUAL_DIM = 3
 
-EXP_NAME = ...
-N_RAND_INITS = ...
+EXP_NAME = 'dropout'
+N_RAND_INITS = 4
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.WHAT
+        self.variable_name = 'dropout'
+        self.variable_value = hyperParams.dropout
     
     @lru_cache(1)
     def name(self):
@@ -48,8 +48,9 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    6, [
-        ([Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
+    3, [
+        ([Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        ([Trivial()], {Slice(2, 3)}), 
     ], 
 )
 template.supervise_rnn = False
@@ -63,7 +64,7 @@ template.energy_noise_std = 1
 template.rnn_width = 16
 template.residual = True
 template.jepa_stop_grad_encoder = False
-template.dropout = 0.0
+template.dropout = None
 template.vae_channels = [16, 32, 64]
 template.deep_spread = False
 template.batch_size = 256
@@ -78,9 +79,8 @@ template.ready()
 # modifying template
 # template.xxx = xxx
 
-# hP = template.copy()
-# hP.xxx = xxx
-# hP.ready()
-# GROUPS.append(MyExpGroup(hP))
-
-assert len(GROUPS) == 0
+for d in (0, .1, .5):
+    hP = template.copy()
+    hP.dropout = d
+    hP.ready()
+    GROUPS.append(MyExpGroup(hP))

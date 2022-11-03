@@ -477,6 +477,11 @@ next {
         if dropout kills network performance, 
             Next exp: dropout=0.5, increase RNN size. 
 }
+11/3 {
+    exp: self_recon
+        just to see if disabling self_recon loss improves. 
+        and also kinda test my exp framework. 
+}
 todo {
     calc equivalent z loss weight as xuanjie's training
     vary K (aug ratio)

@@ -64,6 +64,7 @@ template.energy_noise_std = 1
 template.rnn_width = 16
 template.residual = True
 template.jepa_stop_grad_encoder = False
+template.dropout = 0.0
 template.vae_channels = [16, 32, 64]
 template.deep_spread = False
 template.batch_size = 128

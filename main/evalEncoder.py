@@ -12,7 +12,7 @@ from template_bounce import MyExpGroup
 from linearity_metric import projectionMSE
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m10_d29@15_32_18_tf_time
+2022_m10_d29@14_11_09_dataset_size
 '''.strip())
 LOCK_EPOCH = None
 

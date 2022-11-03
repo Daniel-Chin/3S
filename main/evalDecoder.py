@@ -18,13 +18,13 @@ from vae import VAE
 from template_bounce import MyExpGroup
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m10_d28@13_46_57_energy
+2022_m10_d29@14_11_09_dataset_size
 '''.strip())
 LOCK_EPOCH = None
 
 RADIUS = 2
 TICK_INTERVAL = .5
-IMG_SIZE = 500
+IMG_SIZE = 300
 
 class UI:
     def __init__(
@@ -137,7 +137,9 @@ def main(experiment_path, lock_epoch):
     exp_name, n_rand_inits, groups, experiment = loadExperiment(path.join(
         experiment_path, EXPERIMENT_PY_FILENAME, 
     ))
+    groups: List[MyExpGroup]
     print(f'{exp_name = }')
+    groups = [x for x in groups if x.hyperParams.train_set_size == 64]
     ui = UI(groups, n_rand_inits, experiment_path, lock_epoch)
     ui.win.mainloop()
 

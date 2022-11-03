@@ -23,3 +23,8 @@ def projectionMSE(X: torch.Tensor, Y: torch.Tensor):
     Y_hat = X @ coef + intercept
 
     return (Y - Y_hat).square().mean().cpu()
+
+def projectionMSELockHeight(X: torch.Tensor, Y: torch.Tensor):
+    mse_0 = projectionMSE(X[:, :2], Y[:, :2])
+    mse_1 = projectionMSE(X[:, 2:], Y[:, 2:])
+    return (2 * mse_0 + mse_1) / 3

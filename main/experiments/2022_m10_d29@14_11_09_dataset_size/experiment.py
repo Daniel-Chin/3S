@@ -61,6 +61,7 @@ template.rnn_min_context = 4
 template.rnn_width = 16
 template.residual = True
 template.jepa_stop_grad_encoder = True
+template.dropout = 0.0
 template.vae_channels = [16, 32, 64]
 template.deep_spread = False
 template.batch_size = None

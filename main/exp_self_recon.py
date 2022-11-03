@@ -80,12 +80,12 @@ template.ready()
 # template.xxx = xxx
 
 hP = template.copy()
-hP.lossWeightTree['self_recon'] = 0
+hP.lossWeightTree['self_recon'].weight = 0
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
-hP.lossWeightTree['self_recon'] = 1
+hP.lossWeightTree['self_recon'].weight = 1
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 

@@ -129,7 +129,7 @@ def oneEpoch(
                     ('train', trainSet), 
                     ('validate', validateSet), 
                 ]:
-                    loader = dataLoader(dataset, 24)
+                    loader = dataLoader(dataset, 12)
                     videoEval(
                         epoch, save_path, name, 
                         experiment, hParams, *next(loader), 

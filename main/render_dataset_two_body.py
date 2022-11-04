@@ -83,6 +83,7 @@ def ui(viewer: TwoBodyViewer):
     def h():
         print('''
 L: loop one traj. 
+T: trace. 
 P: prev. 
 S: slower. 
 F: faster.
@@ -90,10 +91,13 @@ H: show this help.
 ''')
     h()
     while True:
-        op = listen(b'lpsfh')
+        op = listen(b'ltpsfh')
         if op == b'l':
             viewer.do_loop_one_traj ^= True
             print(f'{viewer.do_loop_one_traj = }')
+        if op == b't':
+            viewer.leave_trace ^= True
+            print(f'{viewer.leave_trace = }')
         if op == b'p':
             with viewer.lock:
                 viewer.traj_i -= 1

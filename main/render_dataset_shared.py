@@ -47,6 +47,7 @@ class BallViewer(metaclass=ABCMeta):
         self.render_or_screenshot = 0
         self.frames: List[Image.Image] = None
         self.will_reset = True
+        self.leave_trace = False
         self.initGlut()
     
     def reset(self):
@@ -80,13 +81,15 @@ class BallViewer(metaclass=ABCMeta):
             
             bodies = self.trajectory[self.stage]
 
+            if self.leave_trace:
+                for bodies in self.trajectory[:self.stage]:
+                    self.makeBodies(*bodies, scale=.2)
             self.makeBodies(*bodies)
             
-            # step
             self.stage += 1
+        else:
             if self.running_mode is MODE_OBV_ONLY:
                 time.sleep(self.SPF)
-        else:
             bodies = self.trajectory[self.stage - 1]
             self.makeBodies(*bodies)
             if self.running_mode is MODE_MAKE_IMG:
@@ -105,12 +108,12 @@ class BallViewer(metaclass=ABCMeta):
         gluDeleteQuadric(quad)
         glPopMatrix()
     
-    def makeBodies(self, *bodies: Body):
+    def makeBodies(self, *bodies: Body, scale=1):
         for body, color in zip(bodies, (
             (0., 1., 0.), 
             (1., 0., 1.), 
         )):
-            self.makeBall(*body.position, self.ball_radius, color)
+            self.makeBall(*body.position, self.ball_radius * scale, color)
 
     def saveVideo(self):
         # self.frames[0].save(

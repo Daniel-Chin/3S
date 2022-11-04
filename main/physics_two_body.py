@@ -63,7 +63,7 @@ def initBodies(center_of_mass_constant: bool):
     other.velocity = - self.velocity
     if not center_of_mass_constant:
         offset = np.random.normal(
-            0, POSITION_STD, 3, 
+            0, POSITION_STD * 2, 3, 
         )
         for body in bodies:
             body.position += offset

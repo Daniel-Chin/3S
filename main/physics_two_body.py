@@ -42,7 +42,7 @@ def stepFineTime(a: Body, b: Body, /, dt: float):
 def toUnit(x: np.ndarray, /):
     return x / np.linalg.norm(x)
 
-def initBodies(center_of_mass_stationary: bool):
+def initBodies(center_of_mass_constant: bool):
     bodies = [Body(), Body()]
     for body in bodies:
         body.position = np.random.normal(
@@ -52,16 +52,21 @@ def initBodies(center_of_mass_stationary: bool):
             0, VELOCITY_STD, 3, 
         )
     del body
-    if center_of_mass_stationary:
-        self, other = bodies
-        position_unit = toUnit(self.position)
-        normal_to_sphere = np.dot(
-            self.velocity, position_unit
-        ) * position_unit
-        self.velocity -= normal_to_sphere   # make it tangent
+    self, other = bodies
+    position_unit = toUnit(self.position)
+    normal_to_sphere = np.dot(
+        self.velocity, position_unit
+    ) * position_unit
+    self.velocity -= normal_to_sphere   # make it tangent
 
-        other.position = - self.position
-        other.velocity = - self.velocity
+    other.position = - self.position
+    other.velocity = - self.velocity
+    if not center_of_mass_constant:
+        offset = np.random.normal(
+            0, POSITION_STD, 3, 
+        )
+        for body in bodies:
+            body.position += offset
     return bodies
 
 def oneRun(

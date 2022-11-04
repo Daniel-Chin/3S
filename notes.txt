@@ -487,6 +487,9 @@ next {
     2022_m11_d04@00_27_53_self_recon:
         self recon loss helps the pred task generalize! 
             pred validation loss is smaller. 
+    2022_m11_d04@00_27_53_rnn_width:
+        all failed...
+        Wait for successful disen, then try again. 
 }
 todo {
     calc equivalent z loss weight as xuanjie's training

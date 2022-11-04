@@ -484,6 +484,9 @@ next {
     6D twobody dataset: 
         currently, CM is random and moves. Wrong.
         make CM stationary but random across seqs.
+    2022_m11_d04@00_27_53_self_recon:
+        self recon loss helps the pred task generalize! 
+            pred validation loss is smaller. 
 }
 todo {
     calc equivalent z loss weight as xuanjie's training

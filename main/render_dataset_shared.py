@@ -46,19 +46,23 @@ class BallViewer(metaclass=ABCMeta):
         self.output_i = 0
         self.render_or_screenshot = 0
         self.frames: List[Image.Image] = None
-        self.reset()
+        self.will_reset = True
         self.initGlut()
     
     def reset(self):
         self.trajectory = self.getTrajectory()
         self.stage = 0
         self.frames = []
+        self.will_reset = False
     
     @abstractmethod
     def getTrajectory(self) -> List[List[Body]]:
         raise NotImplemented
 
     def loop(self):
+        if self.will_reset:
+            self.reset()
+            return
         if self.render_or_screenshot == 0:
             if self.running_mode is MODE_LOCATE:
                 self.locate_with_ball()
@@ -67,8 +71,12 @@ class BallViewer(metaclass=ABCMeta):
             if self.stage >= SEQ_LEN:
                 if self.running_mode is MODE_MAKE_IMG:
                     self.saveVideo()
-                self.reset()
+                self.will_reset = True
                 self.output_i += 1
+                self.makeBall(-1.5, 0, 0, .5, (1, 1, 0))
+                self.makeBall( 0.0, 0, 0, .5, (1, 1, 0))
+                self.makeBall(+1.5, 0, 0, .5, (1, 1, 0))
+                return
             
             bodies = self.trajectory[self.stage]
 
@@ -86,7 +94,9 @@ class BallViewer(metaclass=ABCMeta):
         
         self.render_or_screenshot = 1 - self.render_or_screenshot
     
-    def makeBall(self, x, y, z, r=1, color3f=(0., 1., 0.)):
+    def makeBall(
+        self, x, y, z, r=1, color3f=(0., 1., 0.), 
+    ):
         glPushMatrix()
         glColor3f(* color3f)
         glTranslatef(x, y, z)

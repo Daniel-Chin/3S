@@ -105,10 +105,10 @@ def oneLegalRun(*a, **kw):
         try:
             trajectory, n_empty = oneRun(*a, **kw)
         except Reject as e:
-            print('rej:', repr(e))
+            # print('rej:', repr(e))
             continue
         else:
-            print('Accept')
+            # print('Accept')
             return trajectory, n_empty
 
 def manyLegalRuns(

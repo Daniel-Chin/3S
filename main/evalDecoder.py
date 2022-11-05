@@ -18,7 +18,7 @@ from vae import VAE
 from template_bounce import MyExpGroup
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m10_d29@14_11_09_dataset_size
+2022_m11_d04@00_22_28_dropout
 '''.strip())
 LOCK_EPOCH = None
 
@@ -139,7 +139,6 @@ def main(experiment_path, lock_epoch):
     ))
     groups: List[MyExpGroup]
     print(f'{exp_name = }')
-    groups = [x for x in groups if x.hyperParams.train_set_size == 64]
     ui = UI(groups, n_rand_inits, experiment_path, lock_epoch)
     ui.win.mainloop()
 

@@ -10,7 +10,7 @@ VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 3
 
 EXP_NAME = 'energy'
-N_RAND_INITS = 3
+N_RAND_INITS = 1
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -80,8 +80,8 @@ template.ready()
 # modifying template
 # template.xxx = xxx
 
-for std in (10, 1, .1):
-    for w in (1, ):
+for std in (1, .1, .03):
+    for w in (.3, 1):
         hP = template.copy()
         hP.lossWeightTree['seq_energy'].weight = w
         hP.energy_noise_std = std

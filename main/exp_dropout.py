@@ -89,5 +89,6 @@ for d, r in (
 ):
     hP = template.copy()
     hP.dropout = d
+    hP.rnn_width = r
     hP.ready()
     GROUPS.append(MyExpGroup(hP))

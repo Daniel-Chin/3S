@@ -16,10 +16,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'dropout,rnn_width'
-        self.variable_value = (
-            hyperParams.dropout, hyperParams.rnn_width, 
-        )
+        self.variable_name = 'dropout'
+        self.variable_value = hyperParams.dropout
     
     @lru_cache(1)
     def name(self):
@@ -63,7 +61,7 @@ template.vvrnn = False
 template.vvrnn_static = -25
 template.rnn_min_context = 4
 template.energy_noise_std = 1
-template.rnn_width = None
+template.rnn_width = 16
 template.residual = True
 template.jepa_stop_grad_encoder = False
 template.dropout = None
@@ -81,12 +79,7 @@ template.ready()
 # modifying template
 # template.xxx = xxx
 
-for d, r in (
-    (0, 16), 
-    # (.1, 16),
-    (.5, 24), 
-    (.5, 32), 
-):
+for d in (0, .1, .5):
     hP = template.copy()
     hP.dropout = d
     hP.ready()

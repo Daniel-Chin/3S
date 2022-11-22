@@ -559,6 +559,9 @@ next {
         indeed, disen prob ~= 15%
     2022_m11_d05@12_56_52_dropout
         seems: no dropout is best. However, try again after high success disen. 
+    doing exp: exp_tr
+        Trying Gus's method, doing T and R seperately. 
+        motivation: My method still cannot match xj. What's different? TR? 
 }
 next {
     calc equivalent z loss weight as xuanjie's training

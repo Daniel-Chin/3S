@@ -1,6 +1,7 @@
 from typing import Callable, List, Set, Tuple
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
+import random
 
 import numpy as np
 import torch
@@ -9,7 +10,7 @@ from torchWork import DEVICE
 __all__ = [
     'Transform', 'TUT', 'Slice', 
     'Trivial', 'Translate', 'Rotate', 
-    'SymmetryAssumption', 
+    'SymmetryAssumption', 'GusMethod', 
 ]
 
 Transform = Callable[[torch.Tensor], torch.Tensor]
@@ -157,6 +158,35 @@ class SymmetryAssumption:
             self.latent_dim, 
             deepcopy(self.rule), 
         )
+
+class GusMethod(SymmetryAssumption):
+    def __init__(self):
+        self.latent_dim = 3
+        self.t = SymmetryAssumption(
+            3, [
+                ([Translate(2, 1)], {Slice(0, 2)}), 
+                ([Trivial()], {Slice(2, 3)}), 
+            ], 
+        )
+        self.r = SymmetryAssumption(
+            3, [
+                ([Rotate(2)], {Slice(0, 2)}), 
+                ([Trivial()], {Slice(2, 3)}), 
+            ], 
+        )
+    
+    def sample(self):
+        if random.random() < .5:
+            symm = self.t
+        else:
+            symm = self.r
+        return symm.sample()
+    
+    def __repr__(self) -> str:
+        return '<symm GusMethod>'
+    
+    def copy(self):
+        return __class__()
 
 def test(size=100):
     symm = SymmetryAssumption(3, [

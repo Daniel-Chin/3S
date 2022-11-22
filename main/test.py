@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_dropout.py
+exp_tr.py
 '''.strip()
 # op = input('Which exp? ')
 

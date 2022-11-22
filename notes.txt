@@ -514,8 +514,54 @@ next {
         is it collapsing? 
         trying smarter RNN + dropout. 
 }
-todo {
+11/6 {
+    rebuttal
+        要提一下最初 shuffle 颜色的做法。
+            对称性假设， 两种实现方法
+                表征扩增
+                锁死维度
+                    是表征扩增方法针对训练的优化
+        rnJU Weakness 2
+            loudness: also T-invariant
+                loudness-pitch SO(2)? 
+        做实验： wrong assum
+            read "surprising effectiveness"
+                while the exp is running
+            音乐：
+                变 2D z, T(2), R(2)
+            以下实验， 被操作维度为 z[:n], n \in {1, 2, 3}
+            T(2)
+            R(2)
+            T(1), R(2)
+            T(3), R(2)
+            T(2), R(3)
+}
+11/15 {
+    exp wrong assum for paper2022:
+        eval_encoder: 
+            就放这张图， 写 rebuttal + paper
+            尽量先只动 appendix. A.2.4 写完了，看看正文里塞哪儿
+            In analysis, add: 
+                "we show that even with not-totally-correct symm assumptions, results are still good. See App. ..."
+        shared K=0
+        use boxplot
+        see if we need 5 subfigs. prolly not
+}
+11/18 {
+    2022_m11_d04@00_27_53_k
+        nope. k doesn't matter. 
+        TODO: continue train! 
+    rebuttal:
+        go over all figure captions in appendix. explain
+}
+next {
     calc equivalent z loss weight as xuanjie's training
+        0.0019
+}
+todo {
+    continue train 2022_m11_d04@00_27_53_k
+    test t r tr, since xj method succeeds more often
+    try time aug, e.g. stretch (int / float ratio), reverse
     2b data: 11/4 notes
     wrong symm: 11/4 notes
     vary K (aug ratio)
@@ -527,6 +573,8 @@ todo {
         after Friday
     test smaller dataset
     test kld weight = 0
+    try RNN ensemble
+    try remove img pred loss and vary whether detach encoder
     diffusion exp
         more cases. 4x4 matrix
         yihuajiemu half

@@ -70,7 +70,7 @@ def forward(
     if hParams.supervise_rnn:
         flat_z = flat_traj_batch
     
-    trans, untrans = hParams.symm.sample()    
+    trans, untrans = hParams.symm.sample()
     flat_z_transed = trans(flat_z)
 
     # restore time axis

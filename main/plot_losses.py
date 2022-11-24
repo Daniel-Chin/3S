@@ -5,7 +5,7 @@ from torchWork.plot_losses import plotLosses, LossType
 from torchWork.experiment_control import EXPERIMENT_PY_FILENAME
 
 EXP_PATH = path.join('./experiments/', '''
-2022_m11_d04@00_27_53_self_recon
+2022_m11_d22@13_49_41_tr
 '''.strip())
 
 fig = plotLosses(

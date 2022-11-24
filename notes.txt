@@ -563,12 +563,22 @@ next {
         Trying Gus's method, doing T and R seperately. 
         motivation: My method still cannot match xj. What's different? TR? 
 }
+11/23 {
+    2022_m11_d22@13_49_41_tr
+        Gus method doesn't look good. 
+        interesting (but irrevalent (prolly)) observation: Gus method has significantly lower image pred loss in the first half of training. 
+    next, trying xj's dataset. 
+}
+11/24 {
+    exp: xj_data
+        This will be compared with 2022_m11_d05@12_35_16_insanity
+}
 next {
     calc equivalent z loss weight as xuanjie's training
         0.0019
 }
 todo {
-    continue train 2022_m11_d04@00_27_53_k
+    stop train 2022_m11_d04@00_27_53_k
     test t r tr, since xj method succeeds more often
     try time aug, e.g. stretch (int / float ratio), reverse
     2b data: 11/4 notes

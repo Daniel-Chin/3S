@@ -36,12 +36,13 @@ def main():
             os.makedirs(dest_cd, exist_ok=True)
             traj = []
             for t, fn, pos in index:
-                traj.append(pos)
+                velocity = [0, 0, 0]
+                traj.append([[pos, velocity]])
                 shutil.copy(
                     path.join(src_cd, fn), 
                     path.join(dest_cd, f'{t}.png')
                 )
             with open(path.join(dest_cd, 'trajectory.json'), 'w') as f:
-                json.dump([[traj]], f)
+                json.dump(traj, f)
 
 main()

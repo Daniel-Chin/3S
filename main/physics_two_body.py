@@ -13,7 +13,7 @@ __all__ = [
     'VIEW_RADIUS', 'BALL_RADIUS', 
 ]
 
-POSITION_STD = 1
+POSITION_STD = 2
 VELOCITY_STD = .3
 G = 1
 BALL_RADIUS = .8
@@ -109,6 +109,24 @@ def oneLegalRun(*a, **kw):
     while True:
         try:
             trajectory, n_empty = oneRun(*a, **kw)
+            traj_array = np.array([
+                (b0.position, b1.position) for (b0, b1) in trajectory
+            ])
+            y_std = traj_array[:, 0, 1].std()
+            print(f'{y_std = }')
+            # if y_std < 1:
+            #     raise Reject('traj y std insufficient')
+            centered_traj: np.ndarray = (
+                traj_array[:, 0, :] - 
+                traj_array[0, :, :].mean()
+            )
+            skew = (np.abs(
+                centered_traj.mean(axis=0)
+            ) / centered_traj.std(axis=0)).mean()
+            # The idea of skew is essentially FTT DC. 
+            print(f'{skew = }')
+            # if skew > .2:
+            #     raise Reject('less than one loop')
         except Reject as e:
             # print('rej:', repr(e))
             continue

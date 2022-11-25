@@ -9,6 +9,7 @@ from shared import *
 from physics_shared import *
 from render_dataset_shared import *
 from physics_bounce import *
+from template_bounce import SEQ_LEN
 
 PATH = path.join(
     '../datasets/bounce', 
@@ -32,7 +33,7 @@ LOOK_AT = np.array([0.0, 10.0, 0.0])  # 瞄准方向的参考点（默认在坐�
 
 class BounceViewer(BallViewer):
     def getTrajectory(self):
-        return oneLegalRun(DT, SEQ_LEN, REJECTABLE_START)
+        return oneLegalRun(DT, self.SEQ_LEN, REJECTABLE_START)
 
     def locate_with_ball(self):
         radius = 4
@@ -62,7 +63,7 @@ def main():
     os.makedirs(PATH, exist_ok=True)
     os.chdir(PATH)
     viewer = BounceViewer(
-        RUNNING_MODE, BALL_RADIUS, EYE, LOOK_AT, SPF, 
+        RUNNING_MODE, SEQ_LEN, BALL_RADIUS, EYE, LOOK_AT, SPF, 
     )
     glutMainLoop()  # 进入glut主循环
 

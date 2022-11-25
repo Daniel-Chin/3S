@@ -21,6 +21,7 @@ from shared import *
 from physics_shared import *
 from render_dataset_shared import *
 from physics_two_body import *
+from template_two_body import SEQ_LEN
 
 PATH = path.join(
     # '../datasets/two_body', 
@@ -49,7 +50,7 @@ class TwoBodyViewer(BallViewer):
         self.do_loop_one_traj = False
         self.trajs = []
         self.traj_i = -1
-        super().__init__(running_mode, ball_radius, eye, look_at, SPF)
+        super().__init__(running_mode, SEQ_LEN, ball_radius, eye, look_at, SPF)
     
     def loop(self):
         with self.lock:

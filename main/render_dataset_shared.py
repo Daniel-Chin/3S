@@ -33,10 +33,11 @@ MODE_MAKE_IMG = 'make_img'
 
 class BallViewer(metaclass=ABCMeta):
     def __init__(
-        self, running_mode, ball_radius, 
+        self, running_mode, SEQ_LEN, ball_radius, 
         eye, look_at, SPF, 
     ) -> None:
         self.running_mode = running_mode
+        self.SEQ_LEN = SEQ_LEN
         self.ball_radius = ball_radius
         self.eye = eye
         self.look_at = look_at
@@ -69,7 +70,7 @@ class BallViewer(metaclass=ABCMeta):
                 self.locate_with_ball()
                 return
             
-            if self.stage >= SEQ_LEN:
+            if self.stage >= self.SEQ_LEN:
                 if self.running_mode is MODE_MAKE_IMG:
                     self.saveVideo()
                 self.will_reset = True

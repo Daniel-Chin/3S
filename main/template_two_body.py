@@ -7,6 +7,7 @@ from shared import *
 TRAIN_SET_PATH    = '../datasets/two_body/train'
 VALIDATE_SET_PATH = '../datasets/two_body/validate'
 VALIDATE_SET_SIZE = 64
+SEQ_LEN = 25
 ACTUAL_DIM = 6
 
 EXP_NAME = ...

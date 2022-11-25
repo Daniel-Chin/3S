@@ -20,6 +20,7 @@ def forward(
     profiler: torchWork.Profiler, 
     require_img_predictions_and_z_hat: bool = True, 
 ):
+    SEQ_LEN = experiment.SEQ_LEN
     batch_size = video_batch.shape[0]
     lossTree = Loss_root()
 
@@ -94,7 +95,7 @@ def forward(
         ):
             flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
                 predRnn, z_transed, untrans, 
-                batch_size, hParams, epoch, profiler, 
+                batch_size, experiment, hParams, epoch, profiler, 
             )
             z_hat_aug = flat_z_hat_aug.view(
                 batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
@@ -122,7 +123,7 @@ def forward(
             if hParams.jepa_stop_grad_encoder:
                 flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
                     predRnn, z_transed.detach(), untrans, 
-                    batch_size, hParams, epoch, profiler, 
+                    batch_size, experiment, hParams, epoch, profiler, 
                 )
             z_hat_aug = flat_z_hat_aug.view(
                 batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
@@ -149,7 +150,7 @@ def forward(
         # stopping grad would make VAE truly untouched. 
         flat_z_hat, r_flat_z_hat, log_var = rnnForward(
             predRnn, z, identity, 
-            batch_size, hParams, epoch, profiler, 
+            batch_size, experiment, hParams, epoch, profiler, 
         )
         lossTree.symm_self_consistency = F.mse_loss(
             flat_z_hat_aug, flat_z_hat, 
@@ -216,9 +217,10 @@ def tryDetach(x: Optional[torch.Tensor], /):
 def rnnForward(
     rnn: PredRNN, 
     z_transed, untrans: Callable[[torch.Tensor], torch.Tensor], 
-    batch_size, hParams: HyperParams, epoch, 
+    batch_size, experiment, hParams: HyperParams, epoch, 
     profiler, 
 ):
+    SEQ_LEN = experiment.SEQ_LEN
     min_context = hParams.rnn_min_context
     teacher_rate = hParams.getTeacherForcingRate(epoch)
     z_hat_transed = torch.zeros((

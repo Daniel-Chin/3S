@@ -1,6 +1,5 @@
 __all__ = [
     'TRAJ_FILENAME', 
-    'SEQ_LEN', 
     'RESOLUTION', 
     'IMG_N_CHANNELS', 
     'ENTIRE_DATASET_IN_DEVICE', 
@@ -22,7 +21,6 @@ from symmetry_transforms import SymmetryAssumption
 from torchWork import *
 
 TRAJ_FILENAME = 'trajectory.json'
-SEQ_LEN = 20
 RESOLUTION = 32
 IMG_N_CHANNELS = 3
 ENTIRE_DATASET_IN_DEVICE = True

@@ -97,7 +97,7 @@ def videoEval(
     height = sum(row_heights)
     vid = VideoWriter(width, height)
     with vid.context(filename):
-        for t in range(SEQ_LEN):
+        for t in range(experiment.SEQ_LEN):
             frame = np.zeros((width, height, 3), dtype=np.uint8)
             for col_i in range(n_datapoints):
                 x = col_i * col_width

@@ -7,6 +7,7 @@ from shared import *
 TRAIN_SET_PATH    = '../datasets/xj_bounce/train'
 VALIDATE_SET_PATH = '../datasets/xj_bounce/validate'
 VALIDATE_SET_SIZE = 64
+SEQ_LEN = 20
 ACTUAL_DIM = 3
 
 EXP_NAME = 'xj_data'

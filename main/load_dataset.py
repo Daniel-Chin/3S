@@ -13,7 +13,7 @@ from shared import *
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(
-        self, dataset_path, size, 
+        self, dataset_path, size, SEQ_LEN, 
         ACTUAL_DIM: int, device=None, 
     ) -> None:
         super().__init__()

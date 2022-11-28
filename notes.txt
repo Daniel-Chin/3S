@@ -550,7 +550,6 @@ next {
 11/18 {
     2022_m11_d04@00_27_53_k
         nope. k doesn't matter. 
-        TODO: continue train! 
     rebuttal:
         go over all figure captions in appendix. explain
 }
@@ -573,15 +572,29 @@ next {
     exp: xj_data
         This will be compared with 2022_m11_d05@12_35_16_insanity
 }
-next {
+11/26 {
     calc equivalent z loss weight as xuanjie's training
         0.0019
+    2b data: DONE
+        seq len, DT -> 绕圈 >= 1
+        traj z 纵深要有足够 variance
+        Gus: dataset looks good. Use! 
+}
+11/28 {
+    next exp: self recon loss weight
+        observe that with high K, the model collapses on x. 
+        image pred is too hard, and it wants to collapse. 
+        self recon is easier. since my models frequently collapse even when k=1, let's try emphasizing self recon. 
+        exp_self_recon_weight
+}
+next {
 }
 todo {
+    fully replicate xj method
+    evalDecoder should control z-score of z instead of z
     stop train 2022_m11_d04@00_27_53_k
     test t r tr, since xj method succeeds more often
     try time aug, e.g. stretch (int / float ratio), reverse
-    2b data: 11/4 notes
     wrong symm: 11/4 notes
     vary K (aug ratio)
         make fig 8 in paper

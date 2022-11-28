@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_xj_data.py
+exp_full_xj.py
 '''.strip()
 # op = input('Which exp? ')
 

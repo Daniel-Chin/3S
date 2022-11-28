@@ -77,7 +77,7 @@ template.lr_diminish = None
 template.train_set_size = 128
 template.image_loss = 'mse'
 template.sched_sampling = LinearScheduledSampling(40000)
-template.max_epoch = template.teacher_forcing_duration
+template.max_epoch = template.sched_sampling.duration
 template.ready()
 
 hP = template.copy()
@@ -109,6 +109,7 @@ def f(epoch, batch_i, hParams: HyperParams):
 hP.lr_diminish = f
 hP.rnn_min_context = 5
 hP.sched_sampling = SigmoidScheduledSampling(alpha=2200, beta=8000)
+hP.max_epoch = 150001 // hP.batch_size
 hP.xj = True
 hP.ready()
 GROUPS.append(MyExpGroup(hP))

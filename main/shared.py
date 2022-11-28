@@ -136,7 +136,7 @@ class HyperParams(BaseHyperParams):
     def copyOneParam(self, k: str, v):
         if v is None:
             return True, None
-        if k == 'imgCriterion':
+        if k in ('imgCriterion', 'sched_sampling'):
             return True, v
         if k == 'symm':
             assert isinstance(v, SymmetryAssumption)
@@ -169,14 +169,14 @@ def reparameterize(mu, log_var):
 
 class ScheduledSampling(metaclass=ABCMeta):
     @abstractmethod
-    def get(self, epoch: int, hParam: HyperParams, batch_i: int) -> float:
+    def get(self, epoch: int, hParams: HyperParams, batch_i: int) -> float:
         raise NotImplemented
 
 class LinearScheduledSampling(ScheduledSampling):
     def __init__(self, duration: int) -> None:
         self.duration = duration
     
-    def get(self, epoch: int, hParam: HyperParams, batch_i: int):
+    def get(self, epoch: int, hParams: HyperParams, batch_i: int):
         try:
             return 1 - min(
                 1, epoch / self.duration, 

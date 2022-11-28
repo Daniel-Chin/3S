@@ -64,7 +64,7 @@ def oneEpoch(
                 lossTree, reconstructions, img_predictions, 
                 z, z_hat, extra_logs, 
             ) = forward(
-                epoch, experiment, hParams, 
+                epoch, batch_i, experiment, hParams, 
                 video_batch, traj_batch, 
                 vae, predRnn, energyRnn, profiler, False, 
             )
@@ -111,7 +111,7 @@ def oneEpoch(
                     lossTree, reconstructions, img_predictions, 
                     z, z_hat, extra_logs, 
                 ) = forward(
-                    epoch, experiment, hParams, 
+                    epoch, 0, experiment, hParams, 
                     video_batch, traj_batch, 
                     vae, predRnn, energyRnn, profiler, False, 
                 )

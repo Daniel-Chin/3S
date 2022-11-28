@@ -76,7 +76,7 @@ template.lr_diminish = None
 template.train_set_size = 256
 template.image_loss = 'mse'
 template.sched_sampling = LinearScheduledSampling(40000)
-template.max_epoch = template.teacher_forcing_duration
+template.max_epoch = template.sched_sampling.duration
 template.ready()
 
 # modifying template

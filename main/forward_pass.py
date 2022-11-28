@@ -14,7 +14,7 @@ from linearity_metric import projectionMSE
 from symmetry_transforms import identity
 
 def forward(
-    epoch, experiment, hParams: HyperParams, 
+    epoch, batch_i, experiment, hParams: HyperParams, 
     video_batch: torch.Tensor, traj_batch: torch.Tensor, 
     vae: VAE, predRnn: PredRNN, energyRnn: EnergyRNN, 
     profiler: torchWork.Profiler, 
@@ -95,7 +95,7 @@ def forward(
         ):
             flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
                 predRnn, z_transed, untrans, 
-                batch_size, experiment, hParams, epoch, profiler, 
+                batch_size, experiment, hParams, epoch, batch_i, profiler, 
             )
             z_hat_aug = flat_z_hat_aug.view(
                 batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
@@ -123,7 +123,7 @@ def forward(
             if hParams.jepa_stop_grad_encoder:
                 flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
                     predRnn, z_transed.detach(), untrans, 
-                    batch_size, experiment, hParams, epoch, profiler, 
+                    batch_size, experiment, hParams, epoch, batch_i, profiler, 
                 )
             z_hat_aug = flat_z_hat_aug.view(
                 batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
@@ -150,7 +150,7 @@ def forward(
         # stopping grad would make VAE truly untouched. 
         flat_z_hat, r_flat_z_hat, log_var = rnnForward(
             predRnn, z, identity, 
-            batch_size, experiment, hParams, epoch, profiler, 
+            batch_size, experiment, hParams, epoch, batch_i, profiler, 
         )
         lossTree.symm_self_consistency = F.mse_loss(
             flat_z_hat_aug, flat_z_hat, 
@@ -217,12 +217,15 @@ def tryDetach(x: Optional[torch.Tensor], /):
 def rnnForward(
     rnn: PredRNN, 
     z_transed, untrans: Callable[[torch.Tensor], torch.Tensor], 
-    batch_size, experiment, hParams: HyperParams, epoch, 
-    profiler, 
+    batch_size, experiment, hParams: HyperParams, 
+    epoch, batch_i, profiler, 
 ):
     SEQ_LEN = experiment.SEQ_LEN
     min_context = hParams.rnn_min_context
-    teacher_rate = hParams.getTeacherForcingRate(epoch)
+    if hParams.sched_sampling is None:
+        teacher_rate = 0
+    else:
+        teacher_rate = hParams.sched_sampling.get(epoch, hParams, batch_i)
     z_hat_transed = torch.zeros((
         batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
     ), device=DEVICE)

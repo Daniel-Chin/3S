@@ -8,6 +8,7 @@ TRAIN_SET_PATH    = '../datasets/xj_bounce/train'
 VALIDATE_SET_PATH = '../datasets/xj_bounce/validate'
 VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 3
+SEQ_LEN = 20
 
 EXP_NAME = 'xj_data'
 N_RAND_INITS = 8

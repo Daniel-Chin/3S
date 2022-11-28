@@ -65,33 +65,17 @@ class VAE(nn.Module):
             channels[  :0:-1], 
             channels[-2: :-1], 
         ):
-            modules.append(
-                nn.Sequential(
-                    nn.ConvTranspose2d(
-                        c0, c1, 
-                        kernel_size=3, stride=2, padding=1,
-                        output_padding=1, 
-                    ),
-                    # nn.BatchNorm2d(c1), 
-                    nn.LeakyReLU(), 
-                )
-            )
+            modules.extend([
+                nn.ConvTranspose2d(
+                    c0, c1, 
+                    kernel_size=3, stride=2, padding=1,
+                    output_padding=1, 
+                ),
+                # nn.BatchNorm2d(c1), 
+                nn.LeakyReLU(), 
+            ])
+        modules[-1] = nn.Sigmoid()
         self.decoder = nn.Sequential(*modules)
-        self.finalLayer = nn.Sequential(
-            nn.ConvTranspose2d(
-                channels[0],
-                channels[0],
-                kernel_size=3, stride=2, padding=1,
-                output_padding=1, 
-            ),
-            # nn.BatchNorm2d(CHANNELS[0]),
-            nn.LeakyReLU(),
-            nn.Conv2d(
-                channels[0], out_channels=IMG_N_CHANNELS,
-                kernel_size=3, padding=1,
-            ),
-            nn.Sigmoid(), 
-        )
 
         # print('VAE # of params:', sum(
         #     p.numel() for p in self.parameters() 
@@ -118,5 +102,4 @@ class VAE(nn.Module):
             self.conv_neck_len, self.conv_neck_len, 
         )
         t = self.decoder(t)
-        t = self.finalLayer(t)
         return t

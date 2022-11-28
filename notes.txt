@@ -586,6 +586,8 @@ next {
         image pred is too hard, and it wants to collapse. 
         self recon is easier. since my models frequently collapse even when k=1, let's try emphasizing self recon. 
         exp_self_recon_weight
+    2022_m11_d24@12_57_26_xj_data
+        does not solve the problem yet. 
 }
 next {
 }

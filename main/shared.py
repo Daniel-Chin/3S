@@ -189,8 +189,8 @@ class SigmoidScheduledSampling(ScheduledSampling):
         self.alpha = alpha
         self.beta = beta
     
-    def get(self, epoch: int, hParam: HyperParams, batch_i: int):
-        total_batch_i = hParam.n_batches_per_epoch * epoch + batch_i
+    def get(self, epoch: int, hParams: HyperParams, batch_i: int):
+        total_batch_i = hParams.n_batches_per_epoch * epoch + batch_i
         return self.alpha / (self.alpha + np.exp(
             (total_batch_i + self.beta) / self.alpha, 
         ))

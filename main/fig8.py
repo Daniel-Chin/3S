@@ -34,7 +34,8 @@ def main(experiment_path, lock_epoch):
     print(f'{exp_name = }')
     dataset = Dataset(
         experiment.VALIDATE_SET_PATH, 
-        experiment.VALIDATE_SET_SIZE, experiment.ACTUAL_DIM, DEVICE, 
+        experiment.VALIDATE_SET_SIZE, experiment.SEQ_LEN, 
+        experiment.ACTUAL_DIM, DEVICE, 
     )
     _shape = dataset.video_set.shape
     image_set = dataset.video_set.view(

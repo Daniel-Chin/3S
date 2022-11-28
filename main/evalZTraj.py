@@ -23,6 +23,7 @@ def main():
     print(f'{exp_name = }')
     dataset, _ = Dataset(
         experiment.TRAIN_SET_PATH, 256, 
+        experiment.SEQ_LEN, 
         experiment.ACTUAL_DIM, DEVICE, 
     )
     # dataset, _ = Dataset(

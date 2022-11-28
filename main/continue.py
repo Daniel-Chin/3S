@@ -37,10 +37,12 @@ def continueTrain():
         )
     trainSet    = Dataset(
         experiment.TRAIN_SET_PATH,    max_dataset_size,  
+        experiment.SEQ_LEN, 
         experiment.ACTUAL_DIM, DEVICE, 
     )
     validateSet = Dataset(
         experiment.VALIDATE_SET_PATH, experiment.VALIDATE_SET_SIZE, 
+        experiment.SEQ_LEN, 
         experiment.ACTUAL_DIM, DEVICE, 
     )
     runExperiment(exp_py_path, oneEpoch, {

@@ -4,8 +4,8 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/bounce/train'
-VALIDATE_SET_PATH = '../datasets/bounce/validate'
+TRAIN_SET_PATH    = '../datasets/xj_bounce/train'
+VALIDATE_SET_PATH = '../datasets/xj_bounce/validate'
 VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
@@ -90,6 +90,9 @@ hP.rnn_width = 256
 hP.vae_channels = [64, 128, 256]
 hP.relu_leak = False
 hP.vae_kernel_size = 4
+hP.lossWeightTree['self_recon'].weight = (
+    RESOLUTION ** 2 * SEQ_LEN * hP.batch_size
+)
 hP.lossWeightTree['kld'].weight = 0.01 * hP.batch_size
 hP.lossWeightTree['predict']['z'].weight = (
     2 * hP.symm.latent_dim * SEQ_LEN * hP.batch_size
@@ -97,6 +100,8 @@ hP.lossWeightTree['predict']['z'].weight = (
 hP.lossWeightTree['predict']['image'].weight = (
     2 * RESOLUTION ** 2 * SEQ_LEN * hP.batch_size
 )
+hP.K = 2    # one for translate, one for rotate
+hP.symm = GusMethod()
 hP.lr = 1e-3
 hP.batch_size = 32
 def f(epoch, batch_i, hParams: HyperParams):

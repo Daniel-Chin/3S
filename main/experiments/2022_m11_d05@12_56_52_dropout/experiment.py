@@ -8,6 +8,7 @@ TRAIN_SET_PATH    = '../datasets/bounce/train'
 VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
 ACTUAL_DIM = 3
+SEQ_LEN = 20
 
 EXP_NAME = 'dropout'
 N_RAND_INITS = 4

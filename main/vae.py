@@ -13,23 +13,26 @@ class VAE(nn.Module):
     def __init__(self, hyperParams: HyperParams) -> None:
         super().__init__()
         self.hParams = hyperParams
-        channels = hyperParams.vae_channels
-        self.conv_neck_len = RESOLUTION // 2 ** len(channels)
+        channels = [IMG_N_CHANNELS, *hyperParams.vae_channels]
+        self.conv_neck_len = RESOLUTION // 2 ** len(
+            hyperParams.vae_channels, 
+        )
 
         modules = []
-        last_c = IMG_N_CHANNELS
-        for c in channels:
+        for c0, c1 in zip(
+            channels[0:], 
+            channels[1:], 
+        ):
             modules.append(
                 nn.Sequential(
                     nn.Conv2d(
-                        last_c, c,
+                        c0, c1, 
                         kernel_size=3, stride=2, padding=1
                     ),
                     # nn.BatchNorm2d(c),
                     nn.LeakyReLU(),
                 )
             )
-            last_c = c
         
         self.conv_neck_dim = (
             channels[-1] * self.conv_neck_len ** 2

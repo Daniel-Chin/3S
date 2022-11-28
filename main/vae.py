@@ -91,7 +91,6 @@ class VAE(nn.Module):
                     c0, c1, 
                     kernel_size=hyperParams.vae_kernel_size, 
                     stride=STRIDE, padding=PADDING, 
-                    output_padding=PADDING, 
                 ),
                 # nn.BatchNorm2d(c1), 
                 MyRelu(), 
@@ -110,6 +109,7 @@ class VAE(nn.Module):
         '''
         t: torch.Tensor = self.encoder(x)
         t = t.flatten(1)
+        # print(t.shape[1], self.conv_neck_dim)
         mu      = self.fcMu (t)
         log_var = self.fcVar(t)
         return mu, log_var

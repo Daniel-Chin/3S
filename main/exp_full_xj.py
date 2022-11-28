@@ -69,7 +69,7 @@ template.dropout = 0.0
 template.vae_channels = [16, 32, 64]
 template.deep_spread = False
 template.relu_leak = True
-template.vae_kernel_size = 3
+template.vae_kernel_size = 4
 template.batch_size = 128
 template.grad_clip = 1
 template.optim_name = 'adam'
@@ -88,6 +88,7 @@ GROUPS.append(MyExpGroup(hP))
 hP = template.copy()
 hP.rnn_width = 256
 hP.vae_channels = [64, 128, 256]
+hP.deep_spread = True
 hP.relu_leak = False
 hP.vae_kernel_size = 4
 hP.lossWeightTree['self_recon'].weight = (

@@ -13,7 +13,7 @@ __all__ = [
     'VIEW_RADIUS', 'BALL_RADIUS', 
 ]
 
-POSITION_STD = 2
+POSITION_STD = 2.5
 VELOCITY_STD = .3
 G = 1
 BALL_RADIUS = .8
@@ -28,6 +28,8 @@ class EmptyFrameException(Reject): pass
 class CollisionException(StrongRejection): pass
 class OccludedException(StrongRejection): pass
 class AngularVelocityTooLarge(StrongRejection): pass
+class LessThanOneLoop(StrongRejection): pass
+class WeakDepthVariation(StrongRejection): pass
 
 def stepFineTime(a: Body, b: Body, /, dt: float):
     # O(2n) = O(n). Readability first. 
@@ -61,13 +63,26 @@ def initBodies(center_of_mass_constant: bool):
 
     other.position = - self.position
     other.velocity = - self.velocity
+    energy = systemEnergy(*bodies)
+    # print(f'{energy = }')
+    if energy > -.07:
+        raise LessThanOneLoop(f'{energy = }')
+    if energy < -.10:
+        raise AngularVelocityTooLarge(f'{energy = }')
     if not center_of_mass_constant:
         offset = np.random.normal(
-            0, POSITION_STD * 2, 3, 
+            0, POSITION_STD * .7, 3, 
         )
         for body in bodies:
             body.position += offset
     return bodies
+
+def systemEnergy(*bodies: Body):
+    a, b = bodies
+    r = np.linalg.norm(a.position - b.position)
+    e_potential = - G / r
+    e_kinetic = sum([np.linalg.norm(x.velocity) ** 2 / 2 for x in bodies])
+    return e_potential + e_kinetic
 
 def oneRun(
     dt: float, n_frames: int, 
@@ -79,7 +94,7 @@ def oneRun(
     acc = 0
     for t in range(n_frames):
         try:
-            verify(bodies, eye_pos)
+            verify(t, bodies, eye_pos)
         except EmptyFrameException:
             if t < rejectable_start:
                 raise
@@ -89,20 +104,20 @@ def oneRun(
         stepTime(dt, lambda x : stepFineTime(*bodies, x))
     return trajectory, acc
 
-def verify(bodies: List[Body], eye_pos: np.ndarray):
+def verify(t, bodies: List[Body], eye_pos: np.ndarray):
     if np.linalg.norm(
         bodies[0].position - bodies[1].position
     ) < 2 * BALL_RADIUS:
-        raise CollisionException
+        raise CollisionException(f'{t = }')
     
     displace = [b.position - eye_pos for b in bodies]
     unit_displace = [x / np.linalg.norm(x) for x in displace]
     if np.dot(*unit_displace) > OCCLUSION_THRES:
-        raise OccludedException
+        raise OccludedException(f'{t = }')
     
     for body in bodies:
         if np.linalg.norm(body.position) > VIEW_RADIUS:
-            raise EmptyFrameException
+            raise EmptyFrameException(f'{t = }')
 
 def oneLegalRun(*a, **kw):
     # rejection sampling
@@ -113,20 +128,9 @@ def oneLegalRun(*a, **kw):
                 (b0.position, b1.position) for (b0, b1) in trajectory
             ])
             y_std = traj_array[:, 0, 1].std()
-            print(f'{y_std = }')
-            # if y_std < 1:
-            #     raise Reject('traj y std insufficient')
-            centered_traj: np.ndarray = (
-                traj_array[:, 0, :] - 
-                traj_array[0, :, :].mean()
-            )
-            skew = (np.abs(
-                centered_traj.mean(axis=0)
-            ) / centered_traj.std(axis=0)).mean()
-            # The idea of skew is essentially FTT DC. 
-            print(f'{skew = }')
-            # if skew > .2:
-            #     raise Reject('less than one loop')
+            # print(f'{y_std = }')
+            if y_std < 1.4:
+                raise WeakDepthVariation(f'{y_std = }')
         except Reject as e:
             # print('rej:', repr(e))
             continue

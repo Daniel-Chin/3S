@@ -72,9 +72,15 @@ def oneEpoch(
             total_loss = lossTree.sum(
                 hParams.lossWeightTree, epoch, 
             )
+            if hParams.lr_diminish is None:
+                scaled_loss = total_loss
+            else:
+                scaled_loss = total_loss * hParams.lr_diminish(
+                    epoch, batch_i, hParams, 
+                )
         with profiler('good', 'backward'):
             optim.zero_grad()
-            total_loss.backward()
+            scaled_loss.backward()
         with profiler('grad norm'):
             params = getParams(optim)
             grad_norm = getGradNorm(params)

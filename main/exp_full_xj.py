@@ -10,15 +10,15 @@ VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
 
-EXP_NAME = ...
-N_RAND_INITS = ...
+EXP_NAME = 'full_xj'
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.WHAT
+        self.variable_name = 'xj'
+        self.variable_value = hyperParams.xj
     
     @lru_cache(1)
     def name(self):
@@ -80,12 +80,32 @@ template.sched_sampling = LinearScheduledSampling(40000)
 template.max_epoch = template.teacher_forcing_duration
 template.ready()
 
-# modifying template
-# template.xxx = xxx
+hP = template.copy()
+hP.xj = False
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
 
-# hP = template.copy()
-# hP.xxx = xxx
-# hP.ready()
-# GROUPS.append(MyExpGroup(hP))
+hP = template.copy()
+hP.rnn_width = 256
+hP.vae_channels = [64, 128, 256]
+hP.relu_leak = False
+hP.vae_kernel_size = 4
+hP.lossWeightTree['kld'].weight = 0.01 * hP.batch_size
+hP.lossWeightTree['predict']['z'].weight = (
+    2 * hP.symm.latent_dim * SEQ_LEN * hP.batch_size
+)
+hP.lossWeightTree['predict']['image'].weight = (
+    2 * RESOLUTION ** 2 * SEQ_LEN * hP.batch_size
+)
+hP.lr = 1e-3
+hP.batch_size = 32
+def f(epoch, batch_i, hParams: HyperParams):
+    return 0.99999 ** (epoch * hParams.n_batches_per_epoch + batch_i)
+hP.lr_diminish = f
+hP.rnn_min_context = 5
+hP.sched_sampling = SigmoidScheduledSampling(alpha=2200, beta=8000)
+hP.xj = True
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 0
+assert len(GROUPS) == 2

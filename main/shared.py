@@ -7,10 +7,14 @@ __all__ = [
     
     'HyperParams', 'torch2PIL', 'torch2np', 
     'reparameterize', 
+
+    'ScheduledSampling', 'LinearScheduledSampling', 
+    'SigmoidScheduledSampling', 
 ]
 
 from typing import Callable, List, Optional
 from contextlib import contextmanager
+from abc import ABCMeta, abstractmethod
 
 import numpy as np
 import torch
@@ -53,12 +57,19 @@ class HyperParams(BaseHyperParams):
         self.dropout: float = None
         self.vae_channels: List[int] = None
         self.deep_spread: bool = None
+        self.relu_leak: bool = None
+        self.vae_kernel_size: int = None
 
         self.batch_size: int = None
         self.grad_clip: Optional[float] = None
         self.optim_name: str = None
+        self.lr_diminish: Optional[Callable[
+            [int, int], float, 
+        ]] = None
 
         self.image_loss: str = None
+        self.sched_sampling: Optional[ScheduledSampling] = None
+        # Deprecated:
         self.teacher_forcing_duration: int = None
 
         self.train_set_size: int = None
@@ -67,10 +78,11 @@ class HyperParams(BaseHyperParams):
         self.imgCriterion: Callable[
             [torch.Tensor, torch.Tensor], torch.Tensor, 
         ] = None
+        self.n_batches_per_epoch: int = None
 
     def fillDefaults(self):
         '''
-        This is necessary when wewant to load old 
+        This is necessary when we want to load old 
         experiments (with less hyper params) without 
         checking out old commits.  
         The default values should guarantee old behaviors.  
@@ -83,6 +95,16 @@ class HyperParams(BaseHyperParams):
             self.energy_noise_std = 1
         if self.dropout is None:
             self.dropout = 0.0
+        if self.relu_leak is None:
+            self.relu_leak = True
+        if self.vae_kernel_size is None:
+            self.vae_kernel_size = 3
+        if self.lr_diminish is None:
+            self.lr_diminish = None
+        if self.teacher_forcing_duration is None:
+            self.sched_sampling = None
+        if isinstance(self.teacher_forcing_duration, int):
+            self.sched_sampling = LinearScheduledSampling(self.teacher_forcing_duration)
         if 'symm_self_consistency' not in self.lossWeightTree:
             self.lossWeightTree['symm_self_consistency'].weight = 0
         if 'seq_energy' not in self.lossWeightTree:
@@ -109,6 +131,7 @@ class HyperParams(BaseHyperParams):
         self.OptimClass = {
             'adam': torch.optim.Adam, 
         }[self.optim_name]
+        self.n_batches_per_epoch = self.train_set_size // self.batch_size
     
     def copyOneParam(self, k: str, v):
         if v is None:
@@ -120,23 +143,15 @@ class HyperParams(BaseHyperParams):
             return True, v.copy()
         return super().copyOneParam(k, v)
     
-    def getTeacherForcingRate(self, epoch):
-        try:
-            return 1 - min(
-                1, epoch / self.teacher_forcing_duration, 
-            )
-        except ZeroDivisionError:
-            return 0
-    
     @contextmanager
     def eval(self):
         # enter eval mode
-        saved = self.teacher_forcing_duration
-        self.teacher_forcing_duration = 0
+        saved = self.sched_sampling
+        self.sched_sampling = None
         try:
             yield
         finally:
-            self.teacher_forcing_duration = saved
+            self.sched_sampling = saved
 
 def torch2np(torchImg: torch.Tensor) -> np.ndarray:
     return (
@@ -151,3 +166,31 @@ def reparameterize(mu, log_var):
     std = torch.exp(0.5 * log_var)
     eps = torch.randn_like(std)
     return eps * std + mu
+
+class ScheduledSampling(metaclass=ABCMeta):
+    @abstractmethod
+    def get(self, epoch: int, hParam: HyperParams, batch_i: int) -> float:
+        raise NotImplemented
+
+class LinearScheduledSampling(ScheduledSampling):
+    def __init__(self, duration: int) -> None:
+        self.duration = duration
+    
+    def get(self, epoch: int, hParam: HyperParams, batch_i: int):
+        try:
+            return 1 - min(
+                1, epoch / self.duration, 
+            )
+        except ZeroDivisionError:
+            return 0
+
+class SigmoidScheduledSampling(ScheduledSampling):
+    def __init__(self, alpha: float, beta: float) -> None:
+        self.alpha = alpha
+        self.beta = beta
+    
+    def get(self, epoch: int, hParam: HyperParams, batch_i: int):
+        total_batch_i = hParam.n_batches_per_epoch * epoch + batch_i
+        return self.alpha / (self.alpha + np.exp(
+            (total_batch_i + self.beta) / self.alpha, 
+        ))

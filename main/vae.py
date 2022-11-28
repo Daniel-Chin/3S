@@ -5,6 +5,9 @@ from torch import nn
 
 from shared import *
 
+STRIDE = 2
+PADDING = 1
+
 class VAE(nn.Module):
     '''
     Huge thanks to AntixK. 
@@ -14,9 +17,19 @@ class VAE(nn.Module):
         super().__init__()
         self.hParams = hyperParams
         channels = [IMG_N_CHANNELS, *hyperParams.vae_channels]
-        self.conv_neck_len = RESOLUTION // 2 ** len(
-            hyperParams.vae_channels, 
-        )
+        if hyperParams.relu_leak:
+            MyRelu = nn.LeakyReLU
+        else:
+            MyRelu = nn.ReLU
+        def computeConvNeck():
+            layer_width = RESOLUTION
+            for _ in hyperParams.vae_channels:
+                layer_width = (
+                    layer_width + PADDING * 2 
+                    - hyperParams.vae_kernel_size
+                ) // STRIDE + 1
+            return layer_width
+        self.conv_neck_width = computeConvNeck()
 
         modules = []
         for c0, c1 in zip(
@@ -27,15 +40,16 @@ class VAE(nn.Module):
                 nn.Sequential(
                     nn.Conv2d(
                         c0, c1, 
-                        kernel_size=3, stride=2, padding=1
+                        kernel_size=hyperParams.vae_kernel_size, 
+                        stride=STRIDE, padding=PADDING, 
                     ),
                     # nn.BatchNorm2d(c),
-                    nn.LeakyReLU(),
+                    MyRelu(),
                 )
             )
         
         self.conv_neck_dim = (
-            channels[-1] * self.conv_neck_len ** 2
+            channels[-1] * self.conv_neck_width ** 2
         )
 
         self.encoder = nn.Sequential(*modules)
@@ -50,11 +64,15 @@ class VAE(nn.Module):
             self.fcBeforeDecode = nn.Sequential(
                 nn.Linear(
                     hyperParams.symm.latent_dim, 
-                    8, 
+                    16, 
                 ), 
-                nn.LeakyReLU(), 
+                MyRelu(), 
+                nn.Linear(16, 32), 
+                MyRelu(), 
+                nn.Linear(32, 64), 
+                MyRelu(), 
                 nn.Linear(
-                    8, 
+                    64, 
                     self.conv_neck_dim, 
                 ), 
             )
@@ -71,11 +89,12 @@ class VAE(nn.Module):
             modules.extend([
                 nn.ConvTranspose2d(
                     c0, c1, 
-                    kernel_size=3, stride=2, padding=1,
-                    output_padding=1, 
+                    kernel_size=hyperParams.vae_kernel_size, 
+                    stride=STRIDE, padding=PADDING, 
+                    output_padding=PADDING, 
                 ),
                 # nn.BatchNorm2d(c1), 
-                nn.LeakyReLU(), 
+                MyRelu(), 
             ])
         modules[-1] = nn.Sigmoid()
         self.decoder = nn.Sequential(*modules)
@@ -102,7 +121,7 @@ class VAE(nn.Module):
         t: torch.Tensor = self.fcBeforeDecode(z)
         t = t.view(
             -1, self.hParams.vae_channels[-1], 
-            self.conv_neck_len, self.conv_neck_len, 
+            self.conv_neck_width, self.conv_neck_width, 
         )
         t = self.decoder(t)
         return t

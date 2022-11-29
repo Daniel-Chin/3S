@@ -24,8 +24,8 @@ from physics_two_body import *
 from template_two_body import SEQ_LEN
 
 PATH = path.join(
-    # '../datasets/two_body', 
-    '../datasets/two_body_no_orbit', 
+    '../datasets/two_body', 
+    # '../datasets/two_body_no_orbit', 
     # 'train', 
     'validate', 
 )

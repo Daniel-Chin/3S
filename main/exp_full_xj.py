@@ -108,9 +108,12 @@ hP.batch_size = 32
 def f(epoch, batch_i, hParams: HyperParams):
     return 0.99999 ** (epoch * hParams.n_batches_per_epoch + batch_i)
 hP.lr_diminish = f
+hP.grad_clip = None
 hP.rnn_min_context = 5
 hP.sched_sampling = SigmoidScheduledSampling(alpha=2200, beta=8000)
 hP.max_epoch = 150001 // hP.batch_size
+hP.residual = False
+hP.image_loss = 'bce'
 hP.xj = True
 hP.ready()
 GROUPS.append(MyExpGroup(hP))

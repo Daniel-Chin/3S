@@ -589,6 +589,13 @@ next {
     2022_m11_d24@12_57_26_xj_data
         does not solve the problem yet. 
 }
+11/29 {
+    2022_m11_d28@21_15_28_full_xj
+        failed to replicate semantic equivalence
+        damn, grad clip was on for xj. 
+    Bug
+        why is logged grad_norm sometimes 0? 
+}
 next {
 }
 todo {

@@ -194,7 +194,7 @@ def forward(
 
     with profiler('eval_linearity'):
         linear_proj_mse = projectionMSE(
-            mu, flat_traj_batch, 
+            mu.detach(), flat_traj_batch.detach(), 
         )
     
     return (

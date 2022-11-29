@@ -84,9 +84,10 @@ def oneEpoch(
         with profiler('grad norm'):
             params = getParams(optim)
             grad_norm = getGradNorm(params)
-            torch.nn.utils.clip_grad_norm_(
-                params, hParams.grad_clip, 
-            )
+            if hParams.grad_clip is not None:
+                torch.nn.utils.clip_grad_norm_(
+                    params, hParams.grad_clip, 
+                )
         with profiler('good', 'step'):
             optim.step()
         with profiler('log losses'):

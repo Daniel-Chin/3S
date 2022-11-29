@@ -70,13 +70,16 @@ template.jepa_stop_grad_encoder = False
 template.dropout = 0.0
 template.vae_channels = [16, 32, 64]
 template.deep_spread = False
+template.relu_leak = True
+template.vae_kernel_size = 4
 template.batch_size = 128
 template.grad_clip = 1
 template.optim_name = 'adam'
+template.lr_diminish = None
 template.train_set_size = 128
 template.image_loss = 'mse'
-template.teacher_forcing_duration = 40000
-template.max_epoch = template.teacher_forcing_duration
+template.sched_sampling = LinearScheduledSampling(40000)
+template.max_epoch = template.sched_sampling.duration
 template.ready()
 
 # modifying template

@@ -593,8 +593,6 @@ next {
     2022_m11_d28@21_15_28_full_xj
         failed to replicate semantic equivalence
         damn, grad clip was on for xj. 
-    Bug
-        why is logged grad_norm sometimes 0? 
 }
 next {
 }

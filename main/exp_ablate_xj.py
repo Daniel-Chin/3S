@@ -10,15 +10,15 @@ VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
 
-EXP_NAME = 'full_xj'
-N_RAND_INITS = 8
+EXP_NAME = 'ablate_xj'
+N_RAND_INITS = 4
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'xj'
-        self.variable_value = hyperParams.xj
+        self.variable_name = 'xj_new_dan'
+        self.variable_value = hyperParams.xj_new_dan
     
     @lru_cache(1)
     def name(self):
@@ -80,17 +80,18 @@ template.sched_sampling = LinearScheduledSampling(40000)
 template.max_epoch = template.sched_sampling.duration
 template.ready()
 
-hP = template.copy()
-hP.xj = False
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
+# hP = template.copy()
+# hP.xj_new_dan = 2
+# hP.ready()
+# GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
+hP.xj_new_dan = 0
 hP.rnn_width = 256
 hP.vae_channels = [64, 128, 256]
 hP.deep_spread = True
 hP.relu_leak = False
-hP.vae_kernel_size = 4
+hP.batch_size = 32
 hP.lossWeightTree['self_recon'].weight = (
     RESOLUTION ** 2 * SEQ_LEN * hP.batch_size
 )
@@ -104,7 +105,6 @@ hP.lossWeightTree['predict']['image'].weight = (
 hP.K = 2    # one for translate, one for rotate
 hP.symm = GusMethod()
 hP.lr = 1e-3
-hP.batch_size = 32
 def f(epoch, batch_i, hParams: HyperParams):
     return 0.99999 ** (epoch * hParams.n_batches_per_epoch + batch_i)
 hP.lr_diminish = f
@@ -114,7 +114,14 @@ hP.sched_sampling = SigmoidScheduledSampling(alpha=2200, beta=8000)
 hP.max_epoch = 150001 // hP.batch_size
 hP.residual = False
 hP.image_loss = 'bce'
-hP.xj = True
+hP.ready()
+xj = hP
+GROUPS.append(MyExpGroup(xj))
+
+hP = xj.copy() # Note, we are copying from xj
+hP.xj_new_dan = 1
+hP.rnn_width = 16
+hP.symm = template.symm
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 

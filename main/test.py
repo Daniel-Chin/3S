@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_self_recon_weight.py
+exp_ablate_xj.py
 '''.strip()
 # op = input('Which exp? ')
 

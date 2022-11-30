@@ -594,7 +594,19 @@ next {
         failed to replicate semantic equivalence
         damn, grad clip was on for xj. 
 }
+11/30 {
+    2022_m11_d29@14_30_18_self_recon_weight
+        higher recon weight cannot even stop collapse. 
+        linear proj seems worse. 
+        no use. 
+    2022_m11_d29@14_34_57_full_xj
+        xuanjie NB! 
+        next, ablate. 
+}
 next {
+    2022_m11_d29@14_34_57_full_xj
+        eval decoder. control z_3. 
+        dan: bounce. xj: 碎了一地
 }
 todo {
     fully replicate xj method

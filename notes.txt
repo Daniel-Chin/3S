@@ -603,6 +603,10 @@ next {
         xuanjie NB! 
         next, ablate. 
 }
+12/1 {
+    2022_m11_d30@14_15_26_ablate_xj
+        xj is right, that two params are important. 
+}
 next {
     2022_m11_d29@14_34_57_full_xj
         eval decoder. control z_3. 

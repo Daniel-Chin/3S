@@ -17,8 +17,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'xj_new_dan'
-        self.variable_value = hyperParams.xj_new_dan
+        self.variable_name = 'rnn_width, symm'
+        self.variable_value = hyperParams.rnn_width, hyperParams.symm
     
     @lru_cache(1)
     def name(self):
@@ -119,10 +119,16 @@ xj = hP
 GROUPS.append(MyExpGroup(xj))
 
 hP = xj.copy() # Note, we are copying from xj
-hP.xj_new_dan = 1
+hP.xj_new_dan = None
+hP.rnn_width = 16
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+hP = xj.copy() # Note, we are copying from xj
+hP.xj_new_dan = None
 hP.rnn_width = 16
 hP.symm = template.symm
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 2
+assert len(GROUPS) == 3

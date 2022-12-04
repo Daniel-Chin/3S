@@ -11,14 +11,14 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 
 EXP_NAME = 'ablate_xj'
-N_RAND_INITS = 4
+N_RAND_INITS = 16
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'rnn_width, symm'
-        self.variable_value = hyperParams.rnn_width, hyperParams.symm
+        self.variable_name = 'symm'
+        self.variable_value = hyperParams.symm
     
     @lru_cache(1)
     def name(self):
@@ -116,7 +116,7 @@ hP.residual = False
 hP.image_loss = 'bce'
 hP.ready()
 xj = hP
-GROUPS.append(MyExpGroup(xj))
+# GROUPS.append(MyExpGroup(xj))
 
 hP = xj.copy() # Note, we are copying from xj
 hP.xj_new_dan = None

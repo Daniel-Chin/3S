@@ -607,10 +607,18 @@ next {
     2022_m11_d30@14_15_26_ablate_xj
         xj is right, that two params are important. 
 }
-next {
+12/2 meeting {
     2022_m11_d29@14_34_57_full_xj
         eval decoder. control z_3. 
         dan: bounce. xj: 碎了一地
+        diff hyper param leads to two types of behaviors. Interesting. 
+}
+12/4 {
+    2022_m12_d01@15_03_00_ablate_xj
+        GusMethod seems superior! 
+        Interesting! next exp: n_rand_init = 16. 
+        Note GusMethod did not show advantage when using Dan's prev method. 
+            see 2022_m11_d22@13_49_41_tr
 }
 todo {
     fully replicate xj method

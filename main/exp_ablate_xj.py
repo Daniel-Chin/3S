@@ -131,4 +131,4 @@ hP.symm = template.symm
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 3
+assert len(GROUPS) == 2

@@ -17,8 +17,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'symm'
-        self.variable_value = hyperParams.symm
+        self.variable_name = 'xj_new_dan'
+        self.variable_value = hyperParams.xj_new_dan
     
     @lru_cache(1)
     def name(self):
@@ -80,10 +80,29 @@ template.sched_sampling = LinearScheduledSampling(40000)
 template.max_epoch = template.sched_sampling.duration
 template.ready()
 
-# hP = template.copy()
-# hP.xj_new_dan = 2
-# hP.ready()
-# GROUPS.append(MyExpGroup(hP))
+hP = template.copy()
+hP.xj_new_dan = 1
+hP.vae_channels = [64, 128, 256]
+hP.deep_spread = True
+hP.relu_leak = False
+hP.lossWeightTree['self_recon'].weight = (
+    RESOLUTION ** 2 * SEQ_LEN * hP.batch_size
+)
+hP.lossWeightTree['kld'].weight = 0.01 * hP.batch_size
+hP.lossWeightTree['predict']['z'].weight = (
+    2 * hP.symm.latent_dim * SEQ_LEN * hP.batch_size
+)
+hP.lossWeightTree['predict']['image'].weight = (
+    2 * RESOLUTION ** 2 * SEQ_LEN * hP.batch_size
+)
+hP.K = 2    # one for translate, one for rotate
+hP.symm = GusMethod()
+hP.grad_clip = None
+hP.rnn_min_context = 5
+hP.sched_sampling = SigmoidScheduledSampling(alpha=2200, beta=8000)
+hP.max_epoch = 150001 // hP.batch_size
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
 hP.xj_new_dan = 0
@@ -104,7 +123,6 @@ hP.lossWeightTree['predict']['image'].weight = (
 )
 hP.K = 2    # one for translate, one for rotate
 hP.symm = GusMethod()
-hP.lr = 1e-3
 def f(epoch, batch_i, hParams: HyperParams):
     return 0.99999 ** (epoch * hParams.n_batches_per_epoch + batch_i)
 hP.lr_diminish = f
@@ -117,18 +135,5 @@ hP.image_loss = 'bce'
 hP.ready()
 xj = hP
 # GROUPS.append(MyExpGroup(xj))
-
-hP = xj.copy() # Note, we are copying from xj
-hP.xj_new_dan = None
-hP.rnn_width = 16
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-hP = xj.copy() # Note, we are copying from xj
-hP.xj_new_dan = None
-hP.rnn_width = 16
-hP.symm = template.symm
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
 
 assert len(GROUPS) == 2

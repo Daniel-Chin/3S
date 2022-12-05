@@ -620,11 +620,14 @@ next {
         Note GusMethod did not show advantage when using Dan's prev method. 
             see 2022_m11_d22@13_49_41_tr
 }
+12/5 {
+    2022_m12_d04@16_23_02_ablate_xj
+        confirms. GusMethod is better. 
+        Why? idk. Ask Gus! 
+}
 todo {
-    fully replicate xj method
+    Try stop_grad w/ xj method, because SimSiam. 
     evalDecoder should control z-score of z instead of z
-    stop train 2022_m11_d04@00_27_53_k
-    test t r tr, since xj method succeeds more often
     try time aug, e.g. stretch (int / float ratio), reverse
     wrong symm: 11/4 notes
     vary K (aug ratio)

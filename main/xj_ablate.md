@@ -17,3 +17,4 @@
 | residual | off | on |
 | image_loss | bce | mse |
 | deep_spread | on | off |
+| dataset | xj | dan |

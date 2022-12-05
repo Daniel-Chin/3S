@@ -134,6 +134,6 @@ hP.residual = False
 hP.image_loss = 'bce'
 hP.ready()
 xj = hP
-# GROUPS.append(MyExpGroup(xj))
+GROUPS.append(MyExpGroup(xj))
 
 assert len(GROUPS) == 2

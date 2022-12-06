@@ -86,6 +86,7 @@ hP = template.copy()
 hP.xj_new_dan = 1
 
 xJ.rnn_width = 256
+# ablated
 
 xJ.vae_channels = [64, 128, 256]
 hP.vae_channels = [64, 128, 256]
@@ -97,6 +98,7 @@ xJ.relu_leak = False
 hP.relu_leak = False
 
 xJ.batch_size = 32
+hP.batch_size = 32
 
 xJ.lossWeightTree['self_recon'].weight = (
     RESOLUTION ** 2 * SEQ_LEN * xJ.batch_size
@@ -128,6 +130,7 @@ hP.symm = GusMethod()
 def f(epoch, batch_i, hParams: HyperParams):
     return 0.99999 ** (epoch * hParams.n_batches_per_epoch + batch_i)
 xJ.lr_diminish = f
+# ablated
 
 xJ.grad_clip = None
 hP.grad_clip = None
@@ -142,8 +145,10 @@ xJ.max_epoch = 150001 // xJ.batch_size
 hP.max_epoch = 150001 // xJ.batch_size
 
 xJ.residual = False
+# ablated
 
 xJ.image_loss = 'bce'
+hP.image_loss = 'bce'
 
 hP.ready()
 GROUPS.append(MyExpGroup(hP))

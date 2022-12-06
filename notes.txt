@@ -625,6 +625,10 @@ next {
         confirms. GusMethod is better. 
         Why? idk. Ask Gus! 
 }
+12/6 {
+    2022_m12_d06@17_33_43_ablate_xj
+        not sure what's going on. trying BCE. 
+}
 todo {
     Try stop_grad w/ xj method, because SimSiam. 
     evalDecoder should control z-score of z instead of z

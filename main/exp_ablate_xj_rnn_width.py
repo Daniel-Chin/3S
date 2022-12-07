@@ -10,7 +10,7 @@ VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
 
-EXP_NAME = 'ablate_xj'
+EXP_NAME = 'ablate_xj_rnn_width'
 N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):

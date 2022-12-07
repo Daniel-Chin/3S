@@ -629,6 +629,12 @@ next {
     2022_m12_d06@17_33_43_ablate_xj
         not sure what's going on. trying BCE. 
 }
+12/7 {
+    2022_m12_d07@03_45_15_ablate_xj
+        BCE is helpful to prevent collapse. 
+        probably achievable via MSE + weight tweaking too. 
+        However, disen performance still xj > ablate. 
+}
 todo {
     Try stop_grad w/ xj method, because SimSiam. 
     evalDecoder should control z-score of z instead of z

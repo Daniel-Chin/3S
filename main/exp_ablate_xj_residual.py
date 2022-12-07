@@ -82,11 +82,12 @@ template.ready()
 
 xJ = template.copy()
 xJ.xj_new_dan = 0
+# 0: xj, 1: new (ablate), 2: dan. 
 hP = template.copy()
 hP.xj_new_dan = 1
 
 xJ.rnn_width = 256
-# ablated
+hP.rnn_width = 256
 
 xJ.vae_channels = [64, 128, 256]
 hP.vae_channels = [64, 128, 256]
@@ -130,7 +131,7 @@ hP.symm = GusMethod()
 def f(epoch, batch_i, hParams: HyperParams):
     return 0.99999 ** (epoch * hParams.n_batches_per_epoch + batch_i)
 xJ.lr_diminish = f
-# ablated
+hP.lr_diminish = f
 
 xJ.grad_clip = None
 hP.grad_clip = None

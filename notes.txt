@@ -635,7 +635,18 @@ next {
         probably achievable via MSE + weight tweaking too. 
         However, disen performance still xj > ablate. 
 }
+12/8 {
+    2022_m12_d07@14_50_06_ablate_xj_residual
+        omg! identity+noise initialization of rnn makes z collapse! 
+    2022_m12_d07@14_50_06_ablate_xj_rnn_width
+        rnn width 256 is better than 16
+        Counter-intuitive! Why? 
+        Try 32 next. 
+    2022_m12_d07@15_15_49_ablate_xj_mse
+        because we changed both rnn_width (which i thought wouldn't matter) and bce, this is inconclusive. 
+}
 todo {
+    try rnn_width=32, compare with 256
     Try stop_grad w/ xj method, because SimSiam. 
     evalDecoder should control z-score of z instead of z
     try time aug, e.g. stretch (int / float ratio), reverse

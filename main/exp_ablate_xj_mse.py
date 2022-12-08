@@ -17,8 +17,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'xj_new_dan'
-        self.variable_value = hyperParams.xj_new_dan
+        self.variable_name = 'Image loss'
+        self.variable_value = hyperParams.image_loss
     
     @lru_cache(1)
     def name(self):
@@ -87,7 +87,7 @@ hP = template.copy()
 hP.xj_new_dan = 1
 
 xJ.rnn_width = 256
-# ablate
+hP.rnn_width = 256
 
 xJ.vae_channels = [64, 128, 256]
 hP.vae_channels = [64, 128, 256]

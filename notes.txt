@@ -645,6 +645,12 @@ next {
     2022_m12_d07@15_15_49_ablate_xj_mse
         because we changed both rnn_width (which i thought wouldn't matter) and bce, this is inconclusive. 
 }
+12/9 {
+    2022_m12_d08@14_16_32_ablate_xj_mse
+        so MSE is good to go! 
+            this way, loss plots are easier to interprete.
+            disen performance also increased. 
+}
 todo {
     try rnn_width=32, compare with 256
     Try stop_grad w/ xj method, because SimSiam. 

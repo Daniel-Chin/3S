@@ -112,7 +112,7 @@ GROUPS.append(MyExpGroup(nowBest))
 
 newTry_ = nowBest.copy()
 newTry_.rnn_width = 32
-nowBest.ready()
-GROUPS.append(MyExpGroup(nowBest))
+newTry_.ready()
+GROUPS.append(MyExpGroup(newTry_))
 
 assert len(GROUPS) == 2

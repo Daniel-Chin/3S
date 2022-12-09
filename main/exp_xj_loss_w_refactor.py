@@ -17,8 +17,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'rnn_width'
-        self.variable_value = hyperParams.rnn_width
+        self.variable_name = 'refac'
+        self.variable_value = hyperParams.refac
     
     @lru_cache(1)
     def name(self):
@@ -101,6 +101,7 @@ nowBest.sched_sampling = SigmoidScheduledSampling(alpha=2200, beta=8000)
 nowBest.max_epoch = 150001 // nowBest.batch_size
 nowBest.residual = False
 nowBest.image_loss = 'mse'
+nowBest.refac = False
 nowBest.ready()
 GROUPS.append(MyExpGroup(nowBest))
 
@@ -111,8 +112,9 @@ newTry_.lossWeightTree['kld'].weight = 3.2e-7
 newTry_.lossWeightTree['predict']['z'].weight = 3.84e-3
 newTry_.lossWeightTree['predict']['image'].weight = 2.62144
 newTry_.lr = 1000
+newTry_.refac = True
 
-nowBest.ready()
-GROUPS.append(MyExpGroup(nowBest))
+newTry_.ready()
+GROUPS.append(MyExpGroup(newTry_))
 
 assert len(GROUPS) == 2

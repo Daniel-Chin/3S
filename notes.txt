@@ -656,6 +656,9 @@ next {
         rnn_width=32 is much better than 256. 
         This makes sense. 
         However, proving that our method works well with 256 is important, because IRL ppl  overparametrize. 
+    2022_m12_d09@16_36_56_xj_loss_w_refactor
+        nan. 
+        it turns out, Adam is not sensitive to total loss scaling. lr should not scale by 1e+6. Retry. 
 }
 todo {
     try rnn_width=32, compare with 256

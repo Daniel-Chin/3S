@@ -81,7 +81,7 @@ template.max_epoch = template.sched_sampling.duration
 template.ready()
 
 nowBest = template.copy()
-nowBest.rnn_width = 256
+nowBest.rnn_width = 32
 nowBest.vae_channels = [64, 128, 256]
 nowBest.deep_spread = True
 nowBest.relu_leak = False
@@ -101,20 +101,30 @@ nowBest.sched_sampling = SigmoidScheduledSampling(alpha=2200, beta=8000)
 nowBest.max_epoch = 150001 // nowBest.batch_size
 nowBest.residual = False
 nowBest.image_loss = 'mse'
-nowBest.refac = False
+nowBest.refac = 0
 nowBest.ready()
 GROUPS.append(MyExpGroup(nowBest))
 
-newTry_ = nowBest.copy()
+newTry0 = nowBest.copy()
 
-newTry_.lossWeightTree['self_recon'].weight = 1.31072
-newTry_.lossWeightTree['kld'].weight = 3.2e-7
-newTry_.lossWeightTree['predict']['z'].weight = 3.84e-3
-newTry_.lossWeightTree['predict']['image'].weight = 2.62144
-newTry_.lr = 1000
-newTry_.refac = True
+newTry0.lossWeightTree['self_recon'].weight = 1.31072
+newTry0.lossWeightTree['kld'].weight = 3.2e-7
+newTry0.lossWeightTree['predict']['z'].weight = 3.84e-3
+newTry0.lossWeightTree['predict']['image'].weight = 2.62144
+newTry0.refac = 1
 
-newTry_.ready()
-GROUPS.append(MyExpGroup(newTry_))
+newTry0.ready()
+GROUPS.append(MyExpGroup(newTry0))
+
+newTry1 = nowBest.copy()
+
+newTry1.lossWeightTree['self_recon'].weight = 1
+newTry1.lossWeightTree['kld'].weight = 2e-7
+newTry1.lossWeightTree['predict']['z'].weight = 3e-3
+newTry1.lossWeightTree['predict']['image'].weight = 2
+newTry1.refac = 1
+
+newTry1.ready()
+GROUPS.append(MyExpGroup(newTry1))
 
 assert len(GROUPS) == 2

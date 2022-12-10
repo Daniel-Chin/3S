@@ -108,7 +108,7 @@ newTry0 = nowBest.copy()
 
 newTry0.lossWeightTree['predict']['z'].weight *= 2
 newTry0.lossWeightTree['predict']['image'].weight *= 2
-nowBest.K = 1
+newTry0.K = 1
 
 newTry0.ready()
 GROUPS.append(MyExpGroup(newTry0))

@@ -10,15 +10,15 @@ VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
 
-EXP_NAME = 'xj_loss_w_refactor'
+EXP_NAME = 'xj_k'
 N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'refac'
-        self.variable_value = hyperParams.refac
+        self.variable_name = 'K'
+        self.variable_value = hyperParams.K
     
     @lru_cache(1)
     def name(self):
@@ -101,30 +101,16 @@ nowBest.sched_sampling = SigmoidScheduledSampling(alpha=2200, beta=8000)
 nowBest.max_epoch = 150001 // nowBest.batch_size
 nowBest.residual = False
 nowBest.image_loss = 'mse'
-nowBest.refac = 0
 nowBest.ready()
 GROUPS.append(MyExpGroup(nowBest))
 
 newTry0 = nowBest.copy()
 
-newTry0.lossWeightTree['self_recon'].weight = 1.31072
-newTry0.lossWeightTree['kld'].weight = 3.2e-7
-newTry0.lossWeightTree['predict']['z'].weight = 3.84e-3
-newTry0.lossWeightTree['predict']['image'].weight = 2.62144
-newTry0.refac = 1
+newTry0.lossWeightTree['predict']['z'].weight *= 2
+newTry0.lossWeightTree['predict']['image'].weight *= 2
+nowBest.K = 1
 
 newTry0.ready()
 GROUPS.append(MyExpGroup(newTry0))
 
-newTry1 = nowBest.copy()
-
-newTry1.lossWeightTree['self_recon'].weight = 1
-newTry1.lossWeightTree['kld'].weight = 2e-7
-newTry1.lossWeightTree['predict']['z'].weight = 3e-3
-newTry1.lossWeightTree['predict']['image'].weight = 2
-newTry1.refac = 2
-
-newTry1.ready()
-GROUPS.append(MyExpGroup(newTry1))
-
-assert len(GROUPS) == 3
+assert len(GROUPS) == 2

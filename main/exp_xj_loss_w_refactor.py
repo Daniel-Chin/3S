@@ -122,7 +122,7 @@ newTry1.lossWeightTree['self_recon'].weight = 1
 newTry1.lossWeightTree['kld'].weight = 2e-7
 newTry1.lossWeightTree['predict']['z'].weight = 3e-3
 newTry1.lossWeightTree['predict']['image'].weight = 2
-newTry1.refac = 1
+newTry1.refac = 2
 
 newTry1.ready()
 GROUPS.append(MyExpGroup(newTry1))

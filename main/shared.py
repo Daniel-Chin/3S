@@ -183,6 +183,9 @@ class LinearScheduledSampling(ScheduledSampling):
             )
         except ZeroDivisionError:
             return 0
+    
+    def __repr__(self):
+        return f'LinearScheduledSampling(duration={self.duration})'
 
 class SigmoidScheduledSampling(ScheduledSampling):
     def __init__(self, alpha: float, beta: float) -> None:
@@ -194,3 +197,6 @@ class SigmoidScheduledSampling(ScheduledSampling):
         return self.alpha / (self.alpha + np.exp(
             (total_batch_i + self.beta) / self.alpha, 
         ))
+    
+    def __repr__(self):
+        return f'SigmoidScheduledSampling({self.alpha}, {self.beta})'

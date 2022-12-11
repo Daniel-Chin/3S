@@ -660,6 +660,13 @@ next {
         nan. 
         it turns out, Adam is not sensitive to total loss scaling. lr should not scale by 1e+6. Retry. 
 }
+12/11 {
+    2022_m12_d10@14_42_11_xj_loss_w_refactor
+        scaled weights look best. 
+            maybe because of floatpoint errors. 
+    2022_m12_d10@14_44_28_xj_k
+        k=1 is better. 
+}
 todo {
     try rnn_width=32, compare with 256
     Try stop_grad w/ xj method, because SimSiam. 

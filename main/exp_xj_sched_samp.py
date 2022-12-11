@@ -10,15 +10,15 @@ VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
 
-EXP_NAME = 'xj_k'
+EXP_NAME = 'xj_sched_samp'
 N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'K'
-        self.variable_value = hyperParams.K
+        self.variable_name = 'sched_sampling'
+        self.variable_value = hyperParams.sched_sampling
     
     @lru_cache(1)
     def name(self):
@@ -86,11 +86,10 @@ nowBest.vae_channels = [64, 128, 256]
 nowBest.deep_spread = True
 nowBest.relu_leak = False
 nowBest.batch_size = 32
-nowBest.lossWeightTree['self_recon'].weight = 1310720
-nowBest.lossWeightTree['kld'].weight = 0.32
-nowBest.lossWeightTree['predict']['z'].weight = 3840
-nowBest.lossWeightTree['predict']['image'].weight = 2621440
-nowBest.K = 2    # one for translate, one for rotate
+nowBest.lossWeightTree['self_recon'].weight = 1.31072
+nowBest.lossWeightTree['kld'].weight = 3.2e-7
+nowBest.lossWeightTree['predict']['z'].weight = 3.84e-3
+nowBest.lossWeightTree['predict']['image'].weight = 2.62144
 nowBest.symm = GusMethod()
 def f(epoch, batch_i, hParams: HyperParams):
     return 0.99999 ** (epoch * hParams.n_batches_per_epoch + batch_i)
@@ -104,13 +103,13 @@ nowBest.image_loss = 'mse'
 nowBest.ready()
 GROUPS.append(MyExpGroup(nowBest))
 
+
 newTry0 = nowBest.copy()
 
-newTry0.lossWeightTree['predict']['z'].weight *= 2
-newTry0.lossWeightTree['predict']['image'].weight *= 2
-newTry0.K = 1
+newTry0.sched_sampling = template.sched_sampling
 
 newTry0.ready()
 GROUPS.append(MyExpGroup(newTry0))
+
 
 assert len(GROUPS) == 2

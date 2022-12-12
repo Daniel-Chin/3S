@@ -667,6 +667,14 @@ next {
     2022_m12_d10@14_44_28_xj_k
         k=1 is better. 
 }
+12/12 {
+    2022_m12_d11@16_30_27_xj_batch_size
+        batch_size matters a lot. 128 is too large. 
+        This is weird. next exp: more groups. Then, as during meeting. 
+    2022_m12_d11@16_30_27_xj_lr_dim
+        seems there's more to find here. 
+        next exp: more lr. 
+}
 todo {
     try rnn_width=32, compare with 256
     Try stop_grad w/ xj method, because SimSiam. 

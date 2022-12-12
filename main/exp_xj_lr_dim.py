@@ -11,14 +11,14 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 
 EXP_NAME = 'xj_lr_dim'
-N_RAND_INITS = 8
+N_RAND_INITS = 16
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'lr_diminish'
-        self.variable_value = hyperParams.lr_diminish
+        self.variable_name = 'lr,lr_diminish'
+        self.variable_value = (hyperParams.lr, hyperParams.lr_diminish)
     
     @lru_cache(1)
     def name(self):
@@ -104,12 +104,21 @@ nowBest.ready()
 GROUPS.append(MyExpGroup(nowBest))
 
 
-newTry0 = nowBest.copy()
+hP = nowBest.copy()
 
-newTry0.lr_diminish = None
+hP.lr_diminish = None
 
-newTry0.ready()
-GROUPS.append(MyExpGroup(newTry0))
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+
+hP = nowBest.copy()
+
+hP.lr_diminish = None
+hP.lr *= .5
+
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
 
 
 assert len(GROUPS) == 2

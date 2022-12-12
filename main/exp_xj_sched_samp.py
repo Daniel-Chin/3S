@@ -106,7 +106,7 @@ GROUPS.append(MyExpGroup(nowBest))
 
 newTry0 = nowBest.copy()
 
-newTry0.sched_sampling = template.sched_sampling
+newTry0.sched_sampling = LinearScheduledSampling(nowBest.max_epoch)
 
 newTry0.ready()
 GROUPS.append(MyExpGroup(newTry0))

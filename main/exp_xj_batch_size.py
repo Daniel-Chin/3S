@@ -11,7 +11,7 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 
 EXP_NAME = 'xj_batch_size'
-N_RAND_INITS = 8
+N_RAND_INITS = 6
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -104,12 +104,19 @@ nowBest.ready()
 GROUPS.append(MyExpGroup(nowBest))
 
 
-newTry0 = nowBest.copy()
+hP = nowBest.copy()
+hP.batch_size = 16
+hP.ready()
+GROUPS.insert(0, MyExpGroup(hP))
 
-newTry0.batch_size = 128
+hP = nowBest.copy()
+hP.batch_size = 64
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
 
-newTry0.ready()
-GROUPS.append(MyExpGroup(newTry0))
+hP = nowBest.copy()
+hP.batch_size = 128
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
 
-
-assert len(GROUPS) == 2
+assert len(GROUPS) == 4

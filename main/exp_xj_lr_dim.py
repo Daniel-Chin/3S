@@ -121,4 +121,4 @@ hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 
-assert len(GROUPS) == 2
+assert len(GROUPS) == 3

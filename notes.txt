@@ -681,9 +681,10 @@ next {
         oh no, it's correlated with sched samp since XJ's sched samp looks at batch_i. 
     2022_m12_d12@14_31_16_xj_sched_samp
         No significant diff. using linear sched samp. 
+    lr scheduling
+        further studying xj code reveals the LR sched actually does not kick in because of a bug. 
 }
 todo {
-    fix last epoch % 1000 != 0
     Try stop_grad w/ xj method, because SimSiam. 
     evalDecoder should control z-score of z instead of z
     try time aug, e.g. stretch (int / float ratio), reverse

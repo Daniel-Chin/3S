@@ -114,6 +114,9 @@ class HyperParams(BaseHyperParams):
             ])
     
     def ready(self):
+        assert self.lr_diminish is None # See below comments
+        # The current implementation of lr_diminish is via loss scaling. 
+        # In Adam, that is not equivalent to lr scaling. Use pytorch's lr sched instead. 
         assert self.supervise_rnn == (
             self.lossWeightTree['supervise']['rnn'].weight != 0
         )

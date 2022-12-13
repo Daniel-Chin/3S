@@ -91,9 +91,6 @@ nowBest.lossWeightTree['kld'].weight = 3.2e-7
 nowBest.lossWeightTree['predict']['z'].weight = 3.84e-3
 nowBest.lossWeightTree['predict']['image'].weight = 2.62144
 nowBest.symm = GusMethod()
-def f(epoch, hParams: HyperParams):
-    return 0.99999 ** (epoch * 4)
-nowBest.lr_diminish = f
 nowBest.grad_clip = None
 nowBest.rnn_min_context = 5
 nowBest.max_epoch = 4000

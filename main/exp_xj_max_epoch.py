@@ -104,4 +104,4 @@ for me in [3500, 3000, 2500, 2000, 1500]:
     hP = nowBest.copy()
     hP.max_epoch = me
     hP.ready()
-    GROUPS.append(0, MyExpGroup(hP))
+    GROUPS.append(MyExpGroup(hP))

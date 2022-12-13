@@ -17,8 +17,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'batch_size'
-        self.variable_value = hyperParams.batch_size
+        self.variable_name = 'residual'
+        self.variable_value = hyperParams.residual
     
     @lru_cache(1)
     def name(self):

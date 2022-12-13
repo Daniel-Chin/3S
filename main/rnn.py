@@ -38,7 +38,7 @@ class PredRNN(nn.Module):
             self.dropout(self.hidden), z_t, 
         ), dim=1))
         if self.hParams.residual:
-            self.hidden = self.hidden + output
+            self.hidden = self.hidden * self.hParams.residual + output
         else:
             self.hidden = output
 

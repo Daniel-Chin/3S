@@ -52,7 +52,7 @@ class HyperParams(BaseHyperParams):
         self.energy_noise_std: float = None
 
         self.rnn_width: int = None
-        self.residual: bool = None
+        self.residual: Optional[float] = None
         self.jepa_stop_grad_encoder: bool = None
         self.dropout: float = None
         self.vae_channels: List[int] = None

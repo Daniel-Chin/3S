@@ -91,9 +91,12 @@ nowBest.lossWeightTree['kld'].weight = 3.2e-7
 nowBest.lossWeightTree['predict']['z'].weight = 3.84e-3
 nowBest.lossWeightTree['predict']['image'].weight = 2.62144
 nowBest.symm = GusMethod()
-def f(epoch, batch_i, hParams: HyperParams):
-    return 0.99999 ** (epoch * hParams.n_batches_per_epoch + batch_i)
-nowBest.lr_diminish = f
+class XJDiminishLR:
+    def __repr__(self) -> str:
+        return 'xj'
+    def __call__(self, epoch, hParams: HyperParams):
+        return 0.99999 ** (epoch * 4)
+nowBest.lr_diminish = XJDiminishLR()
 nowBest.grad_clip = None
 nowBest.rnn_min_context = 5
 nowBest.sched_sampling = SigmoidScheduledSampling(alpha=2200, beta=8000)

@@ -675,8 +675,15 @@ next {
         seems there's more to find here. 
         next exp: more lr. 
 }
+12/13 {
+    2022_m12_d12@14_31_16_xj_batch_size
+        Significant! smaller batch_size is better. 
+        oh no, it's correlated with sched samp since XJ's sched samp looks at batch_i. 
+    2022_m12_d12@14_31_16_xj_sched_samp
+        No significant diff. using linear sched samp. 
+}
 todo {
-    try rnn_width=32, compare with 256
+    fix last epoch % 1000 != 0
     Try stop_grad w/ xj method, because SimSiam. 
     evalDecoder should control z-score of z instead of z
     try time aug, e.g. stretch (int / float ratio), reverse

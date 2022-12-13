@@ -225,7 +225,7 @@ def rnnForward(
     if hParams.sched_sampling is None:
         teacher_rate = 0
     else:
-        teacher_rate = hParams.sched_sampling.get(epoch, hParams, batch_i)
+        teacher_rate = hParams.sched_sampling.get(epoch, hParams)
     z_hat_transed = torch.zeros((
         batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
     ), device=DEVICE)

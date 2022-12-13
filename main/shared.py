@@ -169,14 +169,14 @@ def reparameterize(mu, log_var):
 
 class ScheduledSampling(metaclass=ABCMeta):
     @abstractmethod
-    def get(self, epoch: int, hParams: HyperParams, batch_i: int) -> float:
+    def get(self, epoch: int, hParams: HyperParams) -> float:
         raise NotImplemented
 
 class LinearScheduledSampling(ScheduledSampling):
     def __init__(self, duration: int) -> None:
         self.duration = duration
     
-    def get(self, epoch: int, hParams: HyperParams, batch_i: int):
+    def get(self, epoch: int, hParams: HyperParams):
         try:
             return 1 - min(
                 1, epoch / self.duration, 
@@ -192,10 +192,10 @@ class SigmoidScheduledSampling(ScheduledSampling):
         self.alpha = alpha
         self.beta = beta
     
-    def get(self, epoch: int, hParams: HyperParams, batch_i: int):
-        total_batch_i = hParams.n_batches_per_epoch * epoch + batch_i
+    def get(self, epoch: int, hParams: HyperParams):
+        xj_batch_i_approx = 4 * epoch
         return self.alpha / (self.alpha + np.exp(
-            (total_batch_i + self.beta) / self.alpha, 
+            (xj_batch_i_approx + self.beta) / self.alpha, 
         ))
     
     def __repr__(self):

@@ -76,7 +76,7 @@ def oneEpoch(
                 scaled_loss = total_loss
             else:
                 scaled_loss = total_loss * hParams.lr_diminish(
-                    epoch, batch_i, hParams, 
+                    epoch, hParams, 
                 )
         with profiler('good', 'backward'):
             optim.zero_grad()

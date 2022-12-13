@@ -1,0 +1,1 @@
+This is not how to do lr dim with Adam. 

@@ -17,10 +17,11 @@ from shared import torch2PIL
 from vae import VAE
 from template_bounce import MyExpGroup
 
-EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m11_d04@00_22_28_dropout
-'''.strip())
-LOCK_EPOCH = None
+try:
+    from workspace import EXP_PATH, LOCK_EPOCH
+except ImportError:
+    EXP_PATH = input('EXP_PATH=')
+    LOCK_EPOCH = None
 
 RADIUS = 2
 TICK_INTERVAL = .5

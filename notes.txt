@@ -677,16 +677,32 @@ next {
 }
 12/13 {
     2022_m12_d12@14_31_16_xj_batch_size
-        Significant! smaller batch_size is better. 
+        at first glance, smaller batch_size is better. 
         oh no, it's correlated with sched samp since XJ's sched samp looks at batch_i. 
     2022_m12_d12@14_31_16_xj_sched_samp
         No significant diff. using linear sched samp. 
     lr scheduling
         further studying xj code reveals the LR sched actually does not kick in because of a bug. 
 }
+12/14 {
+    2022_m12_d13@16_26_35_xj_batch_size
+        smaller batch size IS better. 
+        Why? idk. 
+        16 looks better than 32, but let's use 32 because it's faster. 
+    2022_m12_d13@20_27_22_xj_neg_residual
+        init RNN around negative identity is much worse than near-0 init. 
+        at least we tried...
+        thinking about it, initing nonzero kinda makes RNN want to collapse the z. 
+    Cool! xj ablation exps are done. integrate into main training templates. 
+}
 todo {
+    try deep_spread = False
     Try stop_grad w/ xj method, because SimSiam. 
+    try remove z loss (after trying SimSiam!!!)
     evalDecoder should control z-score of z instead of z
+    try bigger train set size
+    integrate GusMethod into symm system
+        also: make twobody use 6D GusMethod
     try time aug, e.g. stretch (int / float ratio), reverse
     wrong symm: 11/4 notes
     vary K (aug ratio)

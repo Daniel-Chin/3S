@@ -11,10 +11,11 @@ from load_dataset import Dataset
 from template_bounce import MyExpGroup
 from linearity_metric import projectionMSE
 
-EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m11_d22@13_49_41_tr
-'''.strip())
-LOCK_EPOCH = None
+try:
+    from workspace import EXP_PATH, LOCK_EPOCH
+except ImportError:
+    EXP_PATH = input('EXP_PATH=')
+    LOCK_EPOCH = None
 
 def main(experiment_path, lock_epoch):
     exp_name, n_rand_inits, groups, experiment = loadExperiment(path.join(
@@ -65,4 +66,4 @@ def main(experiment_path, lock_epoch):
     plt.show()
 
 if __name__ == '__main__':
-    main(EXPERIMENT_PATH, LOCK_EPOCH)
+    main(EXP_PATH, LOCK_EPOCH)

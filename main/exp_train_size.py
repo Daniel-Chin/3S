@@ -17,8 +17,11 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'train_set_size'
-        self.variable_value = hyperParams.train_set_size
+        self.variable_name = 'symm,dataset_size'
+        self.variable_value = (
+            'yes' if hyperParams.symm is ours.symm else 'no', 
+            hyperParams.train_set_size, 
+        )
     
     @lru_cache(1)
     def name(self):

@@ -1,24 +1,25 @@
 from functools import lru_cache
 from symmetry_transforms import *
 from torchWork import LossWeightTree, ExperimentGroup
+import numpy as np
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/xj_bounce/train'
-VALIDATE_SET_PATH = '../datasets/xj_bounce/validate'
+TRAIN_SET_PATH    = '../datasets/bounce/train'
+VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
 
-EXP_NAME = 'max_epoch'
-N_RAND_INITS = 4
+EXP_NAME = 'z_loss'
+N_RAND_INITS = 1
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'max_epoch'
-        self.variable_value = hyperParams.max_epoch
+        self.variable_name = 'z_loss_weight'
+        self.variable_value = hyperParams.lossWeightTree['predict']['z'].weight
     
     @lru_cache(1)
     def name(self):
@@ -35,7 +36,7 @@ template.lossWeightTree = LossWeightTree('total', 1, [
         LossWeightTree('fake', 0, None), 
     ]), 
     LossWeightTree('predict', 1, [
-        LossWeightTree('z', 3.84e-3, None), 
+        LossWeightTree('z', None, None), 
         LossWeightTree('image', 2.62144, None), 
     ]), 
     LossWeightTree('supervise', 0, [
@@ -75,9 +76,11 @@ template.sched_sampling = LinearScheduledSampling(4000)
 template.max_epoch = template.sched_sampling.duration
 template.ready()
 
-for me in [4000, 5000, 7000, 9000]:
+# modifying template
+# template.xxx = xxx
+
+for w in np.exp(np.linspace(np.log(3.84e-3), 0, 24)):
     hP = template.copy()
-    hP.max_epoch = me
-    hP.sched_sampling = LinearScheduledSampling(me)
+    hP.lossWeightTree['predict']['z'].weight = w
     hP.ready()
     GROUPS.append(MyExpGroup(hP))

@@ -4,21 +4,21 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/xj_bounce/train'
-VALIDATE_SET_PATH = '../datasets/xj_bounce/validate'
+TRAIN_SET_PATH    = '../datasets/bounce/train'
+VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
 
-EXP_NAME = 'max_epoch'
-N_RAND_INITS = 4
+EXP_NAME = 'deep_spread'
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'max_epoch'
-        self.variable_value = hyperParams.max_epoch
+        self.variable_name = 'deep_spread'
+        self.variable_value = hyperParams.deep_spread
     
     @lru_cache(1)
     def name(self):
@@ -62,7 +62,7 @@ template.residual = False
 template.jepa_stop_grad_encoder = False
 template.dropout = 0.0
 template.vae_channels = [64, 128, 256]
-template.deep_spread = True
+template.deep_spread = None
 template.relu_leak = False
 template.vae_kernel_size = 4
 template.batch_size = 32
@@ -75,9 +75,17 @@ template.sched_sampling = LinearScheduledSampling(4000)
 template.max_epoch = template.sched_sampling.duration
 template.ready()
 
-for me in [4000, 5000, 7000, 9000]:
-    hP = template.copy()
-    hP.max_epoch = me
-    hP.sched_sampling = LinearScheduledSampling(me)
-    hP.ready()
-    GROUPS.append(MyExpGroup(hP))
+# modifying template
+# template.xxx = xxx
+
+hP = template.copy()
+hP.deep_spread = False
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.deep_spread = True
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+assert len(GROUPS) == 2

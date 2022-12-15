@@ -79,7 +79,7 @@ template.ready()
 # template.xxx = xxx
 
 hP = template.copy()
-hP.symm = GusMethod
+hP.symm = GusMethod()
 hP.ready()
 GROUPS.append(MyExpGroup(hP))
 

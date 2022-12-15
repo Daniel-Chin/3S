@@ -33,7 +33,7 @@ fig = plotLosses(
         # LossType('train',    'linear_proj_mse'), 
         LossType('validate', 'linear_proj_mse'), 
     ], 
-    average_over=300, epoch_start=1000, 
+    average_over=50, epoch_start=1000, 
     which_legend=0, linewidth=1, 
 )
 # fig.axes[-1].set_ylim(0, 1)

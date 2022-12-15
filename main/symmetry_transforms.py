@@ -11,10 +11,24 @@ __all__ = [
     'Transform', 'TUT', 'Slice', 
     'Trivial', 'Translate', 'Rotate', 
     'SymmetryAssumption', 'GusMethod', 
+    'SAMPLE_TRANS', 'COMPOSE_TRANS', 
 ]
 
 Transform = Callable[[torch.Tensor], torch.Tensor]
 TUT = Tuple[Transform, Transform]
+
+class HowTransCombine: 
+    def __init__(self, name):
+        self.name = name
+    def __repr__(self):
+        return self.name
+    # behave like primitives
+    def __copy__(self):
+        return self
+    def __deepcopy__(self, _):
+        return self
+SAMPLE_TRANS  = HowTransCombine('SAMPLE_TRANS')
+COMPOSE_TRANS = HowTransCombine('COMPOSE_TRANS')
 
 class Slice:
     def __init__(self, start: int, stop: int) -> None:
@@ -103,13 +117,13 @@ class SymmetryAssumption:
     
     def __init__(
         self, latent_dim: int, 
-        rule: List[Tuple[List[Group], Set[Slice]]], 
+        rule: List[Tuple[HowTransCombine, List[Group], Set[Slice]]], 
     ) -> None:
         self.latent_dim = latent_dim
         self.rule = rule
 
         dim_set = set()
-        for _, slice_set in self.rule:
+        for _, _, slice_set in self.rule:
             for dim_slice in slice_set:
                 new_dim_set = set(range(dim_slice.start, dim_slice.stop))
                 assert not dim_set.intersection(new_dim_set)
@@ -139,11 +153,17 @@ class SymmetryAssumption:
     def sample(self) -> TUT:
         # instantiate
         instance: __class__.Instance = []
-        for group_seq, slice_set in self.rule:
+        for howCombine, group_seq, slice_set in self.rule:
             tut_seq: List[TUT] = []
             instance.append((tut_seq, slice_set))
-            for group in group_seq:
+            if howCombine is SAMPLE_TRANS:
+                group = random.choice(group_seq)
                 tut_seq.append(group.sample())
+            elif howCombine is COMPOSE_TRANS:
+                for group in group_seq:
+                    tut_seq.append(group.sample())
+            else:
+                raise ValueError(f'what is {howCombine}')
         
         # def
         def trans(x):

@@ -50,7 +50,7 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 template.lr = 0.001
 template.symm = SymmetryAssumption(
     6, [
-        ([Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
+        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
     ], 
 )
 template.supervise_rnn = False

@@ -699,13 +699,14 @@ next {
     2022_m12_d14@14_58_06_max_epoch
         differences are insignificant. one more exp, comparing 4000 vs 9000
     evalDecoder now controls the z-score of z instead of z itself
+    integrate GusMethod into symm system. 
+        now we have SAMPLE_TRANS | COMPOSE_TRANS
 }
 todo {
     Try stop_grad w/ xj method, because SimSiam. 
     try remove z loss (after trying SimSiam!!!)
     try bigger train set size
-    integrate GusMethod into symm system
-        also: make twobody use 6D GusMethod
+    compare SAMPLE_TRANS vs COMPOSE_TRANS in two body. 
     try time aug, e.g. stretch (int / float ratio), reverse
     wrong symm: 11/4 notes
     vary K (aug ratio)

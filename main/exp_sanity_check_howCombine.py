@@ -10,15 +10,15 @@ VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
 
-EXP_NAME = ...
-N_RAND_INITS = ...
+EXP_NAME = 'sanity_check_howCombine'
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.WHAT
+        self.variable_name = 'symm'
+        self.variable_value = hyperParams.symm
     
     @lru_cache(1)
     def name(self):
@@ -48,11 +48,7 @@ template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('symm_self_consistency', 0, None), 
 ])
 template.lr = 0.001
-template.symm = SymmetryAssumption(
-    3, [
-        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
-    ], 
-)
+template.symm = None
 template.supervise_rnn = False
 template.supervise_vae = False
 template.supervise_vae_only_xy = False
@@ -82,9 +78,18 @@ template.ready()
 # modifying template
 # template.xxx = xxx
 
-# hP = template.copy()
-# hP.xxx = xxx
-# hP.ready()
-# GROUPS.append(MyExpGroup(hP))
+hP = template.copy()
+hP.symm = GusMethod
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 0
+hP = template.copy()
+hP.symm = SymmetryAssumption(
+    3, [
+        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
+    ], 
+)
+hP.ready()
+GROUPS.append(MyExpGroup(hP))
+
+assert len(GROUPS) == 2

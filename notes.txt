@@ -698,11 +698,11 @@ next {
         deep_spread is good. It's staying
     2022_m12_d14@14_58_06_max_epoch
         differences are insignificant. one more exp, comparing 4000 vs 9000
+    evalDecoder now controls the z-score of z instead of z itself
 }
 todo {
     Try stop_grad w/ xj method, because SimSiam. 
     try remove z loss (after trying SimSiam!!!)
-    evalDecoder should control z-score of z instead of z
     try bigger train set size
     integrate GusMethod into symm system
         also: make twobody use 6D GusMethod

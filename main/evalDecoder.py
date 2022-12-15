@@ -14,6 +14,7 @@ from PIL import ImageTk
 from PIL.Image import Resampling
 
 from shared import torch2PIL
+from load_dataset import Dataset
 from vae import VAE
 from template_bounce import MyExpGroup
 
@@ -30,8 +31,10 @@ IMG_SIZE = 300
 class UI:
     def __init__(
         self, groups: List[MyExpGroup], n_rand_inits, 
-        experiment_path, lock_epoch, 
+        experiment_path, lock_epoch, experiment, 
     ):
+        computeDist = self.ComputeDist(experiment)
+
         self.win = tk.Tk()
         self.win.title('Eval decoder')
 
@@ -45,6 +48,9 @@ class UI:
             [None] * self.n_col for _ in range(self.n_row)
         ]
         self.photos = [
+            [None] * self.n_col for _ in range(self.n_row)
+        ]
+        self.z_dists = [
             [None] * self.n_col for _ in range(self.n_row)
         ]
         self.max_latent_dim = 0
@@ -81,7 +87,15 @@ class UI:
                 )
                 self.photoLabels[row_i][col_i] = label
 
-        self.z = torch.zeros((
+                next(computeDist)
+                mean, std = computeDist.send(vae)
+                self.z_dists[row_i][col_i] = mean, std
+                print('z space: ', end='')
+                for i, sym in enumerate('xyz'):
+                    print(f'{sym}: mean {mean[i]:+.1f}, std {std[i]:.1f}', end='; ')
+                print()
+
+        self.z_z_score = torch.zeros((
             self.max_latent_dim, 
         ), dtype=torch.float, device=DEVICE)
         topLabel = tk.Label(self.win, text=variable_names.pop())
@@ -95,12 +109,27 @@ class UI:
 
         self.sliders: List[tk.Scale] = []
         self.initSliders()
+    
+    def ComputeDist(self, experiment):
+        dataset = Dataset(
+            experiment.VALIDATE_SET_PATH, 
+            experiment.VALIDATE_SET_SIZE, experiment.SEQ_LEN, 
+            experiment.ACTUAL_DIM, DEVICE, 
+        )
+        _shape = dataset.video_set.shape
+        image_set = dataset.video_set.view(
+            _shape[0] * _shape[1], _shape[2], _shape[3], _shape[4], 
+        )
+        while True:
+            vae: VAE = yield
+            Z, _ = vae.encode(image_set)
+            yield Z.mean(dim=0), Z.std(dim=0)
 
     def initSliders(self):
         for i in range(self.max_latent_dim):
             slider = tk.Scale(
                 self.win,
-                variable=tk.DoubleVar(value=self.z[i]),
+                variable=tk.DoubleVar(value=self.z_z_score[i]),
                 command=lambda value, index=i : (
                     self.onSliderUpdate(index, value)
                 ),
@@ -117,12 +146,14 @@ class UI:
 
     def onSliderUpdate(self, index, value):
         value = float(value)
-        self.z[index] = value
-        # print(self.z)
+        self.z_z_score[index] = value
+        # print(self.z_z_score)
         self.sliders[index].set(value)
         for row_i, vae_row in enumerate(self.vaes):
             for col_i, vae in enumerate(vae_row):
-                img = decode(vae, self.z)
+                mean, std = self.z_dists[row_i][col_i]
+                z = self.z_z_score * std + mean
+                img = decode(vae, z)
                 img = img.resize((
                     IMG_SIZE, IMG_SIZE, 
                 ), resample=Resampling.NEAREST)
@@ -135,13 +166,14 @@ def decode(vae: VAE, z: torch.Tensor):
     return torch2PIL(recon[0, :, :, :])
 
 def main(experiment_path, lock_epoch):
-    exp_name, n_rand_inits, groups, experiment = loadExperiment(path.join(
-        experiment_path, EXPERIMENT_PY_FILENAME, 
-    ))
-    groups: List[MyExpGroup]
-    print(f'{exp_name = }')
-    ui = UI(groups, n_rand_inits, experiment_path, lock_epoch)
-    ui.win.mainloop()
+    with torch.no_grad():
+        exp_name, n_rand_inits, groups, experiment = loadExperiment(path.join(
+            experiment_path, EXPERIMENT_PY_FILENAME, 
+        ))
+        groups: List[MyExpGroup]
+        print(f'{exp_name = }')
+        ui = UI(groups, n_rand_inits, experiment_path, lock_epoch, experiment)
+        ui.win.mainloop()
 
 if __name__ == '__main__':
-    main(EXPERIMENT_PATH, LOCK_EPOCH)
+    main(EXP_PATH, LOCK_EPOCH)

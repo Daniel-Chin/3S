@@ -705,7 +705,11 @@ next {
 todo {
     Try stop_grad w/ xj method, because SimSiam. 
     try remove z loss (after trying SimSiam!!!)
+    try remove img pred loss and vary whether detach encoder
+
     try bigger train set size
+    test smaller dataset
+    
     compare SAMPLE_TRANS vs COMPOSE_TRANS in two body. 
     try time aug, e.g. stretch (int / float ratio), reverse
     wrong symm: 11/4 notes
@@ -714,12 +718,8 @@ todo {
             K = 0 1 4
         exp_k
         exp_data_size
-    read 5 balls by zhang kun
-        after Friday
-    test smaller dataset
     test kld weight = 0
     try RNN ensemble
-    try remove img pred loss and vary whether detach encoder
     diffusion exp
         more cases. 4x4 matrix
         yihuajiemu half

@@ -86,7 +86,8 @@ GROUPS.append(MyExpGroup(hP))
 hP = template.copy()
 hP.symm = SymmetryAssumption(
     3, [
-        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
+        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
     ], 
 )
 hP.ready()

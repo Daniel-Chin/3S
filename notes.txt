@@ -694,9 +694,12 @@ next {
         at least we tried...
         thinking about it, initing nonzero kinda makes RNN want to collapse the z. 
     Cool! xj ablation exps are done. integrate into main training templates. 
+    2022_m12_d14@14_58_07_deep_spread
+        deep_spread is good. It's staying
+    2022_m12_d14@14_58_06_max_epoch
+        differences are insignificant. one more exp, comparing 4000 vs 9000
 }
 todo {
-    try deep_spread = False
     Try stop_grad w/ xj method, because SimSiam. 
     try remove z loss (after trying SimSiam!!!)
     evalDecoder should control z-score of z instead of z

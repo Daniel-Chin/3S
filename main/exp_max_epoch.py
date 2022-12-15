@@ -11,7 +11,7 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 
 EXP_NAME = 'max_epoch'
-N_RAND_INITS = 4
+N_RAND_INITS = 12
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -75,7 +75,7 @@ template.sched_sampling = LinearScheduledSampling(4000)
 template.max_epoch = template.sched_sampling.duration
 template.ready()
 
-for me in [4000, 5000, 7000, 9000]:
+for me in [4000, 9000]:
     hP = template.copy()
     hP.max_epoch = me
     hP.sched_sampling = LinearScheduledSampling(me)

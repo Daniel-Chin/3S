@@ -79,7 +79,7 @@ template.ready()
 # modifying template
 # template.xxx = xxx
 
-for w in np.exp(np.linspace(np.log(3.84e-3), 0, 24)):
+for w in np.exp(np.linspace(np.log(3.84e-3), np.log(2.087e-2), 24)):
     hP = template.copy()
     hP.lossWeightTree['predict']['z'].weight = w
     hP.ready()

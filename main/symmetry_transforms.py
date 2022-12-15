@@ -184,14 +184,14 @@ class GusMethod(SymmetryAssumption):
         self.latent_dim = 3
         self.t = SymmetryAssumption(
             3, [
-                ([Translate(2, 1)], {Slice(0, 2)}), 
-                ([Trivial()], {Slice(2, 3)}), 
+                (COMPOSE_TRANS, [Translate(2, 1)], {Slice(0, 2)}), 
+                (COMPOSE_TRANS, [Trivial()], {Slice(2, 3)}), 
             ], 
         )
         self.r = SymmetryAssumption(
             3, [
-                ([Rotate(2)], {Slice(0, 2)}), 
-                ([Trivial()], {Slice(2, 3)}), 
+                (COMPOSE_TRANS, [Rotate(2)], {Slice(0, 2)}), 
+                (COMPOSE_TRANS, [Trivial()], {Slice(2, 3)}), 
             ], 
         )
     

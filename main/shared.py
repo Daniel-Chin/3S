@@ -53,7 +53,9 @@ class HyperParams(BaseHyperParams):
 
         self.rnn_width: int = None
         self.residual: Optional[float] = None
-        self.jepa_stop_grad_encoder: bool = None
+        self.jepa_stop_grad_l_encoder: bool = None
+        self.jepa_stop_grad_r_encoder: bool = None
+        # "l"eft, "r"ight refers to Fig.1 of SimSiam (Chen & He, 2020).  
         self.dropout: float = None
         self.vae_channels: List[int] = None
         self.deep_spread: bool = None
@@ -89,6 +91,11 @@ class HyperParams(BaseHyperParams):
         '''
         if self.jepa_stop_grad_encoder is None:
             self.jepa_stop_grad_encoder = False
+        if self.jepa_stop_grad_l_encoder is None:
+            self.jepa_stop_grad_l_encoder = self.jepa_stop_grad_encoder
+        if self.jepa_stop_grad_r_encoder is None:
+            self.jepa_stop_grad_r_encoder = self.jepa_stop_grad_encoder
+        del self.jepa_stop_grad_encoder
         if self.supervise_vae_only_xy is None:
             self.supervise_vae_only_xy = False
         if self.energy_noise_std is None:
@@ -101,8 +108,6 @@ class HyperParams(BaseHyperParams):
             self.vae_kernel_size = 3
         if self.lr_diminish is None:
             self.lr_diminish = None
-        if self.teacher_forcing_duration is None:
-            self.sched_sampling = None
         if isinstance(self.teacher_forcing_duration, int):
             self.sched_sampling = LinearScheduledSampling(self.teacher_forcing_duration)
         if 'symm_self_consistency' not in self.lossWeightTree:

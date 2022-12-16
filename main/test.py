@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_ablate_xj.py
+exp_simsiam.py
 '''.strip()
 # op = input('Which exp? ')
 

@@ -120,7 +120,7 @@ def forward(
             hParams.lossWeightTree['predict']['z'].weight != 0
             or hParams.supervise_rnn
         ):
-            if hParams.jepa_stop_grad_encoder:
+            if hParams.jepa_stop_grad_l_encoder:
                 flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
                     predRnn, z_transed.detach(), untrans, 
                     batch_size, experiment, hParams, epoch, batch_i, profiler, 
@@ -129,7 +129,7 @@ def forward(
                 batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
             )
             _z = z[:, min_context:, :]
-            if hParams.jepa_stop_grad_encoder:
+            if hParams.jepa_stop_grad_r_encoder:
                 _z = _z.detach()
             z_loss = F.mse_loss(z_hat_aug, _z)
             if hParams.supervise_rnn:

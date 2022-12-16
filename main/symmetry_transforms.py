@@ -210,8 +210,8 @@ class GusMethod(SymmetryAssumption):
 
 def test(size=100):
     symm = SymmetryAssumption(3, [
-        ([Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
-        ([Trivial()], {Slice(2, 3)}), 
+        (COMPOSE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        (COMPOSE_TRANS, [Trivial()], {Slice(2, 3)}), 
     ])
 
     points = torch.randn((size, 3))

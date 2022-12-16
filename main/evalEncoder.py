@@ -44,6 +44,7 @@ def main(experiment_path, lock_epoch):
     for group in groups:
         print(group.name())
         group.hyperParams.print(depth=1)
+        group.hyperParams.fillDefaults()
         for rand_init_i in range(n_rand_inits):
             print(f'{rand_init_i = }')
             epoch, models = loadLatestModels(experiment_path, group, rand_init_i, dict(

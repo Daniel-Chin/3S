@@ -56,6 +56,7 @@ class UI:
         self.max_latent_dim = 0
         variable_names = set()
         for col_i, group in enumerate(groups):
+            group.hyperParams.fillDefaults()
             self.max_latent_dim = max(
                 self.max_latent_dim, 
                 group.hyperParams.symm.latent_dim, 

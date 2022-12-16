@@ -1,5 +1,6 @@
 from os import path
 from typing import List
+from numbers import Number
 
 import torch
 from torchWork import loadExperiment, DEVICE
@@ -36,7 +37,9 @@ def main(experiment_path, lock_epoch):
     traj_set = dataset.label_set.view(
         _shape[0] * _shape[1], _shape[2], 
     )
-    X = range(len(groups))
+    X = [g.variable_value for g in groups]
+    if not all([isinstance(x, Number) for x in X]):
+        X = range(len(groups))
     Y = [[] for _ in range(n_rand_inits)]
     for group in groups:
         print(group.name())

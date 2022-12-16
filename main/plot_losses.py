@@ -36,7 +36,12 @@ fig = plotLosses(
     average_over=50, epoch_start=1000, 
     which_legend=0, linewidth=1, 
 )
-# fig.axes[-1].set_ylim(0, 1)
+
+# given dataset coord std ~= 1, mse should be in (0, 1). 
+# when z collapses, mse is unstable and can give 1e+34. 
+# so cap it to (0, 1) in the plot.
+assert fig.axes[-1].get_ylabel() == 'validate linear proj mse'
+fig.axes[-1].set_ylim(0, 1)
 
 plt.savefig(path.join(EXP_PATH, 'auto_plot_loss.pdf'))
 plt.show()

@@ -702,11 +702,29 @@ next {
     integrate GusMethod into symm system. 
         now we have SAMPLE_TRANS | COMPOSE_TRANS
 }
+12/16 {
+    2022_m12_d15@13_57_10_z_loss
+        there are spikes in linear porj mse. 
+            but not in training/validation losses. 
+            Why? probably z collapsed and lin proj gave unstable results. 
+        it looks like whether a run succeeds can be foretold at epoch 2000. 
+            The linear porj mse curves rarely cross over. 
+            self-recon also tells. 
+                (there are many lines of self-recon loss ~= 0.001 on top of one another)
+                predicting lin proj loss from self recon has 100% F1. 
+            bascially, you cannot recover from z collapse. 
+        z in (3.84e-3, 0.013) looks like a good place to test simsiam. 
+}
 todo {
+    can we early-stop via self-recon or linear proj mse? 
+        see 12/16 notes
+        observe other exps
+
     Try stop_grad w/ xj method, because SimSiam. 
     try remove z loss (after trying SimSiam!!!)
     try remove img pred loss and vary whether detach encoder
 
+    test grad clip
     try bigger train set size
     test smaller dataset
     

@@ -647,12 +647,15 @@ next {
 }
 12/9 {
     2022_m12_d08@14_16_32_ablate_xj_mse
+        #present_in_meeting
+        see /main/misc/bce_vs_mse.py
         so MSE is good to go! 
             this way, loss plots are easier to interprete.
             disen performance also increased. 
 }
 12/10 {
     2022_m12_d09@16_36_56_xj_rnn_width
+        #present_in_meeting
         rnn_width=32 is much better than 256. 
         This makes sense. 
         However, proving that our method works well with 256 is important, because IRL ppl  overparametrize. 
@@ -662,15 +665,17 @@ next {
 }
 12/11 {
     2022_m12_d10@14_42_11_xj_loss_w_refactor
+        #present_in_meeting
         scaled weights look best. 
             maybe because of floatpoint errors. 
     2022_m12_d10@14_44_28_xj_k
+        #present_in_meeting
         k=1 is better. 
 }
 12/12 {
     2022_m12_d11@16_30_27_xj_batch_size
         batch_size matters a lot. 128 is too large. 
-        This is weird. next exp: more groups. Then, as during meeting. 
+        This is weird. next exp: more groups. Then, ask during meeting. 
     2022_m12_d11@16_30_27_xj_lr_dim
         seems there's more to find here. 
         next exp: more lr. 
@@ -680,21 +685,26 @@ next {
         at first glance, smaller batch_size is better. 
         oh no, it's correlated with sched samp since XJ's sched samp looks at batch_i. 
     2022_m12_d12@14_31_16_xj_sched_samp
+        #present_in_meeting
         No significant diff. using linear sched samp. 
     lr scheduling
         further studying xj code reveals the LR sched actually does not kick in because of a bug. 
 }
 12/14 {
     2022_m12_d13@16_26_35_xj_batch_size
+        #present_in_meeting
         smaller batch size IS better. 
         Why? idk. 
         16 looks better than 32, but let's use 32 because it's faster. 
     2022_m12_d13@20_27_22_xj_neg_residual
+        #present_in_meeting
         init RNN around negative identity is much worse than near-0 init. 
         at least we tried...
         thinking about it, initing nonzero kinda makes RNN want to collapse the z. 
+            VAE would rather collapse for RNN than fixing RNN's prejudice. 
     Cool! xj ablation exps are done. integrate into main training templates. 
     2022_m12_d14@14_58_07_deep_spread
+        #present_in_meeting
         deep_spread is good. It's staying
     2022_m12_d14@14_58_06_max_epoch
         differences are insignificant. one more exp, comparing 4000 vs 9000
@@ -715,6 +725,7 @@ next {
             bascially, you cannot recover from z collapse. 
         z in (3.84e-3, 0.013) looks like a good place to test simsiam. 
     BTW 我才发现 QR decom 方法 sample 的随机旋转是允许翻折的。
+        i.e. it is O(2) instead of SO(2)
     tell Gus about NYU HPC
     2022_m12_d15@15_38_17_sanity_check_howCombine
         utterly strange. the SAMPLE_TRANS symm seems different from GusMethod. 
@@ -723,6 +734,21 @@ next {
         I have no choice but to believe the exp results lied to the eyes. Redo. 
 }
 todo {
+    控制 max_batch vary batch_size
+    test whether identity aug helps
+    2D exp
+        does symm allow over-param VAE? 
+        vary 2d hParam
+            - vae size
+            - symm vs w/o symm
+
+    test K=4 vs max_epoch *= 4
+        this is related to optim stepping. 
+        k=4: 
+            each step is an avg of same traj multi aug
+        max_epoch *= 4: 
+            each step is an avg of multi traj multi aug
+
     can we early-stop via train-set self-recon or train-set linear proj mse? 
         see 12/16 notes
         observe other exps

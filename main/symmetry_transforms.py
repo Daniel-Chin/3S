@@ -209,33 +209,54 @@ class GusMethod(SymmetryAssumption):
         return __class__()
 
 def test(size=100):
+    # symm = SymmetryAssumption(3, [
+    #     (COMPOSE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+    #     (COMPOSE_TRANS, [Trivial()], {Slice(2, 3)}), 
+    # ])
     symm = SymmetryAssumption(3, [
-        (COMPOSE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
-        (COMPOSE_TRANS, [Trivial()], {Slice(2, 3)}), 
+        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
     ])
+    # symm = GusMethod()
 
     points = torch.randn((size, 3))
-    trans, untrans = symm.sample()
-    poof = trans(points)
-    print('trans untrans', (points - untrans(poof)).norm(2))
-    print('altitude change', (points[:, 2] - poof[:, 2]).norm(2))
-    from matplotlib import pyplot as plt
-    from random import random
-    n_points = 10
     for _ in range(8):
-        theta = random() * 2 * np.pi
-        k = np.tan(theta)
-        b = (random() - .5) * 2
-        X = torch.linspace(-2, 2, n_points)
-        Y = k * X + b
-        points = torch.zeros((n_points, 3))
-        points[:, 0] = X
-        points[:, 1] = Y
+        trans, untrans = symm.sample()
         poof = trans(points)
-        plt.scatter(X, Y, c='b')
-        plt.scatter(poof[:, 0], poof[:, 1], c='r')
-        plt.axis('equal')
-        plt.show()
+        print('trans untrans', (points - untrans(poof)).norm(2))
+        print('altitude change', (points[:, 2] - poof[:, 2]).norm(2))
+        from matplotlib import pyplot as plt
+        from random import random
+        n_points = 10
+        for i in range(5):
+            # if True:
+            if i == 0:
+                N = 5
+                points = torch.zeros((N ** 2, 3))
+                for x in range(N):
+                    for y in range(N):
+                        pos = (x, y)
+                        for dim in range(2):
+                            points[x * N + y, dim] = pos[dim] - (N-1) / 2
+                
+                # pp = points
+            else:
+                theta = random() * 2 * np.pi
+                k = np.tan(theta)
+                b = (random() - .5) * 2
+                X = torch.linspace(-2, 2, n_points)
+                Y = k * X + b
+                points = torch.zeros((n_points, 3))
+                points[:, 0] = X
+                points[:, 1] = Y
+
+                # points = torch.cat([points, pp])
+
+            poof = trans(points)
+            plt.scatter(points[:, 0], points[:, 1], c='b')
+            plt.scatter(poof  [:, 0], poof  [:, 1], c='r')
+            plt.axis('equal')
+            plt.show()
 
 if __name__ == '__main__':
     test()

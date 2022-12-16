@@ -714,9 +714,16 @@ next {
                 predicting lin proj loss from self recon has 100% F1. 
             bascially, you cannot recover from z collapse. 
         z in (3.84e-3, 0.013) looks like a good place to test simsiam. 
+    BTW 我才发现 QR decom 方法 sample 的随机旋转是允许翻折的。
+    tell Gus about NYU HPC
+    2022_m12_d15@15_38_17_sanity_check_howCombine
+        utterly strange. the SAMPLE_TRANS symm seems different from GusMethod. 
+        Debugging yields no results. 
+        I can almost prove semantic equivalence. 
+        I have no choice but to believe the exp results lied to the eyes. Redo. 
 }
 todo {
-    can we early-stop via self-recon or linear proj mse? 
+    can we early-stop via train-set self-recon or train-set linear proj mse? 
         see 12/16 notes
         observe other exps
 

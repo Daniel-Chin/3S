@@ -11,7 +11,7 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 
 EXP_NAME = 'sanity_check_howCombine'
-N_RAND_INITS = 8
+N_RAND_INITS = 16
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:

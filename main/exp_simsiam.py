@@ -11,15 +11,18 @@ VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
 
-EXP_NAME = 'z_loss'
+EXP_NAME = 'simsiam'
 N_RAND_INITS = 1
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'z_loss_weight'
-        self.variable_value = hyperParams.lossWeightTree['predict']['z'].weight
+        self.variable_name = 'SimSiam,z_loss_weight'
+        self.variable_value = (
+            hyperParams.jepa_stop_grad_r_encoder, 
+            hyperParams.lossWeightTree['predict']['z'].weight, 
+        )
     
     @lru_cache(1)
     def name(self):
@@ -60,7 +63,8 @@ template.rnn_min_context = 5
 template.energy_noise_std = 1
 template.rnn_width = 32
 template.residual = False
-template.jepa_stop_grad_encoder = False
+template.jepa_stop_grad_l_encoder = False
+template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
 template.vae_channels = [64, 128, 256]
 template.deep_spread = True
@@ -79,8 +83,10 @@ template.ready()
 # modifying template
 # template.xxx = xxx
 
-for w in np.exp(np.linspace(np.log(3.84e-3), np.log(2.087e-2), 24)):
-    hP = template.copy()
-    hP.lossWeightTree['predict']['z'].weight = w
-    hP.ready()
-    GROUPS.append(MyExpGroup(hP))
+for do_stop in (False, True):
+    for w in np.exp(np.linspace(np.log(3.84e-3), np.log(1.3e-2), 12)):
+        hP = template.copy()
+        hP.lossWeightTree['predict']['z'].weight = w
+        hP.jepa_stop_grad_r_encoder = do_stop
+        hP.ready()
+        GROUPS.append(MyExpGroup(hP))

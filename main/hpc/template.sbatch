@@ -10,7 +10,6 @@
 #SBATCH --job-name={JOB_NAME}
 #SBATCH --output={OUT_FILENAME}.out
 #SBATCH --error={OUT_FILENAME}.err
-#SBATCH --partition=gr,gv,ga
 
 module purge
 source /scratch/$USER/py_env/masdar/select_images

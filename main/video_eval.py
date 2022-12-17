@@ -66,7 +66,9 @@ class VideoWriter:
                 raise EOFError(f'ffmpeg exited with {poll}')
             self.ffmpeg.stdin.write(img.tobytes())
         except (EOFError, BrokenPipeError):
+            print('\nBelow is the collected error stream. \n')
             self.ffmpeg.reportCollectedOutErr()
+            print('\nAbove is the collected error stream. \n')
             sys.stdout.flush()
             raise
 

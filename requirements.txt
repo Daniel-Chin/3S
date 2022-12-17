@@ -1,0 +1,17 @@
+- pyTorch
+  - We use pytorch 1.13.1 with cuda 11.6
+  - For latest, https://pytorch.org/get-started/
+
+```bash
+pip install -U numpy
+pip install -U scipy
+pip install -U tabulate
+pip install -U GitPython
+pip install -U matplotlib
+pip install -U opencv-python
+```
+
+- `torchWork` from https://github.com/Daniel-Chin/torchWork
+  - I didn't make it installable. Manually add the parent dir of `torchWork` to `$PYTHONPATH`. 
+- `python_lib` from https://github.com/daniel-chin/python_lib
+  - I didn't make it installable. Manually add the entire `python_lib` to `$PYTHONPATH`. 

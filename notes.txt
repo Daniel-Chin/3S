@@ -739,6 +739,7 @@ next {
 }
 todo {
     控制 max_batch vary batch_size
+        如果还是 小 batch 好， 那就很能说明问题。
     test whether identity aug helps
     2D exp
         does symm allow over-param VAE? 

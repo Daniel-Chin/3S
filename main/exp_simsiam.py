@@ -21,7 +21,10 @@ class MyExpGroup(ExperimentGroup):
         self.variable_name = 'SimSiam,z_loss_weight'
         self.variable_value = (
             hyperParams.jepa_stop_grad_r_encoder, 
-            hyperParams.lossWeightTree['predict']['z'].weight, 
+            format(
+                hyperParams.lossWeightTree['predict']['z'].weight, 
+                '.6f', 
+            )
         )
     
     @lru_cache(1)

@@ -76,7 +76,7 @@ template.optim_name = 'adam'
 template.lr_diminish = None
 template.train_set_size = 256
 template.image_loss = 'mse'
-template.sched_sampling = LinearScheduledSampling(4000)
+template.sched_sampling = LinearScheduledSampling(9000)
 template.max_epoch = template.sched_sampling.duration
 template.ready()
 

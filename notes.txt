@@ -733,6 +733,10 @@ next {
         I can almost prove semantic equivalence. 
         I have no choice but to believe the exp results lied to the eyes. Redo. 
 }
+12/18 {
+    2022_m12_d18@01_37_34_max_epoch
+        9000 epochs is better than 4000.
+}
 todo {
     控制 max_batch vary batch_size
     test whether identity aug helps

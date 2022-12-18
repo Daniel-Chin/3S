@@ -12,4 +12,4 @@
 #SBATCH --error={OUT_FILENAME}.err
 
 module purge
-singularity exec --overlay /scratch/$USER/py_env/masdar/$OVERLAY:ro /scratch/work/public/singularity/$SINGULARITY /bin/bash -c 'source /ext3/env.sh; PATH=$HOME/ffmpeg_4.2.2-1ubuntu1_amd64/usr/bin:$PATH; cd ..; python loss_meta.py; python main.py {ARGS}'
+singularity exec --nv --overlay /scratch/$USER/py_env/masdar/$OVERLAY:ro /scratch/work/public/singularity/$SINGULARITY /bin/bash -c 'source /ext3/env.sh; PATH=$HOME/ffmpeg_4.2.2-1ubuntu1_amd64/usr/bin:$PATH; cd ..; python loss_meta.py; python main.py {ARGS}'

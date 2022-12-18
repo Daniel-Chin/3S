@@ -79,7 +79,6 @@ template.train_set_size = 128
 template.image_loss = 'mse'
 template.sched_sampling = LinearScheduledSampling(9000)
 template.max_epoch = template.sched_sampling.duration
-template.ready()
 
 # modifying template
 # template.xxx = xxx

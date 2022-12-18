@@ -87,7 +87,7 @@ ours = template.copy()
 baseline = template.copy()
 baseline.symm = SymmetryAssumption(
     3, [
-        ([Trivial()], {Slice(0, 3)}), 
+        (COMPOSE_TRANS, [Trivial()], {Slice(0, 3)}), 
     ], 
 )
 

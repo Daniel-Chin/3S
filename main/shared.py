@@ -89,7 +89,10 @@ class HyperParams(BaseHyperParams):
         checking out old commits.  
         The default values should guarantee old behaviors.  
         '''
-        if self.jepa_stop_grad_encoder is None:
+        try:
+            if self.jepa_stop_grad_encoder is None:
+                raise AttributeError
+        except AttributeError:
             self.jepa_stop_grad_encoder = False
         if self.jepa_stop_grad_l_encoder is None:
             self.jepa_stop_grad_l_encoder = self.jepa_stop_grad_encoder

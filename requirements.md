@@ -26,4 +26,4 @@ pip install -U opencv-python
     - Download the `.deb` file. Use `dpkg -x` to extract the standalone. 
   - Then, make sure the full version is found before the conda version. 
     - Place the standalone full ffmpeg in `$PATH` before everything else. 
-      - I recommend doing this in the sbatch script. 
+      - e.g., if you are using Singularity, alter /ext3/env.sh to prepend $PATH with the ffmpeg dir. 

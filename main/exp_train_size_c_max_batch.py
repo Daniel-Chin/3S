@@ -10,7 +10,7 @@ VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
 
-EXP_NAME = 'train_size'
+EXP_NAME = 'train_size_c_max_batch'
 N_RAND_INITS = 30
 
 class MyExpGroup(ExperimentGroup):
@@ -97,5 +97,8 @@ for x in (ours, baseline):
         hP.symm = x.symm
         hP.train_set_size = s
         hP.batch_size = min(32, hP.train_set_size)
+        hP.max_epoch = 1152000 // s
+        hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
+        assert hP.max_epoch * s == 128 * 9000
         hP.ready()
         GROUPS.append(MyExpGroup(hP))

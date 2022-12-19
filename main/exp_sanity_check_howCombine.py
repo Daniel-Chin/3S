@@ -11,7 +11,7 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 
 EXP_NAME = 'sanity_check_howCombine'
-N_RAND_INITS = 16
+N_RAND_INITS = 30
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -48,7 +48,12 @@ template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('symm_self_consistency', 0, None), 
 ])
 template.lr = 0.001
-template.symm = None
+template.symm = SymmetryAssumption(
+    3, [
+        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
+    ], 
+)
 template.supervise_rnn = False
 template.supervise_vae = False
 template.supervise_vae_only_xy = False
@@ -59,21 +64,21 @@ template.rnn_min_context = 5
 template.energy_noise_std = 1
 template.rnn_width = 32
 template.residual = False
-template.jepa_stop_grad_encoder = False
+template.jepa_stop_grad_l_encoder = False
+template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
 template.vae_channels = [64, 128, 256]
 template.deep_spread = True
 template.relu_leak = False
 template.vae_kernel_size = 4
-template.batch_size = 32
+template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
 template.lr_diminish = None
 template.train_set_size = 128
 template.image_loss = 'mse'
-template.sched_sampling = LinearScheduledSampling(4000)
+template.sched_sampling = LinearScheduledSampling(9000)
 template.max_epoch = template.sched_sampling.duration
-template.ready()
 
 # modifying template
 # template.xxx = xxx

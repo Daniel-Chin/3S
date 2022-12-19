@@ -742,6 +742,13 @@ next {
         training size 256 looks best. 
         However, no symm >> symm in terms of linearity! 
         bigger experiment. 
+    2022_m12_d18@14_04_50_simsiam
+        with simsiam, 
+            lin proj is super high, 
+            z pred loss is super high. 
+                most 1e+2 ~ 1e+9
+        Who knows?
+        Ask during meeting. 
 }
 todo {
     控制 max_batch vary batch_size

@@ -65,6 +65,8 @@ def main(experiment_path, lock_epoch):
     plt.ylabel('Linear projection MSE (↓)')
     plt.xlabel(group.variable_name)
     plt.xticks(X, [g.variable_value for g in groups])
+    print()
+    print(*[g.variable_value for g in groups], sep='\n')
     plt.suptitle(exp_name)
     plt.savefig(path.join(experiment_path, 'auto_eval_encoder.pdf'))
     plt.show()

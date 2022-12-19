@@ -11,7 +11,7 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 
 EXP_NAME = 'train_size'
-N_RAND_INITS = 6
+N_RAND_INITS = 30
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -74,7 +74,7 @@ template.optim_name = 'adam'
 template.lr_diminish = None
 template.train_set_size = 128
 template.image_loss = 'mse'
-template.sched_sampling = LinearScheduledSampling(4000)
+template.sched_sampling = LinearScheduledSampling(9000)
 template.max_epoch = template.sched_sampling.duration
 template.ready()
 

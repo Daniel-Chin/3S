@@ -22,7 +22,7 @@ class USING_METRIC:
 #     suptitle = '\n(height locked)'
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m10_d29@14_11_09_dataset_size
+2022_m12_d18@01_37_42_train_size
 '''.strip())
 LOCK_EPOCH = None
 
@@ -73,6 +73,8 @@ def main(experiment_path, lock_epoch):
         ax.boxplot(Ys)
         ax.set_xticks(X)
         ax.set_xticklabels(['symm', 'no symm'])
+        assert 'no'  in groups[col_i    ].variable_value
+        assert 'yes' in groups[col_i + 5].variable_value
         ax.set_xlim(.8, 2.2)
         ax.set_title(f'|train set| = {groups[col_i].hyperParams.train_set_size}')
     axes[0].set_ylabel('MSE')

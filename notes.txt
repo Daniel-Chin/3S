@@ -737,6 +737,12 @@ next {
     2022_m12_d18@01_37_34_max_epoch
         9000 epochs is better than 4000.
 }
+12/19 {
+    2022_m12_d18@01_37_42_train_size
+        training size 256 looks best. 
+        However, no symm >> symm in terms of linearity! 
+        bigger experiment. 
+}
 todo {
     控制 max_batch vary batch_size
         如果还是 小 batch 好， 那就很能说明问题。

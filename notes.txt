@@ -749,6 +749,12 @@ next {
                 most 1e+2 ~ 1e+9
         Who knows?
         Ask during meeting. 
+    2022_m12_d18@14_17_37_batch_size_c_max_batch
+        smaller batch is better. 16 is good. 
+        this is very, very intriguing. 
+            my loss does not scale w/ batch_size. 
+            max_batch_num is held constant. 
+            The only explanation I can think of is: stochasticity helps. 
 }
 todo {
     控制 max_batch vary batch_size

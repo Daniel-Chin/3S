@@ -10,15 +10,18 @@ VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
 
-EXP_NAME = 'batch_size_c_max_batch'
-N_RAND_INITS = 6
+EXP_NAME = 'over_param_vae'
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'batch_size'
-        self.variable_value = hyperParams.batch_size
+        self.variable_name = 'symm,vae_channels'
+        self.variable_value = (
+            'yes' if hyperParams.symm is ours.symm else 'no', 
+            hyperParams.vae_channels, 
+        )
     
     @lru_cache(1)
     def name(self):
@@ -67,26 +70,38 @@ template.residual = False
 template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
-template.vae_channels = [64, 128, 256]
+template.vae_channels = None
 template.deep_spread = True
 template.relu_leak = False
 template.vae_kernel_size = 4
-template.batch_size = None
+template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
 template.lr_diminish = None
 template.train_set_size = 128
 template.image_loss = 'mse'
-template.sched_sampling = None
-template.max_epoch = None
+template.sched_sampling = LinearScheduledSampling(9000)
+template.max_epoch = template.sched_sampling.duration
 
-# modifying template
-# template.xxx = xxx
+ours = template.copy()
 
-for bs in (16, 32, 64, 128):
-    hP = template.copy()
-    hP.batch_size = bs
-    hP.max_epoch = 250 * bs
-    hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
-    hP.ready()
-    GROUPS.append(MyExpGroup(hP))
+baseline = template.copy()
+baseline.symm = SymmetryAssumption(
+    3, [
+        (COMPOSE_TRANS, [Trivial()], {Slice(0, 3)}), 
+    ], 
+)
+
+for x in (ours, baseline):
+    for vc in (
+        [128, 256, 512], 
+        [64, 128, 256], 
+        [32, 64, 128], 
+        [16, 32, 64], 
+        [16, 16, 32], 
+    ):
+        hP = template.copy()
+        hP.symm = x.symm
+        hP.vae_channels = vc
+        hP.ready()
+        GROUPS.append(MyExpGroup(hP))

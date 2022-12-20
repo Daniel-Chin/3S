@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_simsiam.py
+exp_over_param_vae.py
 '''.strip()
 # op = input('Which exp? ')
 

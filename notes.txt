@@ -756,6 +756,10 @@ next {
             max_batch_num is held constant. 
             The only explanation I can think of is: stochasticity helps. 
 }
+12/20 {
+    2022_m12_d19@01_23_45_ablate_z_loss
+        z pred loss helps!
+}
 todo {
     test whether identity aug helps
     2D exp

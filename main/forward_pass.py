@@ -149,9 +149,16 @@ def forward(
         require_all_tasks
         or hParams.lossWeightTree['symm_self_consistency'].weight != 0
     ):
-        assert not hParams.jepa_stop_grad_encoder
-        # As long as we are replicating Will's results, 
-        # stopping grad would make VAE truly untouched. 
+        assert not (
+            hParams.jepa_stop_grad_l_encoder or 
+            hParams.jepa_stop_grad_r_encoder
+            # As long as we are replicating Will's results, 
+            # stopping grad would make VAE truly untouched. 
+            # 
+            # Just generally, it is not clear how 
+            # `symm_self_consistency` should interact with
+            # `jepa_stop_grad...`. So, unimplemented for now. 
+        )
         flat_z_hat, r_flat_z_hat, log_var = rnnForward(
             predRnn, z, identity, 
             batch_size, experiment, hParams, epoch, batch_i, profiler, 

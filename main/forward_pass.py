@@ -19,6 +19,7 @@ def forward(
     vae: VAE, predRnn: PredRNN, energyRnn: EnergyRNN, 
     profiler: torchWork.Profiler, 
     require_img_predictions_and_z_hat: bool = True, 
+    require_all_tasks: bool = False, 
 ):
     SEQ_LEN = experiment.SEQ_LEN
     batch_size = video_batch.shape[0]
@@ -91,6 +92,7 @@ def forward(
         # predict image
         if (
             require_img_predictions_and_z_hat
+            or require_all_tasks 
             or hParams.lossWeightTree['predict']['image'].weight != 0
         ):
             flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
@@ -117,7 +119,8 @@ def forward(
 
         # predict z
         if (
-            hParams.lossWeightTree['predict']['z'].weight != 0
+            require_all_tasks 
+            or hParams.lossWeightTree['predict']['z'].weight != 0
             or hParams.supervise_rnn
         ):
             if hParams.jepa_stop_grad_l_encoder:
@@ -143,7 +146,8 @@ def forward(
 
     # symm_self_consistency
     if (
-        hParams.lossWeightTree['symm_self_consistency'].weight != 0
+        require_all_tasks
+        or hParams.lossWeightTree['symm_self_consistency'].weight != 0
     ):
         assert not hParams.jepa_stop_grad_encoder
         # As long as we are replicating Will's results, 
@@ -158,7 +162,8 @@ def forward(
 
     # seq energy
     if (
-        hParams.lossWeightTree['seq_energy'].weight != 0
+        require_all_tasks 
+        or hParams.lossWeightTree['seq_energy'].weight != 0
     ):
         RATIO = 64
         noise = torch.randn((

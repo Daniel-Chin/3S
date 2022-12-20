@@ -85,7 +85,7 @@ def videoEval(
         z, z_hat, extra_logs, 
     ) = forward(
         epoch, 0, experiment, hParams, video_batch, traj_batch, 
-        vae, predRnn, energyRnn, profiler, True, 
+        vae, predRnn, energyRnn, profiler, True, False, 
     )
     filename = path.join(
         save_path, f'visualize_{set_name}_epoch_{epoch}.mp4', 

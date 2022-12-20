@@ -66,7 +66,8 @@ def oneEpoch(
             ) = forward(
                 epoch, batch_i, experiment, hParams, 
                 video_batch, traj_batch, 
-                vae, predRnn, energyRnn, profiler, False, 
+                vae, predRnn, energyRnn, profiler, 
+                False, False, 
             )
         with profiler('sum loss'):
             total_loss = lossTree.sum(
@@ -114,7 +115,8 @@ def oneEpoch(
                 ) = forward(
                     epoch, 0, experiment, hParams, 
                     video_batch, traj_batch, 
-                    vae, predRnn, energyRnn, profiler, False, 
+                    vae, predRnn, energyRnn, profiler, 
+                    False, True, 
                 )
             with profiler('log losses'):
                 lossLogger.eat(

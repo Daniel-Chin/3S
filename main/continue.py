@@ -13,7 +13,7 @@ from one_epoch import oneEpoch
 from vae import VAE
 from rnn import PredRNN, EnergyRNN
 
-EXP_DIR = '2022_m12_d19@07_43_55_sanity_check_howCombine'
+EXP_DIR = '2022_m12_d20@01_35_36_over_param_vae'
 
 def continueTrain():
     exp_py_path = path.join(

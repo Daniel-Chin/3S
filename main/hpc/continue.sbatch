@@ -7,9 +7,9 @@
 #SBATCH --time=150:00:00
 #SBATCH --mem=5GB
 #SBATCH --gres=gpu:1
-#SBATCH --job-name=cont_%j_%x
-#SBATCH --output=continue.out
-#SBATCH --error=continue.err
+#SBATCH --job-name=continue
+#SBATCH --output=cont_%j.out
+#SBATCH --error=cont_%j.err
 
 module purge
 source /scratch/$USER/py_env/symmEnv/select_images

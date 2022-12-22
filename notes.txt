@@ -766,6 +766,9 @@ next {
         Look at losses. the validation pred loss is lower for low K long epoch. 
             models generalize better if non-augmentation variation is swept through at higher frequency. 
         next exp: larger
+    2022_m12_d19@07_43_55_sanity_check_howCombine
+        thank god... sanity check passed. no significant diff between groups. 
+        this again shows the heavy-tail nature of DL distributions. Careful with drawing conclusions. 
 }
 todo {
     test whether identity aug helps
@@ -785,6 +788,7 @@ todo {
     can we early-stop via train-set self-recon or train-set linear proj mse? 
         see 12/16 notes
         observe other exps
+        plot final lin proj against epoch2000 self recon for 2022_m12_d19@07_43_55_sanity_check_howCombine
 
     Try stop_grad w/ xj method, because SimSiam. 
     try remove z loss (after trying SimSiam!!!)
@@ -813,4 +817,7 @@ archive {
 }
 if {
     if weights still Inf, add weight decay. 
+}
+known issues {
+    if continue train, then epochs will duplicate in loss plots. Behavior: loss plots show max_epoch larger than the real max_epoch. 
 }

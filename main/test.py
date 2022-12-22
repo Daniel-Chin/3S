@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_over_param_vae.py
+exp_identity_aug.py
 '''.strip()
 # op = input('Which exp? ')
 

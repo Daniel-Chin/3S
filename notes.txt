@@ -763,6 +763,8 @@ next {
 12/22 {
     2022_m12_d20@06_22_06_k_vs_epoch
         so interesting. looks like nontrivial results, but inconclusive. 
+        Look at losses. the validation pred loss is lower for low K long epoch. 
+            models generalize better if non-augmentation variation is swept through at higher frequency. 
         next exp: larger
 }
 todo {

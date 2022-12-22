@@ -760,6 +760,11 @@ next {
     2022_m12_d19@01_23_45_ablate_z_loss
         z pred loss helps!
 }
+12/22 {
+    2022_m12_d20@06_22_06_k_vs_epoch
+        so interesting. looks like nontrivial results, but inconclusive. 
+        next exp: larger
+}
 todo {
     test whether identity aug helps
     2D exp

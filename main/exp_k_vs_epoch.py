@@ -11,7 +11,7 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 
 EXP_NAME = 'k_vs_epoch'
-N_RAND_INITS = 8
+N_RAND_INITS = 30
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -84,7 +84,7 @@ template.K = None
 # modifying template
 # template.xxx = xxx
 
-for i in range(7):
+for i in range(3):
     ratio = 2 ** i
     hP = template.copy()
     hP.K = ratio

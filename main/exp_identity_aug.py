@@ -84,10 +84,6 @@ template.max_epoch = template.sched_sampling.duration
 # template.xxx = xxx
 
 hP = template.copy()
-hP.ready()
-GROUPS.append(MyExpGroup(hP))
-
-hP = template.copy()
 hP.symm = SymmetryAssumption(
     3, [
         (SAMPLE_TRANS, [Trivial(), Translate(2, 1), Rotate(2), Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
@@ -96,6 +92,10 @@ hP.symm = SymmetryAssumption(
 )
 hP.ready()
 hasI = hP
+GROUPS.append(MyExpGroup(hasI))
+
+hP = template.copy()
+hP.ready()
 GROUPS.append(MyExpGroup(hP))
 
 assert len(GROUPS) == 2

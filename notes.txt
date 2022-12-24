@@ -782,6 +782,13 @@ next {
             one-tail p = 0.201769302, not assuming equal variance. 
         this again shows the heavy-tail nature of DL distributions. Careful with drawing conclusions. 
 }
+12/24 {
+    2022_m12_d20@01_35_36_over_param_vae
+        symm doesn't work. 
+    2022_m12_d22@15_26_25_identity_aug
+        no significant diff.
+        two-tail unequal var t test = 0.771731383
+}
 todo {
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
     test whether identity aug helps

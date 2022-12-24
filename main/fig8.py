@@ -22,7 +22,7 @@ class USING_METRIC:
 #     suptitle = '\n(height locked)'
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m12_d18@01_37_42_train_size
+2022_m12_d20@01_35_36_over_param_vae
 '''.strip())
 LOCK_EPOCH = None
 
@@ -72,11 +72,12 @@ def main(experiment_path, lock_epoch):
         #     )
         ax.boxplot(Ys)
         ax.set_xticks(X)
-        ax.set_xticklabels(['symm', 'no symm'])
-        assert 'no'  in groups[col_i    ].variable_value
-        assert 'yes' in groups[col_i + 5].variable_value
+        ax.set_xticklabels(['no symm', 'symm'])
+        assert 'yes' in groups[col_i    ].variable_value
+        assert 'no'  in groups[col_i + 5].variable_value
         ax.set_xlim(.8, 2.2)
-        ax.set_title(f'|train set| = {groups[col_i].hyperParams.train_set_size}')
+        # ax.set_title(f'|train set| = {groups[col_i].hyperParams.train_set_size}')
+        ax.set_title(f'vae channels = \n{groups[col_i].hyperParams.vae_channels}')
     axes[0].set_ylabel('MSE')
     plt.suptitle('Linear projection MSE (↓)' 
         + USING_METRIC.suptitle

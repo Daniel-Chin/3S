@@ -728,7 +728,9 @@ next {
         i.e. it is O(2) instead of SO(2)
     tell Gus about NYU HPC
     2022_m12_d15@15_38_17_sanity_check_howCombine
+        #present_in_meeting
         utterly strange. the SAMPLE_TRANS symm seems different from GusMethod. 
+            one-tail p = 0.052730656, not assuming equal variance. 
         Debugging yields no results. 
         I can almost prove semantic equivalence. 
         I have no choice but to believe the exp results lied to the eyes. Redo. 
@@ -743,6 +745,8 @@ next {
         However, no symm >> symm in terms of linearity! 
         bigger experiment. 
     2022_m12_d18@14_04_50_simsiam
+        #present_in_meeting
+        https://arxiv.org/pdf/2011.10566.pdf
         with simsiam, 
             lin proj is super high, 
             z pred loss is super high. 
@@ -750,6 +754,7 @@ next {
         Who knows?
         Ask during meeting. 
     2022_m12_d18@14_17_37_batch_size_c_max_batch
+        #present_in_meeting
         smaller batch is better. 16 is good. 
         this is very, very intriguing. 
             my loss does not scale w/ batch_size. 
@@ -758,19 +763,27 @@ next {
 }
 12/20 {
     2022_m12_d19@01_23_45_ablate_z_loss
+        #present_in_meeting
         z pred loss helps!
 }
 12/22 {
     2022_m12_d20@06_22_06_k_vs_epoch
+        #present_in_meeting
         so interesting. looks like nontrivial results, but inconclusive. 
         Look at losses. the validation pred loss is lower for low K long epoch. 
             models generalize better if non-augmentation variation is swept through at higher frequency. 
         next exp: larger
+        todo:
+            actually keep stepping mechanics the same
+            一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
     2022_m12_d19@07_43_55_sanity_check_howCombine
+        #present_in_meeting
         thank god... sanity check passed. no significant diff between groups. 
+            one-tail p = 0.201769302, not assuming equal variance. 
         this again shows the heavy-tail nature of DL distributions. Careful with drawing conclusions. 
 }
 todo {
+    一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
     test whether identity aug helps
     2D exp
         does symm allow over-param VAE? 

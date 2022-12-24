@@ -9,14 +9,18 @@ def main():
     print('Make sure working tree is clean!!!')
     print('(Enter empty string to begin.)')
     exps = []
-    while True:
-        op = input('exp_dir_name = ').lstrip('#').strip(' /\\\n')
-        if op == '':
-            break
-        if path.isdir(op):
-            exps.append(op)
-        else:
-            print('Not a dir. ')
+    do_continue = True
+    while do_continue:
+        do_continue = False
+        for op in input('exp_dir_name = ').split('\n'):
+            op = op.lstrip('#').strip(' /\\\n')
+            if op == '':
+                continue
+            do_continue = True
+            if path.isdir(op):
+                exps.append(op)
+            else:
+                print('Not a dir. ')
     print('start...')
     if exps:
         for exp in exps:

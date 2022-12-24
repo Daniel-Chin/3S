@@ -57,18 +57,22 @@ def main(experiment_path, lock_epoch):
                 mse = projectionMSE(Z, traj_set)
             Y[rand_init_i].append(mse)
     print('data:')
+    data = [[] for _ in Y[0]]
     for Y_i in Y:
         plt.plot(
             X, Y_i, linestyle='none', 
             markerfacecolor='none', markeredgecolor='k', 
             marker='o', markersize=10, 
         )
-        for y in Y_i:
-            print(y.item())
+        for i, y in enumerate(Y_i):
+            data[i].append(y.item())
+    for d in data:
+        print(*d, sep='\n')
+        print()
     plt.ylabel('Linear projection MSE (↓)')
     plt.xlabel(group.variable_name)
     plt.xticks(X, [g.variable_value for g in groups])
-    print()
+    plt.ylim(0, 1)
     print(*[g.variable_value for g in groups], sep='\n')
     plt.suptitle(exp_name)
     plt.savefig(path.join(experiment_path, 'auto_eval_encoder.pdf'))

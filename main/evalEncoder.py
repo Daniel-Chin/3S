@@ -40,7 +40,7 @@ def main(experiment_path, lock_epoch):
     X = [g.variable_value for g in groups]
     if not all([isinstance(x, Number) for x in X]):
         X = range(len(groups))
-    Y = [[] for _ in range(n_rand_inits)]
+    Y: List[List[torch.Tensor]] = [[] for _ in range(n_rand_inits)]
     for group in groups:
         print(group.name())
         group.hyperParams.print(depth=1)
@@ -56,12 +56,15 @@ def main(experiment_path, lock_epoch):
                 Z, _ = vae.encode(image_set)
                 mse = projectionMSE(Z, traj_set)
             Y[rand_init_i].append(mse)
+    print('data:')
     for Y_i in Y:
         plt.plot(
             X, Y_i, linestyle='none', 
             markerfacecolor='none', markeredgecolor='k', 
             marker='o', markersize=10, 
         )
+        for y in Y_i:
+            print(y.item())
     plt.ylabel('Linear projection MSE (↓)')
     plt.xlabel(group.variable_name)
     plt.xticks(X, [g.variable_value for g in groups])

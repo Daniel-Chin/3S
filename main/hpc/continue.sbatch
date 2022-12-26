@@ -5,7 +5,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=150:00:00
-#SBATCH --mem=5GB
+#SBATCH --mem=4GB
 #SBATCH --gres=gpu:1
 #SBATCH --job-name=continue
 #SBATCH --output=cont_%j.out

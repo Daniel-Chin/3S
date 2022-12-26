@@ -1,3 +1,3 @@
-#!bin/bash
+#!/bin/bash
 
 srun --time=1:00:00 --pty python3 ship.py

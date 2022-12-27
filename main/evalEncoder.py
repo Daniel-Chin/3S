@@ -66,7 +66,8 @@ def main(experiment_path, lock_epoch):
         )
         for i, y in enumerate(Y_i):
             data[i].append(y.item())
-    for d in data:
+    for d, g in zip(data, groups):
+        print(g.variable_value)
         print(*d, sep='\n')
         print()
     plt.ylabel('Linear projection MSE (↓)')

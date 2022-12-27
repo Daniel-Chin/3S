@@ -83,7 +83,7 @@ template.max_epoch = template.sched_sampling.duration
 # template.xxx = xxx
 
 hP = template.copy()
-hP.ready()
+hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 
 assert len(GROUPS) == 1

@@ -12,7 +12,7 @@ __all__ = [
     'SigmoidScheduledSampling', 
 ]
 
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Dict
 from contextlib import contextmanager
 from abc import ABCMeta, abstractmethod
 
@@ -82,6 +82,8 @@ class HyperParams(BaseHyperParams):
         ] = None
         self.n_batches_per_epoch: int = None
 
+        self.experiment_globals: Dict = None
+
     def fillDefaults(self):
         '''
         This is necessary when we want to load old 
@@ -121,7 +123,8 @@ class HyperParams(BaseHyperParams):
                 LossWeightTree('fake', 0, None), 
             ])
     
-    def ready(self):
+    def ready(self, experiment_globals):
+        self.experiment_globals = experiment_globals
         assert self.lr_diminish is None # See below comments
         # The current implementation of lr_diminish is via loss scaling. 
         # In Adam, that is not equivalent to lr scaling. Use pytorch's lr sched instead. 
@@ -157,12 +160,15 @@ class HyperParams(BaseHyperParams):
     @contextmanager
     def eval(self):
         # enter eval mode
-        saved = self.sched_sampling
+        saved_sched_sampling = self.sched_sampling
         self.sched_sampling = None
+        saved_batch_size = self.batch_size
+        self.batch_size = self.experiment_globals['VALIDATE_SET_SIZE']
         try:
             yield
         finally:
-            self.sched_sampling = saved
+            self.sched_sampling = saved_sched_sampling
+            self.batch_size = saved_batch_size
 
 def torch2np(torchImg: torch.Tensor) -> np.ndarray:
     return (

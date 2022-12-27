@@ -10,15 +10,17 @@ VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
 
-EXP_NAME = ...
-N_RAND_INITS = ...
+EXP_NAME = 'four_shots'
+N_RAND_INITS = 16
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.WHAT
+        self.variable_name = 'symm'
+        self.variable_value = (
+            'yes' if hyperParams.symm is ours.symm else 'no'
+        )
     
     @lru_cache(1)
     def name(self):
@@ -75,17 +77,26 @@ template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
 template.lr_diminish = None
-template.train_set_size = 64
+template.train_set_size = None
 template.image_loss = 'mse'
 template.sched_sampling = LinearScheduledSampling(9000)
 template.max_epoch = template.sched_sampling.duration
 
 # modifying template
-# template.xxx = xxx
+template.train_set_size = 4
 
-# hP = template.copy()
-# hP.xxx = xxx
-# hP.ready()
-# GROUPS.append(MyExpGroup(hP))
+ours = template.copy()
 
-assert len(GROUPS) == 0
+baseline = template.copy()
+baseline.symm = SymmetryAssumption(
+    3, [
+        (COMPOSE_TRANS, [Trivial()], {Slice(0, 3)}), 
+    ], 
+)
+
+ours.ready()
+GROUPS.append(MyExpGroup(ours))
+baseline.ready()
+GROUPS.append(MyExpGroup(baseline))
+
+assert len(GROUPS) == 2

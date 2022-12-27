@@ -172,6 +172,11 @@ def main(experiment_path, lock_epoch):
             experiment_path, EXPERIMENT_PY_FILENAME, 
         ))
         groups: List[MyExpGroup]
+        # groups = groups[5:]
+        # print(groups[0].variable_value)
+        # n_rand_inits = 8
+        # print(f'forced {n_rand_inits = }')
+        # input('enter...')
         print(f'{exp_name = }')
         ui = UI(groups, n_rand_inits, experiment_path, lock_epoch, experiment)
         ui.win.mainloop()

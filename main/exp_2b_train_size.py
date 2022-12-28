@@ -10,15 +10,15 @@ VALIDATE_SET_SIZE = 64
 SEQ_LEN = 25
 ACTUAL_DIM = 6
 
-EXP_NAME = '2b'
-N_RAND_INITS = 12
+EXP_NAME = '2b_train_size'
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = '0'
-        self.variable_value = 0
+        self.variable_name = 'train_set_size'
+        self.variable_value = hyperParams.train_set_size
     
     @lru_cache(1)
     def name(self):
@@ -82,8 +82,11 @@ template.max_epoch = template.sched_sampling.duration
 # modifying template
 # template.xxx = xxx
 
-hP = template.copy()
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
-
-assert len(GROUPS) == 1
+for s in (64, 128, 256, 1024):
+    hP = template.copy()
+    hP.train_set_size = s
+    hP.max_epoch = 1152000 // s
+    hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
+    assert hP.max_epoch * s == 128 * 9000
+    hP.ready()
+    GROUPS.append(MyExpGroup(hP))

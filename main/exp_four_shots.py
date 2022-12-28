@@ -97,9 +97,9 @@ baseline.symm = SymmetryAssumption(
     ], 
 )
 
-ours.ready()
+ours.ready(globals())
 GROUPS.append(MyExpGroup(ours))
-baseline.ready()
+baseline.ready(globals())
 GROUPS.append(MyExpGroup(baseline))
 
 assert len(GROUPS) == 2

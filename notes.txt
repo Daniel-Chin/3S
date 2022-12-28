@@ -809,6 +809,10 @@ next {
             note that 32*20 = 640 images, maybe enough to fill the view space. 
         1-video learning? exp. 
 }
+12/28 {
+    2022_m12_d27@02_29_29_four_shots
+        you cannot learn it with four shots. 
+}
 todo {
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
     test whether identity aug helps

@@ -812,6 +812,8 @@ next {
 12/28 {
     2022_m12_d27@02_29_29_four_shots
         you cannot learn it with four shots. 
+        looking at the loss plots, symm helps a lot compared to no symm (but cannot succeed)
+        next exp: hold total batch numbers the same as baseline training. 
 }
 todo {
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好

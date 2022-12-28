@@ -88,5 +88,5 @@ for s in (64, 128, 256, 1024):
     hP.max_epoch = 1152000 // s
     hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
     assert hP.max_epoch * s == 128 * 9000
-    hP.ready()
+    hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

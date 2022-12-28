@@ -84,6 +84,9 @@ template.max_epoch = template.sched_sampling.duration
 
 # modifying template
 template.train_set_size = 4
+template.batch_size = template.train_set_size
+template.max_epoch = 1152000 // template.train_set_size
+template.sched_sampling = LinearScheduledSampling(template.max_epoch)
 
 ours = template.copy()
 

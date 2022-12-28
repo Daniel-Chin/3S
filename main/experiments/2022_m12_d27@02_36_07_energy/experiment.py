@@ -92,5 +92,5 @@ for std in (10, 1, .1):
         hP.lossWeightTree['seq_energy']['real'].weight = 1
         hP.lossWeightTree['seq_energy']['fake'].weight = 1
         hP.energy_noise_std = std
-        hP.ready()
+        hP.ready(globals())
         GROUPS.append(MyExpGroup(hP))

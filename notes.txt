@@ -820,6 +820,14 @@ next {
         std=10: sometimes too easy, energy loss = 0 but linear proj is big. 
         std=1, .1: too difficult. NN cannot classify. 
         next exp: just remove self recon and try luck. if fails, forget about energy. 
+    2022_m12_d27@02_58_22_2b
+        fails. 
+        self recon overfits to train set and cannot self-recon validation set at all. 
+        next exp: increase train_set_size, see if self-recon is better. 
+    2022_m12_d27@03_03_56_dropout
+        dropout kills disen. 
+        wait, what about pred? 
+        next exp: larger RNN. 
 }
 todo {
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好

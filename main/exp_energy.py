@@ -17,10 +17,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'loss_weight,noise_std'
-        self.variable_value = (hyperParams.lossWeightTree[
-            'seq_energy'
-        ], hyperParams.energy_noise_std)
+        self.variable_name = 'noise_std'
+        self.variable_value = hyperParams.energy_noise_std
     
     @lru_cache(1)
     def name(self):
@@ -84,13 +82,14 @@ template.max_epoch = template.sched_sampling.duration
 
 # modifying template
 template.lossWeightTree['predict'].weight = 0
+template.lossWeightTree['self_recon'].weight = 0
+template.lossWeightTree['kld'].weight = 0
+template.lossWeightTree['seq_energy'].weight = 1
+template.lossWeightTree['seq_energy']['real'].weight = 1
+template.lossWeightTree['seq_energy']['fake'].weight = 1
 
-for std in (10, 1, .1):
-    for w in (1, ):
-        hP = template.copy()
-        hP.lossWeightTree['seq_energy'].weight = w
-        hP.lossWeightTree['seq_energy']['real'].weight = 1
-        hP.lossWeightTree['seq_energy']['fake'].weight = 1
-        hP.energy_noise_std = std
-        hP.ready()
-        GROUPS.append(MyExpGroup(hP))
+for std in (2, 4, 7):
+    hP = template.copy()
+    hP.energy_noise_std = std
+    hP.ready(globals())
+    GROUPS.append(MyExpGroup(hP))

@@ -814,6 +814,12 @@ next {
         you cannot learn it with four shots. 
         looking at the loss plots, symm helps a lot compared to no symm (but cannot succeed)
         next exp: hold total batch numbers the same as baseline training. 
+    2022_m12_d27@02_36_07_energy
+        self recon is collapse
+            logically, if we want JEPA, even self recon should be scraped. 
+        std=10: sometimes too easy, energy loss = 0 but linear proj is big. 
+        std=1, .1: too difficult. NN cannot classify. 
+        next exp: just remove self recon and try luck. if fails, forget about energy. 
 }
 todo {
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好

@@ -9,7 +9,12 @@ def projectionMSE(X: torch.Tensor, Y: torch.Tensor):
 
     X = F.pad(X, (1, 0), value=1)
 
-    solution, residuals, _, _ = lstsq(X, Y)
+    try:
+        solution, residuals, _, _ = lstsq(X, Y)
+    except RuntimeError: 
+        assert torch.isnan(X).any()
+        print('Warning: nan encountered during linear proj. Returning -1.')
+        return torch.tensor(-1)
     solution: torch.Tensor
 
     # Some versions of pyTorch has bugs with `residuals`. 

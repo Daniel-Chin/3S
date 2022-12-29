@@ -26,8 +26,8 @@ from template_two_body import SEQ_LEN
 PATH = path.join(
     '../datasets/two_body', 
     # '../datasets/two_body_no_orbit', 
-    # 'train', 
-    'validate', 
+    'train', 
+    # 'validate', 
 )
 
 CENTER_OF_MASS_STATIONARY = False
@@ -38,8 +38,8 @@ SPF = .1
 DT = 4
 
 # RUNNING_MODE = MODE_LOCATE
-RUNNING_MODE = MODE_OBV_ONLY
-# RUNNING_MODE = MODE_MAKE_IMG
+# RUNNING_MODE = MODE_OBV_ONLY
+RUNNING_MODE = MODE_MAKE_IMG
 
 EYE = np.array([0.0, -11.5, 0.0])  # 眼睛的位置（默认z轴的正方向）
 LOOK_AT = np.array([0.0, 0.0, 0.0])  # 瞄准方向的参考点（默认在坐标原点）

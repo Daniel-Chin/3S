@@ -88,9 +88,9 @@ template.max_epoch = template.sched_sampling.duration
 
 for d, r in (
     # (0, 32), 
-    (.5, 128), 
-    (.5, 256), 
-    (.5, 512), 
+    (.1, 64), 
+    (.1, 128), 
+    (.1, 256), 
 ):
     hP = template.copy()
     hP.dropout = d

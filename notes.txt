@@ -829,6 +829,12 @@ next {
         wait, what about pred? 
         next exp: larger RNN. 
 }
+12/29 {
+    2022_m12_d28@06_15_28_energy
+        no use. 
+    2022_m12_d28@06_29_48_dropout
+        no good. 
+}
 todo {
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
     test whether identity aug helps

@@ -18,7 +18,6 @@ from abc import ABCMeta, abstractmethod
 
 import numpy as np
 import torch
-import torch.nn.functional as F
 from PIL import Image
 from symmetry_transforms import SymmetryAssumption
 
@@ -139,7 +138,8 @@ class HyperParams(BaseHyperParams):
         if self.supervise_rnn:
             assert self.lossWeightTree['predict']['z'].weight != 0
         self.imgCriterion = {
-            'mse': F.mse_loss, 
+            'mse': torch.nn.MSELoss(), 
+            'l1' : torch.nn.L1Loss(), 
             'bce': torch.nn.BCELoss(), 
         }[self.image_loss]
         self.OptimClass = {

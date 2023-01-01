@@ -163,11 +163,11 @@ def forward(
                     if hParams.vicreg_invariance_on_Y:
                         lossTree.vicreg.invariance = F.mse_loss(
                             z_hat_aug, _z, 
-                        )
+                        ).cpu()
                     else:
                         lossTree.vicreg.invariance = F.mse_loss(
                             flat_emb_l, flat_emb_r, 
-                        )
+                        ).cpu()
                 
                     # variance
                     std_emb_l = torch.sqrt(flat_emb_l.var(dim=0) + 1e-4)
@@ -175,7 +175,7 @@ def forward(
                     lossTree.vicreg.variance = (
                         torch.mean(F.relu(1 - std_emb_l)) +
                         torch.mean(F.relu(1 - std_emb_r))
-                    )
+                    ).cpu()
 
                     # covariance
                     flat_emb_l = flat_emb_l - flat_emb_l.mean(dim=0)
@@ -185,7 +185,7 @@ def forward(
                     lossTree.vicreg.covariance = (
                         (offDiagonalMask2d(D) * cov_emb_l).pow_(2).sum() / D + 
                         (offDiagonalMask2d(D) * cov_emb_r).pow_(2).sum() / D
-                    )
+                    ).cpu()
             else:
                 with profiler('good'):
                     z_loss = F.mse_loss(z_hat_aug, _z)

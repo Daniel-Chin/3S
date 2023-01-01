@@ -841,6 +841,20 @@ next {
         try more hParams, see if symm is generally more robust to achieve disen than baseline. 
     try no X loss + VICREG
 }
+2023/1/1 {
+    2022_m12_d29@09_34_59_2b_train_size
+        2022_m12_d27@02_58_22_2b has incorrect max_epoch. 
+            it should be 18000, but it was 9000. 
+        in the current exp it is correct. 
+        self recon generalization to the validation set is good. 
+        predictions make sense to human eyes, but gets blurry over time.
+            The location distribution naturally widens. humans cannot do better either. 
+        I believe this kind of prediction also works with SPS to disen. 
+        The problem here is, RNN needs to use some dimensions in z to denote "confidence". 
+            confidence does not follow S(3)|T(3). 
+        changing image loss from L2 to L1 might just solve it. 
+        VICReg may also solve it, since z loss doesn't require RNN to keep track of confidence. 
+}
 todo {
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
     test whether identity aug helps

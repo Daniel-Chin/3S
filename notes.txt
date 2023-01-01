@@ -862,46 +862,18 @@ next {
 }
 todo {
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
-    test whether identity aug helps
-    2D exp
-        does symm allow over-param VAE? 
-        vary 2d hParam
-            - vae size
-            - symm vs w/o symm
-
-    test K=4 vs max_epoch *= 4
-        this is related to optim stepping. 
-        k=4: 
-            each step is an avg of same traj multi aug
-        max_epoch *= 4: 
-            each step is an avg of multi traj multi aug
 
     can we early-stop via train-set self-recon or train-set linear proj mse? 
         see 12/16 notes
         observe other exps
         plot final lin proj against epoch2000 self recon for 2022_m12_d19@07_43_55_sanity_check_howCombine
 
-    Try stop_grad w/ xj method, because SimSiam. 
-    try remove z loss (after trying SimSiam!!!)
-    try remove img pred loss and vary whether detach encoder
-
     test grad clip
-    try bigger train set size
-    test smaller dataset
     
     compare SAMPLE_TRANS vs COMPOSE_TRANS in two body. 
     try time aug, e.g. stretch (int / float ratio), reverse
     wrong symm: 11/4 notes
-    vary K (aug ratio)
-        make fig 8 in paper
-            K = 0 1 4
-        exp_k
-        exp_data_size
-    test kld weight = 0
     try RNN ensemble
-    diffusion exp
-        more cases. 4x4 matrix
-        yihuajiemu half
 }
 archive {
     有些结， 升一维就能解开。 暂时升一维， 等会儿降回来？

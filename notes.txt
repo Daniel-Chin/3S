@@ -854,6 +854,11 @@ next {
             confidence does not follow S(3)|T(3). 
         changing image loss from L2 to L1 might just solve it. 
         VICReg may also solve it, since z loss doesn't require RNN to keep track of confidence. 
+    2022_m12_d29@09_49_29_dropout
+        dropout cannot disen, cannot predict. 
+        if dropout = 0, image pred loss can < 0.001
+        if dropout > 0, image pred loss always > 0.001 regardless of RNN size. 
+        (we are always talking about validation loss.)
 }
 todo {
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好

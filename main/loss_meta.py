@@ -34,6 +34,11 @@ def main():
             ]), 
         ]), 
         'symm_self_consistency', 
+        AbstractLossNode('vicreg', [
+            'variance', 
+            'invariance', 
+            'covariance', 
+        ]), 
     ])
     with open('losses.py', 'w') as f:
         loss_tree.writeCode(f, absLossRoot)

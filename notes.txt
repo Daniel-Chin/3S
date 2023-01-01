@@ -861,6 +861,8 @@ next {
         (we are always talking about validation loss.)
 }
 todo {
+    sanity check w/ new code; weight decay
+    vicreg
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
 
     can we early-stop via train-set self-recon or train-set linear proj mse? 

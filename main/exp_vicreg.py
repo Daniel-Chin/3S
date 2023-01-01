@@ -4,21 +4,21 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/two_body/train'
-VALIDATE_SET_PATH = '../datasets/two_body/validate'
+TRAIN_SET_PATH    = '../datasets/bounce/train'
+VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
-SEQ_LEN = 25
-ACTUAL_DIM = 6
+SEQ_LEN = 20
+ACTUAL_DIM = 3
 
-EXP_NAME = ...
-N_RAND_INITS = ...
+EXP_NAME = 'vicreg'
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.WHAT
+        self.variable_name = '0'
+        self.variable_value = 0
     
     @lru_cache(1)
     def name(self):
@@ -54,8 +54,9 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    6, [
-        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
+    3, [
+        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
     ], 
 )
 template.supervise_rnn = False
@@ -92,9 +93,24 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-# hP = template.copy()
-# hP.xxx = xxx
-# hP.ready(globals())
-# GROUPS.append(MyExpGroup(hP))
+hP = template.copy()
+hP.lossWeightTree['vicreg'].weight = 1
+hP.lossWeightTree['vicreg']['variance'].weight = 25
+hP.lossWeightTree['vicreg']['invariance'].weight = 25
+hP.lossWeightTree['vicreg']['covariance'].weight = 1
+hP.vicreg_expander_identity = True
+hP.vicreg_expander_widths = None # [64, 64, 64]
+hP.vicreg_invariance_on_Y = False
+hP.lossWeightTree['self_recon'].weight = 0
+hP.lossWeightTree['kld'].weight = 0
+hP.lossWeightTree['predict'].weight = 0
+hP.lossWeightTree['predict']['image'].weight = 0
+hP.lossWeightTree['predict']['z'].weight = 0
+hP.vae_is_actually_ae = True
+hP.variational_rnn = False
+hP.vvrnn = None
+hP.vvrnn_static = None
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 0
+assert len(GROUPS) == 1

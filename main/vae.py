@@ -4,6 +4,7 @@ import torch
 from torch import nn
 
 from shared import *
+from symmetry_transforms import identity
 
 STRIDE = 2
 PADDING = 1
@@ -56,9 +57,10 @@ class VAE(nn.Module):
         self.fcMu  = nn.Linear(
             self.conv_neck_dim, hyperParams.symm.latent_dim, 
         )
-        self.fcVar = nn.Linear(
-            self.conv_neck_dim, hyperParams.symm.latent_dim, 
-        )
+        if not self.hParams.vae_is_actually_ae:
+            self.fcVar = nn.Linear(
+                self.conv_neck_dim, hyperParams.symm.latent_dim, 
+            )
 
         if hyperParams.deep_spread:
             self.fcBeforeDecode = nn.Sequential(
@@ -103,6 +105,19 @@ class VAE(nn.Module):
         #     if p.requires_grad
         # ), flush=True)
 
+        if hyperParams.lossWeightTree['vicreg'].weight:
+            if hyperParams.vicreg_expander_identity:
+                self.expander = identity
+            else:
+                modules = []
+                last_width = hyperParams.symm.latent_dim
+                for width in hyperParams.vicreg_expander_widths:
+                    modules.append(nn.Linear(last_width, width))
+                    last_width = width
+                    modules.append(nn.BatchNorm1d(width))
+                    modules.append(MyRelu())
+                self.expander = nn.Sequential(*modules[:-2])
+
     def encode(self, x) -> Tuple[torch.Tensor, torch.Tensor]:
         '''
         `x` is (batch_size, IMAGE_CHANNELS, height, width)
@@ -111,7 +126,10 @@ class VAE(nn.Module):
         t = t.flatten(1)
         # print(t.shape[1], self.conv_neck_dim)
         mu      = self.fcMu (t)
-        log_var = self.fcVar(t)
+        if self.hParams.vae_is_actually_ae:
+            log_var = None
+        else:
+            log_var = self.fcVar(t)
         return mu, log_var
     
     def decode(self, z):

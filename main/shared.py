@@ -60,6 +60,7 @@ class HyperParams(BaseHyperParams):
         self.deep_spread: bool = None
         self.relu_leak: bool = None
         self.vae_kernel_size: int = None
+        self.vae_is_actually_ae: bool = None
 
         self.batch_size: int = None
         self.grad_clip: Optional[float] = None
@@ -75,6 +76,13 @@ class HyperParams(BaseHyperParams):
 
         self.train_set_size: int = None
         self.max_epoch: int = None
+
+        self.vicreg_expander_identity: bool = None
+        self.vicreg_expander_widths: List[int] = None
+        self.vicreg_invariance_on_Y: bool = None
+        # That "Y" follows the symbols defined in the vicreg paper. 
+        # In this source code, vicreg's Y is `z`, 
+        # and vicreg's Z is `emb_l` and `emb_r`. 
 
         self.imgCriterion: Callable[
             [torch.Tensor, torch.Tensor], torch.Tensor, 
@@ -134,9 +142,29 @@ class HyperParams(BaseHyperParams):
             self.lossWeightTree['supervise']['vae']['encode'].weight != 0 or
             self.lossWeightTree['supervise']['vae']['decode'].weight != 0
         )
-        assert self.vvrnn == (self.vvrnn_static is None)
+        assert not (self.vvrnn and (self.vvrnn_static is not None))
         if self.supervise_rnn:
             assert self.lossWeightTree['predict']['z'].weight != 0
+        if self.lossWeightTree['vicreg'].weight:
+            if self.vicreg_expander_identity:
+                assert self.vicreg_expander_widths is None
+            assert self.lossWeightTree['predict']['z'].weight == 0
+            assert not self.jepa_stop_grad_l_encoder
+            assert not self.jepa_stop_grad_r_encoder
+        else:
+            assert self.vicreg_expander_identity is None
+            assert self.vicreg_expander_widths is None
+            assert self.vicreg_invariance_on_Y is None
+            assert self.lossWeightTree['vicreg']['variance'].weight == 0
+            assert self.lossWeightTree['vicreg']['invariance'].weight == 0
+            assert self.lossWeightTree['vicreg']['covariance'].weight == 0
+        if self.vae_is_actually_ae:
+            assert self.lossWeightTree['kld'].weight == 0
+        if self.variational_rnn:
+            assert not self.vae_is_actually_ae
+        else:
+            assert self.vvrnn is None
+            assert self.vvrnn_static is None
         self.imgCriterion = {
             'mse': torch.nn.MSELoss(), 
             'l1' : torch.nn.L1Loss(), 

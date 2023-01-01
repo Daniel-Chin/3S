@@ -133,17 +133,18 @@ def oneEpoch(
         if epoch % SLOW_EVAL_EPOCH_INTERVAL == 0:
             with profiler('save checkpoints'):
                 saveModels(models, epoch, save_path)
-            with profiler('video eval'):
-                for name, dataset in [
-                    ('train', trainSet), 
-                    ('validate', validateSet), 
-                ]:
-                    loader = dataLoader(dataset, 12)
-                    videoEval(
-                        epoch, save_path, name, 
-                        experiment, hParams, *next(loader), 
-                        vae, predRnn, energyRnn, profiler, 
-                    )
+            if hParams.lossWeightTree['vicreg'].weight == 0:
+                with profiler('video eval'):
+                    for name, dataset in [
+                        ('train', trainSet), 
+                        ('validate', validateSet), 
+                    ]:
+                        loader = dataLoader(dataset, 12)
+                        videoEval(
+                            epoch, save_path, name, 
+                            experiment, hParams, *next(loader), 
+                            vae, predRnn, energyRnn, profiler, 
+                        )
     
     if epoch % 32 == 0:
         print(group_name, 'epoch', epoch, 'finished.')

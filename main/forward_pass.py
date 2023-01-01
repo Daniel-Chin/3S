@@ -1,10 +1,11 @@
 import random
 from typing import Callable, List, Optional
+from functools import lru_cache
 
 import torch
 import torch.nn.functional as F
 import torchWork
-from torchWork import DEVICE, HAS_CUDA
+from torchWork import DEVICE, HAS_CUDA, CPU
 
 from shared import *
 from losses import Loss_root
@@ -19,7 +20,7 @@ def forward(
     vae: VAE, predRnn: PredRNN, energyRnn: EnergyRNN, 
     profiler: torchWork.Profiler, 
     require_img_predictions_and_z_hat: bool = True, 
-    require_all_tasks: bool = False, 
+    validating: bool = False, 
 ):
     SEQ_LEN = experiment.SEQ_LEN
     batch_size = video_batch.shape[0]
@@ -36,14 +37,25 @@ def forward(
     # vae forward pass
     with profiler('good'):
         mu, log_var = vae.encode(flat_video_batch)
-        flat_z = reparameterize(mu, log_var)
-        reconstructions = vae.decode(flat_z)
-        lossTree.self_recon = hParams.imgCriterion(
-            reconstructions, flat_video_batch, 
-        ).cpu()
-        lossTree.kld = torch.mean(-0.5 * torch.sum(
-            1 + log_var - mu ** 2 - log_var.exp(), dim=1, 
-        ), dim=0).cpu()
+        if hParams.vae_is_actually_ae:
+            flat_z = mu
+        else:
+            flat_z = reparameterize(mu, log_var)
+        if validating or hParams.lossWeightTree['self_recon'].weight:
+            flat_reconstructions = vae.decode(flat_z)
+            lossTree.self_recon = hParams.imgCriterion(
+                flat_reconstructions, flat_video_batch, 
+            ).cpu()
+            reconstructions = flat_reconstructions.detach().view(
+                batch_size, SEQ_LEN, 
+                IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
+            )
+        else:
+            reconstructions = None
+        if hParams.lossWeightTree['kld'].weight:
+            lossTree.kld = torch.mean(-0.5 * torch.sum(
+                1 + log_var - mu ** 2 - log_var.exp(), dim=1, 
+            ), dim=0).cpu()
     
     if hParams.supervise_vae:
         if hParams.supervise_vae_only_xy:
@@ -90,16 +102,17 @@ def forward(
     lossTree.predict.z     = torch.tensor(0, dtype=torch.float)
     lossTree.supervise.rnn = torch.tensor(0, dtype=torch.float)
     for _ in range(hParams.K):
+        flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
+            predRnn, z_transed, untrans, 
+            batch_size, experiment, hParams, epoch, batch_i, profiler, 
+        )
+
         # predict image
         if (
             require_img_predictions_and_z_hat
-            or require_all_tasks 
+            or validating 
             or hParams.lossWeightTree['predict']['image'].weight != 0
         ):
-            flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
-                predRnn, z_transed, untrans, 
-                batch_size, experiment, hParams, epoch, batch_i, profiler, 
-            )
             z_hat_aug = flat_z_hat_aug.view(
                 batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
             )
@@ -120,9 +133,10 @@ def forward(
 
         # predict z
         if (
-            require_all_tasks 
+            validating 
             or hParams.lossWeightTree['predict']['z'].weight != 0
-            or hParams.supervise_rnn
+            or hParams.supervise_rnn 
+            or hParams.lossWeightTree['vicreg'].weight
         ):
             if hParams.jepa_stop_grad_l_encoder:
                 flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
@@ -135,21 +149,60 @@ def forward(
             _z = z[:, min_context:, :]
             if hParams.jepa_stop_grad_r_encoder:
                 _z = _z.detach()
-            z_loss = F.mse_loss(z_hat_aug, _z)
-            if hParams.supervise_rnn:
-                lossTree.supervise.rnn += z_loss.cpu()
-            else:
-                lossTree.predict.z += z_loss.cpu()
+            if hParams.lossWeightTree['vicreg'].weight:
+                D = hParams.symm.latent_dim
+                flat_emb_r = vae.expander(_z.reshape(
+                    batch_size * (SEQ_LEN - min_context), D, 
+                ))
+                flat_emb_l = vae.expander(z_hat_aug.reshape(
+                    batch_size * (SEQ_LEN - min_context), D, 
+                ))
 
-    mean_square_vrnn_std = torch.exp(
-        0.5 * log_var
-    ).norm(2).cpu() ** 2 / batch_size
+                with profiler('good'):
+                    # invariance
+                    if hParams.vicreg_invariance_on_Y:
+                        lossTree.vicreg.invariance = F.mse_loss(
+                            z_hat_aug, _z, 
+                        )
+                    else:
+                        lossTree.vicreg.invariance = F.mse_loss(
+                            flat_emb_l, flat_emb_r, 
+                        )
+                
+                    # variance
+                    std_emb_l = torch.sqrt(flat_emb_l.var(dim=0) + 1e-4)
+                    std_emb_r = torch.sqrt(flat_emb_r.var(dim=0) + 1e-4)
+                    lossTree.vicreg.variance = (
+                        torch.mean(F.relu(1 - std_emb_l)) +
+                        torch.mean(F.relu(1 - std_emb_r))
+                    )
+
+                    # covariance
+                    flat_emb_l = flat_emb_l - flat_emb_l.mean(dim=0)
+                    flat_emb_r = flat_emb_r - flat_emb_r.mean(dim=0)
+                    cov_emb_l = (flat_emb_l.T @ flat_emb_l) / (batch_size - 1)
+                    cov_emb_r = (flat_emb_r.T @ flat_emb_r) / (batch_size - 1)
+                    lossTree.vicreg.covariance = (
+                        (offDiagonalMask2d(D) * cov_emb_l).pow_(2).sum() / D + 
+                        (offDiagonalMask2d(D) * cov_emb_r).pow_(2).sum() / D
+                    )
+            else:
+                with profiler('good'):
+                    z_loss = F.mse_loss(z_hat_aug, _z)
+                if hParams.supervise_rnn:
+                    lossTree.supervise.rnn += z_loss.cpu()
+                else:
+                    lossTree.predict.z += z_loss.cpu()
+
+    if hParams.vvrnn or hParams.vvrnn_static:
+        mean_square_vrnn_std = torch.exp(
+            0.5 * log_var
+        ).norm(2).cpu() ** 2 / batch_size
+    else:
+        mean_square_vrnn_std = torch.tensor(0, device=CPU)
 
     # symm_self_consistency
-    if (
-        require_all_tasks
-        or hParams.lossWeightTree['symm_self_consistency'].weight != 0
-    ):
+    if hParams.lossWeightTree['symm_self_consistency'].weight != 0:
         assert not (
             hParams.jepa_stop_grad_l_encoder or 
             hParams.jepa_stop_grad_r_encoder
@@ -169,10 +222,7 @@ def forward(
         ).cpu()
 
     # seq energy
-    if (
-        require_all_tasks 
-        or hParams.lossWeightTree['seq_energy'].weight != 0
-    ):
+    if hParams.lossWeightTree['seq_energy'].weight != 0:
         RATIO = 64
         noise = torch.randn((
             RATIO * batch_size, SEQ_LEN, hParams.symm.latent_dim, 
@@ -211,10 +261,8 @@ def forward(
         )
     
     return (
-        lossTree, tryDetach(reconstructions).view(
-            batch_size, SEQ_LEN, 
-            IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
-        ), tryDetach(img_predictions), 
+        lossTree, reconstructions, 
+        tryDetach(img_predictions), 
         tryDetach(z), tryDetach(z_hat_aug), 
         [
             ('mean_square_vrnn_std', mean_square_vrnn_std.detach()), 
@@ -267,3 +315,9 @@ def rnnForward(
     return untrans(flat_z_hat_transed), untrans(reparameterize(
         flat_z_hat_transed, flat_log_var, 
     )), log_var
+
+@lru_cache(1)
+def offDiagonalMask2d(size: int):
+    x = torch.ones((size, size), device=DEVICE)
+    x.fill_diagonal_(0)
+    return x

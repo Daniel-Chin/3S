@@ -88,6 +88,7 @@ def forward(
 
     lossTree.predict.image = torch.tensor(0, dtype=torch.float)
     lossTree.predict.z     = torch.tensor(0, dtype=torch.float)
+    lossTree.supervise.rnn = torch.tensor(0, dtype=torch.float)
     for _ in range(hParams.K):
         # predict image
         if (
@@ -136,7 +137,7 @@ def forward(
                 _z = _z.detach()
             z_loss = F.mse_loss(z_hat_aug, _z)
             if hParams.supervise_rnn:
-                lossTree.supervise.rnn = z_loss.cpu()
+                lossTree.supervise.rnn += z_loss.cpu()
             else:
                 lossTree.predict.z += z_loss.cpu()
 

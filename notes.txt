@@ -825,8 +825,7 @@ next {
         self recon overfits to train set and cannot self-recon validation set at all. 
         next exp: increase train_set_size, see if self-recon is better. 
     2022_m12_d27@03_03_56_dropout
-        dropout kills disen. 
-        wait, what about pred? 
+        dropout kills disen. hurts image pred. 
         next exp: larger RNN. 
 }
 12/29 {
@@ -834,6 +833,13 @@ next {
         no use. 
     2022_m12_d28@06_29_48_dropout
         no good. 
+}
+12/30 {
+    meeting
+    did not have time talk about this week's progress.
+    about symm vs baseline:
+        try more hParams, see if symm is generally more robust to achieve disen than baseline. 
+    try no X loss + VICREG
 }
 todo {
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好

@@ -1,0 +1,30 @@
+2022_m12_d27@02_58_22_2b
+    fails. 
+    self recon overfits to train set and cannot self-recon validation set at all. 
+    next exp: increase train_set_size, see if self-recon is better. 
+
+2022_m12_d19@07_44_07_train_size_c_max_batch
+    see fig8_scatter.pdf 
+    We also gave fig8_box.pdf, but maybe too messy. But maybe not. so also show it during meeting. 
+    see 2022_m12_d19@07_44_07_train_size_c_max_batch/stats.xlsx
+        is symm useful? 
+            two-tail unequal-variance t test P = 0.014615945
+            however, even baselines can get linear proj loss < 0.03 for 55% of the time. 
+            see evalDecoder, force: 
+                groups = groups[5:]
+                n_rand_inits = 8
+        what's the optimal traning set size?
+            ANOVA yielded P = 0.062850687 > 0.05
+            Not any one group among [32,64,128,256,1024] is significantly different from the rest. 
+            We will use 64.
+
+2022_m12_d27@02_29_29_four_shots
+    you cannot learn it with four shots. 
+    looking at the loss plots, symm helps a lot compared to no symm (but cannot succeed)
+    next exp: hold total batch numbers the same as baseline training. 
+
+2022_m12_d22@15_26_25_identity_aug
+    no significant diff.
+    two-tail unequal var t test = 0.771731383
+
+2022_m12_d20@01_35_36_over_param_vae

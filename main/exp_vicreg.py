@@ -108,7 +108,7 @@ hP.lossWeightTree['predict']['image'].weight = 0
 hP.lossWeightTree['predict']['z'].weight = 0
 hP.vae_is_actually_ae = True
 hP.variational_rnn = False
-hP.vvrnn = None
+hP.vvrnn = False
 hP.vvrnn_static = None
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))

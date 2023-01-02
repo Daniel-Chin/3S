@@ -17,8 +17,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'weight_decay'
-        self.variable_value = hyperParams.weight_decay
+        self.variable_name = 'rnn_width'
+        self.variable_value = hyperParams.rnn_width
     
     @lru_cache(1)
     def name(self):
@@ -93,14 +93,12 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-hP = template.copy()
-hP.weight_decay = 0
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
-
-hP = template.copy()
-hP.weight_decay = 1e-6
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
-
-assert len(GROUPS) == 2
+for rnn_width in [
+    # 32, 
+    48, 64, 128, 
+]:
+    hP = template.copy()
+    hP.weight_decay = 1e-6
+    hP.rnn_width = rnn_width
+    hP.ready(globals())
+    GROUPS.append(MyExpGroup(hP))

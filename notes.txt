@@ -869,6 +869,7 @@ next {
             weight decay. (exp ongoing)
             change ae to vae. (will test)
             increase training set size. 
+            larger batch size. 
             dropout. 
             batch norm. 
         next exp: vanilla vicreg, best-shot approximation of Lecun's method. 

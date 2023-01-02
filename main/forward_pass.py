@@ -194,7 +194,7 @@ def forward(
                 else:
                     lossTree.predict.z += z_loss.cpu()
 
-    if hParams.vvrnn or hParams.vvrnn_static:
+    if hParams.vvrnn or hParams.vvrnn_static is not None:
         mean_square_vrnn_std = torch.exp(
             0.5 * log_var
         ).norm(2).cpu() ** 2 / batch_size
@@ -311,10 +311,15 @@ def rnnForward(
     flat_z_hat_transed = z_hat_transed.view(
         -1, hParams.symm.latent_dim, 
     )
-    flat_log_var = log_var.view(-1, hParams.symm.latent_dim)
-    return untrans(flat_z_hat_transed), untrans(reparameterize(
-        flat_z_hat_transed, flat_log_var, 
-    )), log_var
+    flat_z_hat_tut = untrans(flat_z_hat_transed)
+    if hParams.vvrnn or hParams.vvrnn_static is not None:
+        flat_log_var = log_var.view(-1, hParams.symm.latent_dim)
+        reparamed = untrans(reparameterize(
+            flat_z_hat_transed, flat_log_var, 
+        ))
+    else:
+        reparamed = flat_z_hat_tut
+    return flat_z_hat_tut, reparamed, log_var
 
 @lru_cache(1)
 def offDiagonalMask2d(size: int):

@@ -46,7 +46,7 @@ class HyperParams(BaseHyperParams):
 
         self.variational_rnn: bool = None
         self.vvrnn: bool = None
-        self.vvrnn_static: float = None
+        self.vvrnn_static: Optional[float] = None
         self.rnn_min_context: int = None
         self.energy_noise_std: float = None
 
@@ -162,9 +162,6 @@ class HyperParams(BaseHyperParams):
             assert self.lossWeightTree['kld'].weight == 0
         if self.variational_rnn:
             assert not self.vae_is_actually_ae
-        else:
-            assert self.vvrnn is None
-            assert self.vvrnn_static is None
         self.imgCriterion = {
             'mse': torch.nn.MSELoss(), 
             'l1' : torch.nn.L1Loss(), 

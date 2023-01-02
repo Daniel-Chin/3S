@@ -17,8 +17,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'rnn_width'
-        self.variable_value = hyperParams.rnn_width
+        self.variable_name = 'vae_channels'
+        self.variable_value = hyperParams.vae_channels
     
     @lru_cache(1)
     def name(self):
@@ -93,14 +93,14 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-for rnn_width in [
-    2, 
-    # 32, 
-    # 48, 64, 128, 
+for vae_channels in [
+    # [64, 128, 256], 
+    [128, 256, 512], 
+    [128, 256, 512, 512], 
 ]:
     hP = template.copy()
     hP.weight_decay = 1e-6
-    hP.rnn_width = rnn_width
+    hP.vae_channels = vae_channels
     hP.lossWeightTree['predict']['z'].weight = 0
     hP.lossWeightTree['predict']['image'].weight = 0
     hP.lossWeightTree['predict'].weight = 0

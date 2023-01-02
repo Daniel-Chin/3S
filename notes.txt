@@ -876,6 +876,14 @@ next {
     2023_m01_d01@12_34_51_weight_decay
         at least sanity check passed. 
         weight decay makes vae collapse. trying self recon only. 
+    2023_m01_d02@05_53_58_weight_decay
+        such weight decay prevents vae from training. 
+        bigger vae. 
+    2023_m01_d02@01_37_15_vicreg_vanilla
+        rnn pred still overfits.
+        the way V and C decreases looks promising. 
+            maybe vicreg only work with non-identity expander? 
+        weight_decay may be messing up the encoder. wait for the results of weight_decay exps and try again. 
 }
 todo {
     sanity check w/ new code; weight decay

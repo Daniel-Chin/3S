@@ -18,15 +18,22 @@ lossTypes = [
     # LossType('train',    'loss_root.supervise.vae.encode'), 
     # LossType('train',    'loss_root.supervise.vae.decode'), 
     # LossType('train',    'loss_root.self_recon'), 
-    LossType('validate', 'loss_root.self_recon'), 
+    # LossType('validate', 'loss_root.self_recon'), 
 
     # LossType('train',    'loss_root.predict.z'), 
-    LossType('validate', 'loss_root.predict.z'), 
+    # LossType('validate', 'loss_root.predict.z'), 
     # LossType('train',    'loss_root.predict.image'), 
-    LossType('validate', 'loss_root.predict.image'), 
+    # LossType('validate', 'loss_root.predict.image'), 
 
     # LossType('validate', 'loss_root.seq_energy.real'), 
     # LossType('validate', 'loss_root.seq_energy.fake'), 
+
+    LossType('validate', 'loss_root.vicreg.invariance'), 
+    LossType('validate', 'loss_root.vicreg.variance'), 
+    LossType('validate', 'loss_root.vicreg.covariance'), 
+    # LossType('train', 'loss_root.vicreg.invariance'), 
+    # LossType('train', 'loss_root.vicreg.variance'), 
+    # LossType('train', 'loss_root.vicreg.covariance'), 
 
     # LossType('train',    'linear_proj_mse'), 
     LossType('validate', 'linear_proj_mse'), 
@@ -34,7 +41,7 @@ lossTypes = [
 plotLosses = PlotLosses(
     path.join(EXP_PATH, EXPERIMENT_PY_FILENAME), 
     lossTypes, 
-    average_over=50, epoch_start=1000, 
+    average_over=100, epoch_start=1000, 
     which_legend=0, linewidth=1, 
 )
 fig = next(plotLosses)

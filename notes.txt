@@ -860,10 +860,25 @@ next {
         if dropout > 0, image pred loss always > 0.001 regardless of RNN size. 
         (we are always talking about validation loss.)
 }
+1/2 {
+    2023_m01_d01@12_37_10_vicreg
+        invariance loss overfits. 
+        covariance loss overfits. 
+        invariance loss rises up fast as sched samp progresses. 
+        Potential regularizations:
+            weight decay. (exp ongoing)
+            change ae to vae. (will test)
+            increase training set size. 
+            dropout. 
+            batch norm. 
+        next exp: vanilla vicreg, best-shot approximation of Lecun's method. 
+}
 todo {
     sanity check w/ new code; weight decay
     vicreg
+        batch norm the encoder? 
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
+    ablate vvrnn_static. this is also good for paper publishing. 
 
     can we early-stop via train-set self-recon or train-set linear proj mse? 
         see 12/16 notes

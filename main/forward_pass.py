@@ -150,12 +150,13 @@ def forward(
             if hParams.jepa_stop_grad_r_encoder:
                 _z = _z.detach()
             if hParams.lossWeightTree['vicreg'].weight:
-                D = hParams.symm.latent_dim
                 flat_emb_r = vae.expander(_z.reshape(
-                    batch_size * (SEQ_LEN - min_context), D, 
+                    batch_size * (SEQ_LEN - min_context), 
+                    hParams.symm.latent_dim, 
                 ))
                 flat_emb_l = vae.expander(z_hat_aug.reshape(
-                    batch_size * (SEQ_LEN - min_context), D, 
+                    batch_size * (SEQ_LEN - min_context), 
+                    hParams.symm.latent_dim, 
                 ))
 
                 with profiler('good'):
@@ -183,8 +184,8 @@ def forward(
                     cov_emb_l = (flat_emb_l.T @ flat_emb_l) / (batch_size - 1)
                     cov_emb_r = (flat_emb_r.T @ flat_emb_r) / (batch_size - 1)
                     lossTree.vicreg.covariance = (
-                        (offDiagonalMask2d(D) * cov_emb_l).pow_(2).sum() / D + 
-                        (offDiagonalMask2d(D) * cov_emb_r).pow_(2).sum() / D
+                        (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_l).pow_(2).sum() / hParams.vicreg_emb_dim + 
+                        (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_r).pow_(2).sum() / hParams.vicreg_emb_dim
                     ).cpu()
             else:
                 with profiler('good'):

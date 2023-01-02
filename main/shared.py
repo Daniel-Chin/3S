@@ -88,6 +88,7 @@ class HyperParams(BaseHyperParams):
             [torch.Tensor, torch.Tensor], torch.Tensor, 
         ] = None
         self.n_batches_per_epoch: int = None
+        self.vicreg_emb_dim: int = None
 
         self.experiment_globals: Dict = None
 
@@ -171,6 +172,11 @@ class HyperParams(BaseHyperParams):
             'adam': torch.optim.Adam, 
         }[self.optim_name]
         self.n_batches_per_epoch = self.train_set_size // self.batch_size
+        if self.lossWeightTree['vicreg'].weight != 0:
+            if self.vicreg_expander_identity:
+                self.vicreg_emb_dim = self.symm.latent_dim
+            else:
+                self.vicreg_emb_dim = self.vicreg_expander_widths[-1]
     
     def copyOneParam(self, k: str, v):
         if v is None:

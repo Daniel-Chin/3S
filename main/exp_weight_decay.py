@@ -94,11 +94,15 @@ template.vicreg_invariance_on_Y = None
 # template.xxx = xxx
 
 for rnn_width in [
+    2, 
     # 32, 
-    48, 64, 128, 
+    # 48, 64, 128, 
 ]:
     hP = template.copy()
     hP.weight_decay = 1e-6
     hP.rnn_width = rnn_width
+    hP.lossWeightTree['predict']['z'].weight = 0
+    hP.lossWeightTree['predict']['image'].weight = 0
+    hP.lossWeightTree['predict'].weight = 0
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

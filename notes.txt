@@ -873,6 +873,9 @@ next {
             dropout. 
             batch norm. 
         next exp: vanilla vicreg, best-shot approximation of Lecun's method. 
+    2023_m01_d01@12_34_51_weight_decay
+        at least sanity check passed. 
+        weight decay makes vae collapse. trying self recon only. 
 }
 todo {
     sanity check w/ new code; weight decay

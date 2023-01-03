@@ -897,6 +897,10 @@ next {
         exp. 
     GPU utilization
         ~ 55%. Removing gpu.sync improves ~10%, so forget about it. 
+    2023_m01_d03@05_30_06_2b_l1
+        L2 -> epoch 2000 -> L1
+            it works!!!
+        I used the incorrect hyperParam from bounce... omfg
 }
 todo {
     vicreg

@@ -54,9 +54,8 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    3, [
-        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
-        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
+    6, [
+        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
     ], 
 )
 template.supervise_rnn = False
@@ -77,6 +76,7 @@ template.deep_spread = True
 template.relu_leak = False
 template.vae_kernel_size = 4
 template.vae_is_actually_ae = False
+template.encoder_batch_norm = False
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
@@ -94,7 +94,8 @@ template.vicreg_invariance_on_Y = None
 # template.xxx = xxx
 
 for sil in [
-    # ScheduledImageLoss((0, 'mse')), 
+    ScheduledImageLoss((0, 'mse')), 
+    ScheduledImageLoss((0, 'l1')), 
     ScheduledImageLoss((0, 'mse'), (2000, 'l1')), 
 ]:
     hP = template.copy()

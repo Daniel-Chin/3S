@@ -885,6 +885,12 @@ next {
             maybe vicreg only work with non-identity expander? 
         weight_decay may be messing up the encoder. wait for the results of weight_decay exps and try again. 
 }
+1/3 {
+    2023_m01_d01@08_47_02_2b_l1
+        L1 makes VAE collapse very early on, since MLE is grey. 
+        L2 allows weak, correct beliefs to survive and get strengthened. 
+        next: try L2 -> epoch 2000 -> L1
+}
 todo {
     sanity check w/ new code; weight decay
     vicreg

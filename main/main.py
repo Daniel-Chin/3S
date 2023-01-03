@@ -41,15 +41,10 @@ def main():
         experiment.SEQ_LEN, 
         experiment.ACTUAL_DIM, DEVICE, 
     )
-    gur = GPUUtilizationReporter()
-    gur.start()
-    try:
-        runExperiment(args.exp_py_path, oneEpoch, {
-            'vae': VAE, 
-            'predRnn': PredRNN, 
-            'energyRnn': EnergyRNN, 
-        }, trainSet, validateSet)
-    finally:
-        gur.close()
+    runExperiment(args.exp_py_path, oneEpoch, {
+        'vae': VAE, 
+        'predRnn': PredRNN, 
+        'energyRnn': EnergyRNN, 
+    }, trainSet, validateSet)
 
 main()

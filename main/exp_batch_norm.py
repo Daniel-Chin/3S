@@ -4,21 +4,24 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/two_body/train'
-VALIDATE_SET_PATH = '../datasets/two_body/validate'
+TRAIN_SET_PATH    = '../datasets/bounce/train'
+VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
-SEQ_LEN = 25
-ACTUAL_DIM = 6
+SEQ_LEN = 20
+ACTUAL_DIM = 3
 
-EXP_NAME = ...
-N_RAND_INITS = ...
+EXP_NAME = 'batch_norm'
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.WHAT
+        self.variable_name = 'encoder_batch_norm,batch_size'
+        self.variable_value = (
+            hyperParams.encoder_batch_norm, 
+            hyperParams.batch_size, 
+        )
     
     @lru_cache(1)
     def name(self):
@@ -54,8 +57,9 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    6, [
-        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
+    3, [
+        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
     ], 
 )
 template.supervise_rnn = False
@@ -93,9 +97,10 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-# hP = template.copy()
-# hP.xxx = xxx
-# hP.ready(globals())
-# GROUPS.append(MyExpGroup(hP))
-
-assert len(GROUPS) == 0
+for batch_size in (16, 32):
+    for ebn in (False, True):
+        hP = template.copy()
+        hP.batch_size = batch_size
+        hP.encoder_batch_norm = ebn
+        hP.ready(globals())
+        GROUPS.append(MyExpGroup(hP))

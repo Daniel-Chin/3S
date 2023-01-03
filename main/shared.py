@@ -61,6 +61,7 @@ class HyperParams(BaseHyperParams):
         self.relu_leak: bool = None
         self.vae_kernel_size: int = None
         self.vae_is_actually_ae: bool = None
+        self.encoder_batch_norm: bool = None
 
         self.batch_size: int = None
         self.grad_clip: Optional[float] = None

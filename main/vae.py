@@ -37,17 +37,22 @@ class VAE(nn.Module):
             channels[0:], 
             channels[1:], 
         ):
-            modules.append(
-                nn.Sequential(
-                    nn.Conv2d(
-                        c0, c1, 
-                        kernel_size=hyperParams.vae_kernel_size, 
-                        stride=STRIDE, padding=PADDING, 
-                    ),
-                    # nn.BatchNorm2d(c),
-                    MyRelu(),
-                )
+            sequential = []
+            sequential.append(
+                nn.Conv2d(
+                    c0, c1, 
+                    kernel_size=hyperParams.vae_kernel_size, 
+                    stride=STRIDE, padding=PADDING, 
+                ),
             )
+            if hyperParams.encoder_batch_norm:
+                sequential.append(
+                    nn.BatchNorm2d(c1),
+                )
+            sequential.append(
+                MyRelu(),
+            )
+            modules.append(nn.Sequential(*sequential))
         
         self.conv_neck_dim = (
             channels[-1] * self.conv_neck_width ** 2

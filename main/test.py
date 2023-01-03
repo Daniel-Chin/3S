@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_2b_l1.py
+exp_batch_norm.py
 '''.strip()
 # op = input('Which exp? ')
 

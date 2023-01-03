@@ -9,6 +9,7 @@ pip install -U tabulate
 pip install -U GitPython
 pip install -U matplotlib
 pip install -U opencv-python
+pip install -U pynvml
 ```
 
 - `torchWork` from https://github.com/Daniel-Chin/torchWork

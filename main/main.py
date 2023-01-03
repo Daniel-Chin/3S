@@ -3,6 +3,7 @@ from torchWork import DEVICE
 from torchWork.experiment_control import (
     runExperiment, loadExperiment, ExperimentGroup, 
 )
+from torchWork.profiler import GPUUtilizationReporter
 
 from shared import *
 from load_dataset import Dataset
@@ -40,10 +41,15 @@ def main():
         experiment.SEQ_LEN, 
         experiment.ACTUAL_DIM, DEVICE, 
     )
-    runExperiment(args.exp_py_path, oneEpoch, {
-        'vae': VAE, 
-        'predRnn': PredRNN, 
-        'energyRnn': EnergyRNN, 
-    }, trainSet, validateSet)
+    gur = GPUUtilizationReporter()
+    gur.start()
+    try:
+        runExperiment(args.exp_py_path, oneEpoch, {
+            'vae': VAE, 
+            'predRnn': PredRNN, 
+            'energyRnn': EnergyRNN, 
+        }, trainSet, validateSet)
+    finally:
+        gur.close()
 
 main()

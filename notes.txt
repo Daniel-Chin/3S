@@ -899,7 +899,6 @@ next {
         ~ 55%. Removing gpu.sync improves ~10%, so forget about it. 
 }
 todo {
-    sanity check w/ new code; weight decay
     vicreg
         batch norm the encoder? 
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好

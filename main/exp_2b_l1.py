@@ -94,7 +94,7 @@ template.vicreg_invariance_on_Y = None
 # template.xxx = xxx
 
 for sil in [
-    ScheduledImageLoss((0, 'mse')), 
+    # ScheduledImageLoss((0, 'mse')), 
     ScheduledImageLoss((0, 'mse'), (2000, 'l1')), 
 ]:
     hP = template.copy()

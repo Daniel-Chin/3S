@@ -17,8 +17,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'vae_channels'
-        self.variable_value = hyperParams.vae_channels
+        self.variable_name = 'weight_decay'
+        self.variable_value = hyperParams.weight_decay
     
     @lru_cache(1)
     def name(self):

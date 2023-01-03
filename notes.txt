@@ -890,6 +890,13 @@ next {
         L1 makes VAE collapse very early on, since MLE is grey. 
         L2 allows weak, correct beliefs to survive and get strengthened. 
         next: try L2 -> epoch 2000 -> L1
+    2023_m01_d02@15_00_23_weight_decay
+        doesn't recon, even with large VAE. 
+        maybe in our specific problem, the ball iamge loss has low gradeint (most pixels are trivial). So weight decay should be smaller? 
+        (still, 1e-6 looks very small already.)
+        exp. 
+    GPU utilization
+        ~ 55%. Removing gpu.sync improves ~10%, so forget about it. 
 }
 todo {
     sanity check w/ new code; weight decay

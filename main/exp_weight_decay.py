@@ -93,14 +93,12 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-for vae_channels in [
-    # [64, 128, 256], 
-    [128, 256, 512], 
-    [128, 256, 512, 512], 
+for weight_decay in [
+    # 1e-6, 
+    1e-7, 1e-8, 1e-9, 
 ]:
     hP = template.copy()
-    hP.weight_decay = 1e-6
-    hP.vae_channels = vae_channels
+    hP.weight_decay = weight_decay
     hP.lossWeightTree['predict']['z'].weight = 0
     hP.lossWeightTree['predict']['image'].weight = 0
     hP.lossWeightTree['predict'].weight = 0

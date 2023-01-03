@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_vicreg_vanilla.py
+exp_2b_l1.py
 '''.strip()
 # op = input('Which exp? ')
 

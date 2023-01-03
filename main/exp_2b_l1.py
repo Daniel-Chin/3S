@@ -17,8 +17,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'image_loss'
-        self.variable_value = hyperParams.image_loss
+        self.variable_name = 'sched_image_loss'
+        self.variable_value = hyperParams.sched_image_loss
     
     @lru_cache(1)
     def name(self):
@@ -45,12 +45,18 @@ template.lossWeightTree = LossWeightTree('total', 1, [
             LossWeightTree('decode', 0, None), 
         ]), 
     ]), 
+    LossWeightTree('vicreg', 0, [
+        LossWeightTree('variance', 0, None), 
+        LossWeightTree('invariance', 0, None), 
+        LossWeightTree('covariance', 0, None), 
+    ]), 
     LossWeightTree('symm_self_consistency', 0, None), 
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    6, [
-        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
+    3, [
+        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
     ], 
 )
 template.supervise_rnn = False
@@ -70,20 +76,28 @@ template.vae_channels = [64, 128, 256]
 template.deep_spread = True
 template.relu_leak = False
 template.vae_kernel_size = 4
+template.vae_is_actually_ae = False
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
+template.weight_decay = 0   # 1e-6
 template.lr_diminish = None
 template.train_set_size = 64
-template.image_loss = 'mse'
+template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
 template.sched_sampling = LinearScheduledSampling(18000)
 template.max_epoch = template.sched_sampling.duration
+template.vicreg_expander_identity = None
+template.vicreg_expander_widths = None
+template.vicreg_invariance_on_Y = None
 
 # modifying template
 # template.xxx = xxx
 
-for il in ['mse', 'l1']:
+for sil in [
+    ScheduledImageLoss((0, 'mse')), 
+    ScheduledImageLoss((0, 'mse'), (2000, 'l1')), 
+]:
     hP = template.copy()
-    hP.image_loss = il
+    hP.sched_image_loss = sil
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

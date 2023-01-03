@@ -24,6 +24,7 @@ def forward(
 ):
     SEQ_LEN = experiment.SEQ_LEN
     batch_size = video_batch.shape[0]
+    imgCriterion = hParams.sched_image_loss.get(epoch)
     lossTree = Loss_root()
 
     # remove time axis
@@ -43,7 +44,7 @@ def forward(
             flat_z = reparameterize(mu, log_var)
         if validating or hParams.lossWeightTree['self_recon'].weight:
             flat_reconstructions = vae.decode(flat_z)
-            lossTree.self_recon = hParams.imgCriterion(
+            lossTree.self_recon = imgCriterion(
                 flat_reconstructions, flat_video_batch, 
             ).cpu()
             reconstructions = flat_reconstructions.detach().view(
@@ -74,7 +75,7 @@ def forward(
         ).cpu()
         with profiler('good'):
             synthesis = vae.decode(to_decode)
-            lossTree.supervise.vae.decode = hParams.imgCriterion(
+            lossTree.supervise.vae.decode = imgCriterion(
                 synthesis, flat_video_batch, 
             ).cpu()
         del my_slice, to_decode, my_z_hat, my_z
@@ -123,7 +124,7 @@ def forward(
                 IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
             )
             with profiler('good'):
-                lossTree.predict.image += hParams.imgCriterion(
+                lossTree.predict.image += imgCriterion(
                     img_predictions, 
                     video_batch[:, min_context:, :, :, :], 
                 ).cpu()

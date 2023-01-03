@@ -9,10 +9,10 @@ __all__ = [
     'reparameterize', 
 
     'ScheduledSampling', 'LinearScheduledSampling', 
-    'SigmoidScheduledSampling', 
+    'SigmoidScheduledSampling', 'ScheduledImageLoss', 
 ]
 
-from typing import Callable, List, Optional, Dict
+from typing import Callable, List, Optional, Dict, Tuple
 from contextlib import contextmanager
 from abc import ABCMeta, abstractmethod
 
@@ -69,10 +69,9 @@ class HyperParams(BaseHyperParams):
             [int, int], float, 
         ]] = None
 
-        self.image_loss: str = None
+        self.sched_image_loss: ScheduledImageLoss = None
         self.sched_sampling: Optional[ScheduledSampling] = None
-        # Deprecated:
-        self.teacher_forcing_duration: int = None
+        self.teacher_forcing_duration: int = None   # Deprecated
 
         self.train_set_size: int = None
         self.max_epoch: int = None
@@ -84,9 +83,10 @@ class HyperParams(BaseHyperParams):
         # In this source code, vicreg's Y is `z`, 
         # and vicreg's Z is `emb_l` and `emb_r`. 
 
+        
         self.imgCriterion: Callable[
             [torch.Tensor, torch.Tensor], torch.Tensor, 
-        ] = None
+        ] = None    # Deprecated
         self.n_batches_per_epoch: int = None
         self.vicreg_emb_dim: int = None
 
@@ -130,7 +130,16 @@ class HyperParams(BaseHyperParams):
                 LossWeightTree('real', 0, None), 
                 LossWeightTree('fake', 0, None), 
             ])
-    
+        if 'vicreg' not in self.lossWeightTree:
+            self.lossWeightTree['vicreg'] = LossWeightTree('vicreg', 0, [
+                LossWeightTree('variance', 0, None), 
+                LossWeightTree('invariance', 0, None), 
+                LossWeightTree('covariance', 0, None), 
+            ])
+            self.vicreg_expander_identity = None
+            self.vicreg_expander_widths = None
+            self.vicreg_invariance_on_Y = None
+
     def ready(self, experiment_globals):
         self.experiment_globals = experiment_globals
         assert self.lr_diminish is None # See below comments
@@ -163,11 +172,6 @@ class HyperParams(BaseHyperParams):
             assert self.lossWeightTree['kld'].weight == 0
         if self.variational_rnn:
             assert not self.vae_is_actually_ae
-        self.imgCriterion = {
-            'mse': torch.nn.MSELoss(), 
-            'l1' : torch.nn.L1Loss(), 
-            'bce': torch.nn.BCELoss(), 
-        }[self.image_loss]
         self.OptimClass = {
             'adam': torch.optim.Adam, 
         }[self.optim_name]
@@ -181,7 +185,7 @@ class HyperParams(BaseHyperParams):
     def copyOneParam(self, k: str, v):
         if v is None:
             return True, None
-        if k in ('imgCriterion', 'sched_sampling'):
+        if k in ('sched_image_loss', 'sched_sampling'):
             return True, v
         if k == 'symm':
             assert isinstance(v, SymmetryAssumption)
@@ -248,3 +252,24 @@ class SigmoidScheduledSampling(ScheduledSampling):
     
     def __repr__(self):
         return f'SigmoidScheduledSampling({self.alpha}, {self.beta})'
+
+class ScheduledImageLoss:
+    def __init__(self, *schedule: Tuple[int, str]) -> None:
+        self.schedule = schedule
+    
+    def __repr__(self):
+        return '__'.join([f'{epoch}_{loss_name}' for (epoch, loss_name) in self.schedule])
+    
+    def get(self, epoch: int) -> Callable[
+        [torch.Tensor, torch.Tensor], torch.Tensor, 
+    ]:
+        loss_name = None
+        for _epoch, _loss_name in self.schedule:
+            if _epoch > epoch:
+                break
+            loss_name = _loss_name
+        return {
+            'mse': torch.nn.MSELoss(), 
+            'l1' : torch.nn.L1Loss(), 
+            'bce': torch.nn.BCELoss(), 
+        }[loss_name]

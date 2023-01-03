@@ -47,6 +47,11 @@ template.lossWeightTree = LossWeightTree('total', 1, [
             LossWeightTree('decode', 0, None), 
         ]), 
     ]), 
+    LossWeightTree('vicreg', 0, [
+        LossWeightTree('variance', 0, None), 
+        LossWeightTree('invariance', 0, None), 
+        LossWeightTree('covariance', 0, None), 
+    ]), 
     LossWeightTree('symm_self_consistency', 0, None), 
 ])
 template.lr = 0.001
@@ -73,14 +78,19 @@ template.vae_channels = [64, 128, 256]
 template.deep_spread = True
 template.relu_leak = False
 template.vae_kernel_size = 4
+template.vae_is_actually_ae = False
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
+template.weight_decay = 0   # 1e-6
 template.lr_diminish = None
-template.train_set_size = None
-template.image_loss = 'mse'
-template.sched_sampling = LinearScheduledSampling(9000)
+template.train_set_size = 64
+template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
+template.sched_sampling = LinearScheduledSampling(18000)
 template.max_epoch = template.sched_sampling.duration
+template.vicreg_expander_identity = None
+template.vicreg_expander_widths = None
+template.vicreg_invariance_on_Y = None
 
 # modifying template
 template.train_set_size = 4

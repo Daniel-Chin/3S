@@ -39,6 +39,7 @@ def oneEpoch(
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, trainer_id: int, 
 ):
+    profiler.active = False
     if epoch > hParams.max_epoch:
         return False
     with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):

@@ -85,5 +85,6 @@ template.max_epoch = template.sched_sampling.duration
 for il in ['mse', 'l1']:
     hP = template.copy()
     hP.image_loss = il
+    hP.fillDefaults()
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

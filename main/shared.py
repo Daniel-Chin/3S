@@ -56,6 +56,8 @@ class HyperParams(BaseHyperParams):
         self.jepa_stop_grad_r_encoder: bool = None
         # "l"eft, "r"ight refers to Fig.1 of SimSiam (Chen & He, 2020).  
         self.dropout: float = None
+        self.rnn_ensemble: int = None
+
         self.vae_channels: List[int] = None
         self.deep_spread: bool = None
         self.relu_leak: bool = None

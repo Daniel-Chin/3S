@@ -907,6 +907,12 @@ next {
         1e-9: self-recon looks good. linear proj imrpoved, ~50%. 
         note: weight decay also applies to RNN. bigger RNN? 
 }
+next {
+    exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
+        可不可以这样做：
+        self-recon: 照常
+        rnn pred: 随机抽选 batch 中一个 traj, 扩增 batch_size 次。
+}
 todo {
     vicreg
         batch norm the encoder? 
@@ -917,6 +923,7 @@ todo {
         see 12/16 notes
         observe other exps
         plot final lin proj against epoch2000 self recon for 2022_m12_d19@07_43_55_sanity_check_howCombine
+        this is kinda trivial in terms of publishing methods. helpful in accelerating experiments. 
 
     test grad clip
     

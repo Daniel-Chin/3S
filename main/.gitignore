@@ -7,3 +7,4 @@ losses.py
 *.zip
 *.gz
 workspace.py
+*.data

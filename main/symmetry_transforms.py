@@ -40,6 +40,10 @@ class Slice:
 
     def __hash__(self):
         return hash(self.start) ^ hash(self.stop)
+    
+    def __eq__(self, other):
+        assert isinstance(other, __class__)
+        return self.start == other.start and self.stop == other.stop
 
 class Group(metaclass=ABCMeta):
     @abstractmethod
@@ -55,6 +59,10 @@ class Trivial(Group):   # The Trivial Group
     
     def __repr__(self) -> str:
         return 'I()'
+
+    def __eq__(self, other):
+        assert isinstance(other, __class__)
+        return True
 
 class Translate(Group):
     def __init__(self, n_dim: int, std: float) -> None:
@@ -78,6 +86,10 @@ class Translate(Group):
             return x - translate
         return transform, untransform
 
+    def __eq__(self, other):
+        assert isinstance(other, __class__)
+        return self.n_dim == other.n_dim and self.std == other.std
+
 class Rotate(Group):
     def __init__(self, n_dim: int) -> None:
         self.n_dim = n_dim
@@ -97,6 +109,10 @@ class Rotate(Group):
         def untransform(x: torch.Tensor):
             return (x @ unrotate)
         return transform, untransform
+
+    def __eq__(self, other):
+        assert isinstance(other, __class__)
+        return self.n_dim == other.n_dim
 
 class Cattor:
     def __init__(self, capacity: int) -> None:
@@ -177,6 +193,13 @@ class SymmetryAssumption:
         return __class__(
             self.latent_dim, 
             deepcopy(self.rule), 
+        )
+    
+    def __eq__(self, other):
+        assert isinstance(other, __class__)
+        return (
+            self.latent_dim == other.latent_dim 
+            and self.rule == other.rule
         )
 
 class GusMethod(SymmetryAssumption):

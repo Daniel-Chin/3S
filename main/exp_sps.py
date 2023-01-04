@@ -19,7 +19,7 @@ class MyExpGroup(ExperimentGroup):
 
         self.variable_name = 'symm,rnn_width,batch_size'
         self.variable_value = (
-            'yes' if hyperParams.symm is ours.symm else 'no', 
+            'yes' if hyperParams.symm == ours.symm else 'no', 
             hyperParams.rnn_width, 
             hyperParams.batch_size, 
         )

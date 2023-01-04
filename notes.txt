@@ -909,6 +909,14 @@ next {
     decided not to do:
         try time aug, e.g. stretch (int / float ratio), reverse
         because: doesn't generalize to music or real videos. 
+    decided not to do:
+        can we early-stop via train-set self-recon or train-set linear proj mse? 
+        see 12/16 notes
+        plotted final lin proj against epoch2000:
+            self_recon_against_lin_proj.py
+            indeed, at 10% training time, you can early stop by looking at lin proj loss. 
+        this is kinda trivial in terms of publishing methods. helpful in accelerating experiments. 
+        even for accelerating exps, you might be missing out on late-training solutions. Don't. 
 }
 next {
     exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
@@ -917,16 +925,11 @@ next {
         rnn pred: 随机抽选 batch 中一个 traj, 扩增 batch_size 次。
 }
 todo {
+    accelerate code by moving cpu()
     vicreg
         batch norm the encoder? 
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
     ablate vvrnn_static. this is also good for paper publishing. 
-
-    can we early-stop via train-set self-recon or train-set linear proj mse? 
-        see 12/16 notes
-        observe other exps
-        plot final lin proj against epoch2000 self recon for 2022_m12_d19@07_43_55_sanity_check_howCombine
-        this is kinda trivial in terms of publishing methods. helpful in accelerating experiments. 
 
     compare SAMPLE_TRANS vs COMPOSE_TRANS in two body. 
     try RNN ensemble

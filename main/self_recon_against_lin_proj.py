@@ -1,10 +1,11 @@
-# Can we early stop by looking at self recon? 
+# Can we early stop by looking at self recon / linear proj loss? 
 
 import os
 from os import path
 from typing import List, Tuple, Dict
 import itertools
 import pickle
+import math
 
 import torch
 from torchWork import loadExperiment, DEVICE
@@ -102,10 +103,15 @@ def plot(data: List[Tuple[int, MyExpGroup, int, List[int], Dict[LossType, LossAc
         for lossType, lossAcc in lossAccs.items():
             loss = lossAcc.getHistory()
             if lossType.loss_name == 'loss_root.self_recon':
-                i = torch.ceil(len(loss) * early_stop)
-                print(early_stop, '~=', i / len(loss))
-                X.append(loss[i])
+                pass
             else:
+                i = math.ceil(len(loss) * early_stop)
+                # print(early_stop, '~=', i / len(loss))
+                X.append(loss[i])
                 Y.append(loss[-1])
+    plt.plot(X, Y, 'x')
+    plt.xlabel(f'lin proj loss @ {early_stop:.0%}')
+    plt.ylabel('lin proj loss')
+    plt.show()
 
 main()

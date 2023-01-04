@@ -105,6 +105,7 @@ for weight_decay, rnn_width in [
 ]:
     hP = template.copy()
     hP.weight_decay = weight_decay
+    hP.rnn_width = rnn_width
     hP.lossWeightTree['predict']['z'].weight = 0
     hP.lossWeightTree['predict']['image'].weight = 0
     hP.lossWeightTree['predict'].weight = 0

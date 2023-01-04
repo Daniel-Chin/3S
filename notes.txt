@@ -917,6 +917,8 @@ next {
             indeed, at 10% training time, you can early stop by looking at lin proj loss. 
         this is kinda trivial in terms of publishing methods. helpful in accelerating experiments. 
         even for accelerating exps, you might be missing out on late-training solutions. Don't. 
+    2023_m01_d03@05_51_38_batch_norm
+        batch norm super effective! 
 }
 next {
     exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好

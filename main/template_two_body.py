@@ -71,6 +71,7 @@ template.residual = False
 template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
+template.rnn_ensemble = 1
 template.vae_channels = [64, 128, 256]
 template.deep_spread = True
 template.relu_leak = False

@@ -76,7 +76,6 @@ template.train_set_size = 128
 template.image_loss = 'mse'
 template.sched_sampling = LinearScheduledSampling(9000)
 template.max_epoch = template.sched_sampling.duration
-template.ready()
 
 # modifying template
 # template.xxx = xxx
@@ -100,5 +99,6 @@ for x in (ours, baseline):
         hP.max_epoch = 1152000 // s
         hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
         assert hP.max_epoch * s == 128 * 9000
-        hP.ready()
+        hP.fillDefaults()
+        hP.ready(globals())
         GROUPS.append(MyExpGroup(hP))

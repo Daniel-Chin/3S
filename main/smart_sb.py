@@ -20,6 +20,7 @@ def main():
     exp_name = getExpName(args.exp_py_path)
 
     t = datetime.now().strftime('%Y_m%m_d%d@%H_%M_%S')
+    user = os.getenv('USER')
 
     os.chdir('./hpc')
     with open('template.sbatch', 'r') as fin:
@@ -31,6 +32,8 @@ def main():
                     '{JOB_NAME}', exp_name, 
                 ).replace(
                     '{ARGS}', f'"{args.exp_py_path}"', 
+                ).replace(
+                    '{USER}', user, 
                 ))
     
     with Popen(['sbatch', SBATCH_FILENAME]) as p:

@@ -925,7 +925,6 @@ next {
         rnn pred: 随机抽选 batch 中一个 traj, 扩增 batch_size 次。
 }
 todo {
-    accelerate code by moving cpu()
     vicreg
         batch norm the encoder? 
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好

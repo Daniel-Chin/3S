@@ -100,11 +100,14 @@ def forward(
     # rnn forward pass
     min_context = hParams.rnn_min_context
 
-    lossTree.predict.image = torch.tensor(0, dtype=torch.float)
-    lossTree.predict.z     = torch.tensor(0, dtype=torch.float)
-    lossTree.supervise.rnn = torch.tensor(0, dtype=torch.float)
+    lossTree.predict.image = []
+    lossTree.predict.z     = []
+    lossTree.supervise.rnn = []
+    lossTree.vicreg.variance = []
+    lossTree.vicreg.invariance = []
+    lossTree.vicreg.covariance = []
     for predRnn in predRnns:
-        for _ in range(hParams.K):
+        for K_i in range(hParams.K):
             flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
                 predRnn, z_transed, untrans, 
                 batch_size, experiment, hParams, epoch, batch_i, profiler, 
@@ -126,10 +129,10 @@ def forward(
                     IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
                 )
                 with profiler('good'):
-                    lossTree.predict.image += imgCriterion(
+                    lossTree.predict.image.append(imgCriterion(
                         img_predictions, 
                         video_batch[:, min_context:, :, :, :], 
-                    ).cpu()
+                    ))
             else:
                 img_predictions = None
                 z_hat_aug = None
@@ -165,41 +168,50 @@ def forward(
                     with profiler('good'):
                         # invariance
                         if hParams.vicreg_invariance_on_Y:
-                            lossTree.vicreg.invariance = F.mse_loss(
-                                z_hat_aug, _z, 
-                            ).cpu()
+                            l, r = z_hat_aug, _z
                         else:
-                            lossTree.vicreg.invariance = F.mse_loss(
-                                flat_emb_l, flat_emb_r, 
-                            ).cpu()
+                            l, r = flat_emb_l, flat_emb_r
+                        lossTree.vicreg.invariance.append(
+                            F.mse_loss(l, r), 
+                        )
+                        del l, r
                     
                         # variance
                         std_emb_l = torch.sqrt(flat_emb_l.var(dim=0) + 1e-4)
                         std_emb_r = torch.sqrt(flat_emb_r.var(dim=0) + 1e-4)
-                        lossTree.vicreg.variance = (
+                        lossTree.vicreg.variance.append(
                             torch.mean(F.relu(1 - std_emb_l)) +
                             torch.mean(F.relu(1 - std_emb_r))
-                        ).cpu()
+                        )
 
                         # covariance
                         flat_emb_l = flat_emb_l - flat_emb_l.mean(dim=0)
                         flat_emb_r = flat_emb_r - flat_emb_r.mean(dim=0)
                         cov_emb_l = (flat_emb_l.T @ flat_emb_l) / (batch_size - 1)
                         cov_emb_r = (flat_emb_r.T @ flat_emb_r) / (batch_size - 1)
-                        lossTree.vicreg.covariance = (
+                        lossTree.vicreg.covariance.append(
                             (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_l).pow_(2).sum() / hParams.vicreg_emb_dim + 
                             (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_r).pow_(2).sum() / hParams.vicreg_emb_dim
-                        ).cpu()
+                        )
                 else:
                     with profiler('good'):
                         z_loss = F.mse_loss(z_hat_aug, _z)
                     if hParams.supervise_rnn:
-                        lossTree.supervise.rnn += z_loss.cpu()
+                        lossTree.supervise.rnn.append(z_loss)
                     else:
-                        lossTree.predict.z += z_loss.cpu()
-    lossTree.predict.image /= hParams.rnn_ensemble
-    lossTree.predict.z     /= hParams.rnn_ensemble
-    lossTree.supervise.rnn /= hParams.rnn_ensemble
+                        lossTree.predict.z.append(z_loss)
+    def _aggregate(x):
+        if x:
+            return torch.stack(x).sum().cpu() / hParams.rnn_ensemble
+        else:
+            return torch.tensor(0)
+    lossTree.predict.image     = _aggregate(lossTree.predict.image    )
+    lossTree.predict.z         = _aggregate(lossTree.predict.z        )
+    lossTree.supervise.rnn     = _aggregate(lossTree.supervise.rnn    )
+    lossTree.vicreg.variance   = _aggregate(lossTree.vicreg.variance  )
+    lossTree.vicreg.invariance = _aggregate(lossTree.vicreg.invariance)
+    lossTree.vicreg.covariance = _aggregate(lossTree.vicreg.covariance)
+    del _aggregate
 
     if hParams.vvrnn or hParams.vvrnn_static is not None:
         mean_square_vrnn_std = torch.exp(

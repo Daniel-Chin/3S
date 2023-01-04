@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --mail-user=daniel.chin@nyu.edu
+#SBATCH --mail-user={USER}@nyu.edu
 #SBATCH --mail-type=ALL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

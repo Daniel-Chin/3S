@@ -906,6 +906,9 @@ next {
     2023_m01_d03@05_40_32_weight_decay
         1e-9: self-recon looks good. linear proj imrpoved, ~50%. 
         note: weight decay also applies to RNN. bigger RNN? 
+    decided not to do:
+        try time aug, e.g. stretch (int / float ratio), reverse
+        because: doesn't generalize to music or real videos. 
 }
 next {
     exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
@@ -925,18 +928,11 @@ todo {
         plot final lin proj against epoch2000 self recon for 2022_m12_d19@07_43_55_sanity_check_howCombine
         this is kinda trivial in terms of publishing methods. helpful in accelerating experiments. 
 
-    test grad clip
-    
     compare SAMPLE_TRANS vs COMPOSE_TRANS in two body. 
-    try time aug, e.g. stretch (int / float ratio), reverse
-    wrong symm: 11/4 notes
     try RNN ensemble
 }
 archive {
     有些结， 升一维就能解开。 暂时升一维， 等会儿降回来？
-}
-if {
-    if weights still Inf, add weight decay. 
 }
 known issues {
     if continue train, then epochs will duplicate in loss plots. Behavior: loss plots show max_epoch larger than the real max_epoch. 

@@ -41,10 +41,11 @@ def main():
         experiment.SEQ_LEN, 
         experiment.ACTUAL_DIM, DEVICE, 
     )
-    runExperiment(
-        args.exp_py_path, requireModelClasses, oneEpoch, 
-        trainSet, validateSet, 
-    )
+    with GPUUtilizationReporter(interval=10):
+        runExperiment(
+            args.exp_py_path, requireModelClasses, oneEpoch, 
+            trainSet, validateSet, 
+        )
 
 def requireModelClasses(hParams: HyperParams):
     x = {}

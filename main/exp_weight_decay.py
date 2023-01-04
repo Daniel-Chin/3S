@@ -17,8 +17,11 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'weight_decay'
-        self.variable_value = hyperParams.weight_decay
+        self.variable_name = 'weight_decay,rnn_width'
+        self.variable_value = (
+            hyperParams.weight_decay, 
+            hyperParams.rnn_width, 
+        )
     
     @lru_cache(1)
     def name(self):
@@ -93,9 +96,12 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-for weight_decay in [
+for weight_decay, rnn_width in [
     # 1e-6, 
-    1e-7, 1e-8, 1e-9, 
+    # 1e-7, 1e-8, 1e-9, 
+    (1e-9, 64), 
+    (1e-10, 32), 
+    (1e-10, 64), 
 ]:
     hP = template.copy()
     hP.weight_decay = weight_decay

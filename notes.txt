@@ -902,6 +902,11 @@ next {
             it works!!!
         I used the incorrect hyperParam from bounce... omfg
 }
+1/4 {
+    2023_m01_d03@05_40_32_weight_decay
+        1e-9: self-recon looks good. linear proj imrpoved, ~50%. 
+        note: weight decay also applies to RNN. bigger RNN? 
+}
 todo {
     vicreg
         batch norm the encoder? 

@@ -95,7 +95,7 @@ template.vicreg_invariance_on_Y = None
 # template.xxx = xxx
 
 for rnn_ensemble in (
-    # 1, 
+    1, 
     2, 4, 8, 16, 
 ):
     hP = template.copy()

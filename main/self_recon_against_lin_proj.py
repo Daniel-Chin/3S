@@ -1,5 +1,6 @@
 # Can we early stop by looking at self recon? 
 
+import os
 from os import path
 from typing import List, Tuple, Dict
 import itertools
@@ -17,9 +18,9 @@ from template_bounce import MyExpGroup
 
 EARLY_STOP = .5
 
-EXP_PATH = path.join('./experiments/', '''
+EXP_PATH = path.abspath(path.join('./experiments/', '''
 2022_m12_d19@07_44_07_train_size_c_max_batch
-'''.strip())
+'''.strip()))
 
 def main():
     exp_name, n_rand_inits, groups, experiment = loadExperiment(path.join(
@@ -28,8 +29,9 @@ def main():
     groups: List[MyExpGroup]
     print(f'{exp_name = }')
 
+    os.chdir(EXP_PATH)
     saveData(exp_name, n_rand_inits, groups)
-    loadData()
+    data = loadData()
 
     for early_stop in range(0.1, 1, .2):
         plot(data, early_stop)
@@ -79,8 +81,12 @@ def saveData(exp_name, n_rand_inits, groups):
             epochs, lossAccs, 
         ))
     
-    with open(__file__ + '.cache.data', 'wb') as f:
-        pickle.dump(data, f)
+    try:
+        with open(__file__ + '.cache.data', 'wb') as f:
+            pickle.dump(data, f)
+    except:
+        from console import console
+        console({**globals(), **locals()})
 
 def loadData():
     with open(__file__ + '.cache.data', 'rb') as f:

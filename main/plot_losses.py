@@ -22,7 +22,7 @@ lossTypes = [
 
     # LossType('train',    'loss_root.predict.z'), 
     LossType('validate', 'loss_root.predict.z'), 
-    LossType('train',    'loss_root.predict.image'), 
+    # LossType('train',    'loss_root.predict.image'), 
     LossType('validate', 'loss_root.predict.image'), 
 
     # LossType('validate', 'loss_root.seq_energy.real'), 

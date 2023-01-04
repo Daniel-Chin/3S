@@ -73,10 +73,10 @@ class UI:
             for row_i in range(self.n_row):
                 epoch, models = loadLatestModels(
                     experiment_path, group, row_i, dict(
-                        vae=VAE, 
+                        vae=(VAE, 1), 
                     ), lock_epoch, 
                 )
-                vae = models['vae']
+                vae = models['vae'][0]
                 vae.eval()
                 self.vaes[row_i][col_i] = vae
 

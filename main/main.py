@@ -41,10 +41,19 @@ def main():
         experiment.SEQ_LEN, 
         experiment.ACTUAL_DIM, DEVICE, 
     )
-    runExperiment(args.exp_py_path, oneEpoch, {
-        'vae': VAE, 
-        'predRnn': PredRNN, 
-        'energyRnn': EnergyRNN, 
-    }, trainSet, validateSet)
+    runExperiment(
+        args.exp_py_path, requireModelClasses, oneEpoch, 
+        trainSet, validateSet, 
+    )
+
+def requireModelClasses(hParams: HyperParams):
+    x = {}
+    x['vae'] = (VAE, 1)
+    x['predRnn'] = (PredRNN, hParams.rnn_ensemble)
+    x['energyRnn'] = (EnergyRNN, (
+        1 if hParams.lossWeightTree['seq_energy'].weight 
+        else 0
+    ))
+    return x
 
 main()

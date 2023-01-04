@@ -77,7 +77,7 @@ def videoEval(
     epoch, save_path, set_name, 
     experiment, hParams: HyperParams, 
     video_batch: torch.Tensor, traj_batch, 
-    vae, predRnn, energyRnn, profiler, 
+    vae, predRnns, energyRnns, profiler, 
 ):
     n_datapoints = video_batch.shape[0]
     (
@@ -85,7 +85,7 @@ def videoEval(
         z, z_hat, extra_logs, 
     ) = forward(
         epoch, 0, experiment, hParams, video_batch, traj_batch, 
-        vae, predRnn, energyRnn, profiler, True, False, 
+        vae, predRnns, energyRnns, profiler, True, False, 
     )
     filename = path.join(
         save_path, f'visualize_{set_name}_epoch_{epoch}.mp4', 

@@ -52,9 +52,9 @@ def main(experiment_path, lock_epoch):
         for rand_init_i in range(n_rand_inits):
             print(f'{rand_init_i = }')
             epoch, models = loadLatestModels(experiment_path, group, rand_init_i, dict(
-                vae=VAE, 
+                vae=(VAE, 1), 
             ), lock_epoch)
-            vae: VAE = models['vae']
+            vae: VAE = models['vae'][0]
             vae.eval()
             with torch.no_grad():
                 Z, _ = vae.encode(image_set)

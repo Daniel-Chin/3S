@@ -17,7 +17,8 @@ from symmetry_transforms import identity
 def forward(
     epoch, batch_i, experiment, hParams: HyperParams, 
     video_batch: torch.Tensor, traj_batch: torch.Tensor, 
-    vae: VAE, predRnn: PredRNN, energyRnn: EnergyRNN, 
+    vae: VAE, 
+    predRnns: List[PredRNN], energyRnns: List[EnergyRNN], 
     profiler: torchWork.Profiler, 
     require_img_predictions_and_z_hat: bool = True, 
     validating: bool = False, 
@@ -102,99 +103,103 @@ def forward(
     lossTree.predict.image = torch.tensor(0, dtype=torch.float)
     lossTree.predict.z     = torch.tensor(0, dtype=torch.float)
     lossTree.supervise.rnn = torch.tensor(0, dtype=torch.float)
-    for _ in range(hParams.K):
-        flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
-            predRnn, z_transed, untrans, 
-            batch_size, experiment, hParams, epoch, batch_i, profiler, 
-        )
-
-        # predict image
-        if (
-            require_img_predictions_and_z_hat
-            or validating 
-            or hParams.lossWeightTree['predict']['image'].weight != 0
-        ):
-            z_hat_aug = flat_z_hat_aug.view(
-                batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
+    for predRnn in predRnns:
+        for _ in range(hParams.K):
+            flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
+                predRnn, z_transed, untrans, 
+                batch_size, experiment, hParams, epoch, batch_i, profiler, 
             )
-            with profiler('good'):
-                flat_predictions = vae.decode(r_flat_z_hat_aug)
-            img_predictions = flat_predictions.view(
-                batch_size, SEQ_LEN - min_context, 
-                IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
-            )
-            with profiler('good'):
-                lossTree.predict.image += imgCriterion(
-                    img_predictions, 
-                    video_batch[:, min_context:, :, :, :], 
-                ).cpu()
-        else:
-            img_predictions = None
-            z_hat_aug = None
 
-        # predict z
-        if (
-            validating 
-            or hParams.lossWeightTree['predict']['z'].weight != 0
-            or hParams.supervise_rnn 
-            or hParams.lossWeightTree['vicreg'].weight
-        ):
-            if hParams.jepa_stop_grad_l_encoder:
-                flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
-                    predRnn, z_transed.detach(), untrans, 
-                    batch_size, experiment, hParams, epoch, batch_i, profiler, 
+            # predict image
+            if (
+                require_img_predictions_and_z_hat
+                or validating 
+                or hParams.lossWeightTree['predict']['image'].weight != 0
+            ):
+                z_hat_aug = flat_z_hat_aug.view(
+                    batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
                 )
-            z_hat_aug = flat_z_hat_aug.view(
-                batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
-            )
-            _z = z[:, min_context:, :]
-            if hParams.jepa_stop_grad_r_encoder:
-                _z = _z.detach()
-            if hParams.lossWeightTree['vicreg'].weight:
-                flat_emb_r = vae.expander(_z.reshape(
-                    batch_size * (SEQ_LEN - min_context), 
-                    hParams.symm.latent_dim, 
-                ))
-                flat_emb_l = vae.expander(z_hat_aug.reshape(
-                    batch_size * (SEQ_LEN - min_context), 
-                    hParams.symm.latent_dim, 
-                ))
-
                 with profiler('good'):
-                    # invariance
-                    if hParams.vicreg_invariance_on_Y:
-                        lossTree.vicreg.invariance = F.mse_loss(
-                            z_hat_aug, _z, 
-                        ).cpu()
-                    else:
-                        lossTree.vicreg.invariance = F.mse_loss(
-                            flat_emb_l, flat_emb_r, 
-                        ).cpu()
-                
-                    # variance
-                    std_emb_l = torch.sqrt(flat_emb_l.var(dim=0) + 1e-4)
-                    std_emb_r = torch.sqrt(flat_emb_r.var(dim=0) + 1e-4)
-                    lossTree.vicreg.variance = (
-                        torch.mean(F.relu(1 - std_emb_l)) +
-                        torch.mean(F.relu(1 - std_emb_r))
-                    ).cpu()
-
-                    # covariance
-                    flat_emb_l = flat_emb_l - flat_emb_l.mean(dim=0)
-                    flat_emb_r = flat_emb_r - flat_emb_r.mean(dim=0)
-                    cov_emb_l = (flat_emb_l.T @ flat_emb_l) / (batch_size - 1)
-                    cov_emb_r = (flat_emb_r.T @ flat_emb_r) / (batch_size - 1)
-                    lossTree.vicreg.covariance = (
-                        (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_l).pow_(2).sum() / hParams.vicreg_emb_dim + 
-                        (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_r).pow_(2).sum() / hParams.vicreg_emb_dim
+                    flat_predictions = vae.decode(r_flat_z_hat_aug)
+                img_predictions = flat_predictions.view(
+                    batch_size, SEQ_LEN - min_context, 
+                    IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
+                )
+                with profiler('good'):
+                    lossTree.predict.image += imgCriterion(
+                        img_predictions, 
+                        video_batch[:, min_context:, :, :, :], 
                     ).cpu()
             else:
-                with profiler('good'):
-                    z_loss = F.mse_loss(z_hat_aug, _z)
-                if hParams.supervise_rnn:
-                    lossTree.supervise.rnn += z_loss.cpu()
+                img_predictions = None
+                z_hat_aug = None
+
+            # predict z
+            if (
+                validating 
+                or hParams.lossWeightTree['predict']['z'].weight != 0
+                or hParams.supervise_rnn 
+                or hParams.lossWeightTree['vicreg'].weight
+            ):
+                if hParams.jepa_stop_grad_l_encoder:
+                    flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
+                        predRnn, z_transed.detach(), untrans, 
+                        batch_size, experiment, hParams, epoch, batch_i, profiler, 
+                    )
+                z_hat_aug = flat_z_hat_aug.view(
+                    batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
+                )
+                _z = z[:, min_context:, :]
+                if hParams.jepa_stop_grad_r_encoder:
+                    _z = _z.detach()
+                if hParams.lossWeightTree['vicreg'].weight:
+                    flat_emb_r = vae.expander(_z.reshape(
+                        batch_size * (SEQ_LEN - min_context), 
+                        hParams.symm.latent_dim, 
+                    ))
+                    flat_emb_l = vae.expander(z_hat_aug.reshape(
+                        batch_size * (SEQ_LEN - min_context), 
+                        hParams.symm.latent_dim, 
+                    ))
+
+                    with profiler('good'):
+                        # invariance
+                        if hParams.vicreg_invariance_on_Y:
+                            lossTree.vicreg.invariance = F.mse_loss(
+                                z_hat_aug, _z, 
+                            ).cpu()
+                        else:
+                            lossTree.vicreg.invariance = F.mse_loss(
+                                flat_emb_l, flat_emb_r, 
+                            ).cpu()
+                    
+                        # variance
+                        std_emb_l = torch.sqrt(flat_emb_l.var(dim=0) + 1e-4)
+                        std_emb_r = torch.sqrt(flat_emb_r.var(dim=0) + 1e-4)
+                        lossTree.vicreg.variance = (
+                            torch.mean(F.relu(1 - std_emb_l)) +
+                            torch.mean(F.relu(1 - std_emb_r))
+                        ).cpu()
+
+                        # covariance
+                        flat_emb_l = flat_emb_l - flat_emb_l.mean(dim=0)
+                        flat_emb_r = flat_emb_r - flat_emb_r.mean(dim=0)
+                        cov_emb_l = (flat_emb_l.T @ flat_emb_l) / (batch_size - 1)
+                        cov_emb_r = (flat_emb_r.T @ flat_emb_r) / (batch_size - 1)
+                        lossTree.vicreg.covariance = (
+                            (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_l).pow_(2).sum() / hParams.vicreg_emb_dim + 
+                            (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_r).pow_(2).sum() / hParams.vicreg_emb_dim
+                        ).cpu()
                 else:
-                    lossTree.predict.z += z_loss.cpu()
+                    with profiler('good'):
+                        z_loss = F.mse_loss(z_hat_aug, _z)
+                    if hParams.supervise_rnn:
+                        lossTree.supervise.rnn += z_loss.cpu()
+                    else:
+                        lossTree.predict.z += z_loss.cpu()
+    lossTree.predict.image /= hParams.rnn_ensemble
+    lossTree.predict.z     /= hParams.rnn_ensemble
+    lossTree.supervise.rnn /= hParams.rnn_ensemble
 
     if hParams.vvrnn or hParams.vvrnn_static is not None:
         mean_square_vrnn_std = torch.exp(
@@ -225,6 +230,7 @@ def forward(
 
     # seq energy
     if hParams.lossWeightTree['seq_energy'].weight != 0:
+        energyRnn = energyRnns[0]
         RATIO = 64
         noise = torch.randn((
             RATIO * batch_size, SEQ_LEN, hParams.symm.latent_dim, 

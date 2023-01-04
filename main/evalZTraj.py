@@ -36,8 +36,8 @@ def main():
         group.hyperParams.print(depth=1)
         print(f'{RAND_INIT_I = }')
         vae = loadLatestModels(EXPERIMENT_PATH, group, RAND_INIT_I, dict(
-            vae=VAE, 
-        ), LOCK_EPOCH)['vae']
+            vae=(VAE, 1), 
+        ), LOCK_EPOCH)['vae'][0]
         vae.eval()
         evalZTraj(vae, dataset, group.hyperParams, experiment.SEQ_LEN)
 

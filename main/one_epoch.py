@@ -1,5 +1,5 @@
 from os import path
-from typing import Dict
+from typing import Dict, List, Optional
 import inspect
 
 import torch
@@ -33,7 +33,7 @@ def dataLoader(dataset, batch_size, set_size=None):
 def oneEpoch(
     group_name: str, epoch: int, 
     experiment, hParams: HyperParams, 
-    models: Dict[str, torch.nn.Module], 
+    models: Dict[str, List[torch.nn.Module]], 
     optim: torch.optim.Optimizer, 
     trainSet: Dataset, validateSet: Dataset, 
     lossLogger: LossLogger, profiler: Profiler, 
@@ -43,9 +43,9 @@ def oneEpoch(
     if epoch > hParams.max_epoch:
         return False
     with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
-        vae: VAE = models['vae']
-        predRnn: PredRNN = models['predRnn']
-        energyRnn: EnergyRNN = models['energyRnn']
+        vae: VAE = models['vae'][0]
+        predRnns: List[PredRNN] = models['predRnn']
+        energyRnns: List[EnergyRNN] = models['energyRnn']
 
         trainLoader    = dataLoader(
             trainSet,    hParams.batch_size, hParams.train_set_size, 
@@ -55,8 +55,8 @@ def oneEpoch(
         )
 
         vae.train()
-        predRnn.train()
-        energyRnn.train()
+        [x.train() for x in predRnns]
+        [x.train() for x in energyRnns]
     for batch_i, (video_batch, traj_batch) in enumerate(
         trainLoader, 
     ):
@@ -67,7 +67,7 @@ def oneEpoch(
             ) = forward(
                 epoch, batch_i, experiment, hParams, 
                 video_batch, traj_batch, 
-                vae, predRnn, energyRnn, profiler, 
+                vae, predRnns, energyRnns, profiler, 
                 False, False, 
             )
         with profiler('sum loss'):
@@ -103,8 +103,8 @@ def oneEpoch(
 
     with profiler(f'line {inspect.getframeinfo(inspect.currentframe()).lineno}'):
         vae.eval()
-        predRnn.eval()
-        energyRnn.eval()
+        [x.eval() for x in predRnns]
+        [x.eval() for x in energyRnns]
     with torch.no_grad(), hParams.eval():
         for batch_i, (video_batch, traj_batch) in enumerate(
             validateLoader, 
@@ -116,7 +116,7 @@ def oneEpoch(
                 ) = forward(
                     epoch, 0, experiment, hParams, 
                     video_batch, traj_batch, 
-                    vae, predRnn, energyRnn, profiler, 
+                    vae, predRnns, energyRnns, profiler, 
                     False, True, 
                 )
             with profiler('log losses'):
@@ -144,7 +144,7 @@ def oneEpoch(
                         videoEval(
                             epoch, save_path, name, 
                             experiment, hParams, *next(loader), 
-                            vae, predRnn, energyRnn, profiler, 
+                            vae, predRnns, energyRnns, profiler, 
                         )
     
     if epoch % 32 == 0:

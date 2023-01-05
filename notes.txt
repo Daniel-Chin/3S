@@ -931,7 +931,11 @@ next {
                 Overall, it is not clear whether it will benefit final disen. ablate for now, and later if we see a similar need, we can try l1 again. 
     2023_m01_d03@23_48_11_weight_decay
         weight decay still seems to kill disen. 
-        next: smaller weight decay VS 0. 
+        weight decay encourages RNN collapse. 
+        next: 
+            smaller weight decay VS 0. 
+            only apply weight decay to vae. 
+                Only if bigger RNN doesn't work! 
 }
 next {
     exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好

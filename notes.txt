@@ -936,6 +936,8 @@ next {
             smaller weight decay VS 0. 
             only apply weight decay to vae. 
                 Only if bigger RNN doesn't work! 
+    2023_m01_d04@01_32_48_vvrnn_static
+        p >> 0.05. safe to ablate. 
 }
 next {
     exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好

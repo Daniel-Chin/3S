@@ -82,7 +82,7 @@ template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
-template.weight_decay = 0   # 1e-6
+template.weight_decay = 0
 template.lr_diminish = None
 template.train_set_size = 64
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
@@ -95,9 +95,8 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-# hP = template.copy()
-# hP.xxx = xxx
-# hP.ready(globals())
-# GROUPS.append(MyExpGroup(hP))
-
-assert len(GROUPS) == 0
+for xxx in []:
+    hP = template.copy()
+    hP.xxx = xxx
+    hP.ready(globals())
+    GROUPS.append(MyExpGroup(hP))

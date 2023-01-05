@@ -920,6 +920,19 @@ next {
     2023_m01_d03@05_51_38_batch_norm
         batch norm super effective! 
 }
+1/5 {
+    2023_m01_d03@13_21_44_2b_l1
+        both mse_l1 and mse overfit to training set, for both self-recon and image pred. 
+        try increase train set size? see if it fights overfitting. 
+        in terms of the mse->l1 trick:
+            compared to l1, it clearly solves the initial collapse problem. 
+            compared to mse, 
+                the recons are prone to be blank. MSE encourages weak guesses, but the weak guesses turn out to be wrong anyways. 
+                Overall, it is not clear whether it will benefit final disen. ablate for now, and later if we see a similar need, we can try l1 again. 
+    2023_m01_d03@23_48_11_weight_decay
+        weight decay still seems to kill disen. 
+        next: smaller weight decay VS 0. 
+}
 next {
     exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
         可不可以这样做：

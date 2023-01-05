@@ -10,15 +10,15 @@ VALIDATE_SET_SIZE = 64
 SEQ_LEN = 25
 ACTUAL_DIM = 6
 
-EXP_NAME = '2b_l1'
+EXP_NAME = '2b_train_set_size'
 N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'sched_image_loss'
-        self.variable_value = hyperParams.sched_image_loss
+        self.variable_name = 'train_set_size'
+        self.variable_value = hyperParams.train_set_size
     
     @lru_cache(1)
     def name(self):
@@ -71,12 +71,13 @@ template.residual = False
 template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
+template.rnn_ensemble = 1
 template.vae_channels = [64, 128, 256]
 template.deep_spread = True
 template.relu_leak = False
 template.vae_kernel_size = 4
 template.vae_is_actually_ae = False
-template.encoder_batch_norm = False
+template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
@@ -93,12 +94,10 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-for sil in [
-    ScheduledImageLoss((0, 'mse')), 
-    ScheduledImageLoss((0, 'l1')), 
-    ScheduledImageLoss((0, 'mse'), (2000, 'l1')), 
-]:
+for tss in [64, 128, 256]:
     hP = template.copy()
-    hP.sched_image_loss = sil
+    hP.train_set_size = tss
+    hP.max_epoch = 16000 * 64 // tss
+    hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

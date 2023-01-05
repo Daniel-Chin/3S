@@ -75,11 +75,13 @@ template.residual = False
 template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
+template.rnn_ensemble = 1
 template.vae_channels = [64, 128, 256]
 template.deep_spread = True
 template.relu_leak = False
 template.vae_kernel_size = 4
 template.vae_is_actually_ae = False
+template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
@@ -99,9 +101,12 @@ template.vicreg_invariance_on_Y = None
 for weight_decay, rnn_width in [
     # 1e-6, 
     # 1e-7, 1e-8, 1e-9, 
-    (1e-9, 64), 
-    (1e-10, 32), 
-    (1e-10, 64), 
+    # (1e-9, 64), 
+    # (1e-10, 32), 
+    # (1e-10, 64), 
+    (1e-11, 32), 
+    (1e-11, 64), 
+    (0, 32), 
 ]:
     hP = template.copy()
     hP.weight_decay = weight_decay

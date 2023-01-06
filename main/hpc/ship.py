@@ -40,7 +40,7 @@ prefix, suffix = template.split('%d')
 def tar(exp_dir_name):
     print('taring', exp_dir_name, '...')
     with sp.Popen(
-        ['tar', '-czfv', exp_dir_name + '.tar.gz', '-T', '-'], 
+        ['tar', '-vczf', exp_dir_name + '.tar.gz', '-T', '-'], 
         stdin=sp.PIPE, 
     ) as p:
         paths = [exp_dir_name]

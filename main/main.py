@@ -1,7 +1,10 @@
+from os import path
+
 import torchWork
 from torchWork import DEVICE
 from torchWork.experiment_control import (
     runExperiment, loadExperiment, ExperimentGroup, 
+    EXPERIMENT_PY_FILENAME, 
 )
 from torchWork.profiler import GPUUtilizationReporter
 
@@ -12,13 +15,20 @@ from vae import VAE
 from rnn import PredRNN, EnergyRNN
 from arg_parser import ArgParser
 
-def main():
-    args = ArgParser()
-    print(f'{args.exp_py_path = }')
+def main(continue_exp_dir=None):
+    if continue_exp_dir is None:
+        args = ArgParser()
+        print(f'{args.exp_py_path = }')
+        exp_py_path = args.exp_py_path
+    else:
+        exp_py_path = path.join(
+            './experiments', 
+            continue_exp_dir, EXPERIMENT_PY_FILENAME, 
+        )
 
     (
         experiment_name, n_rand_inits, groups, experiment, 
-    ) = loadExperiment(args.exp_py_path)
+    ) = loadExperiment(exp_py_path)
     print(
         'Experiment:', experiment_name, ',', 
         len(groups), 'x', n_rand_inits, 
@@ -44,7 +54,7 @@ def main():
     with GPUUtilizationReporter(interval=10):
         runExperiment(
             args.exp_py_path, requireModelClasses, oneEpoch, 
-            trainSet, validateSet, 
+            trainSet, validateSet, continue_from=continue_exp_dir, 
         )
 
 def requireModelClasses(hParams: HyperParams):
@@ -57,4 +67,5 @@ def requireModelClasses(hParams: HyperParams):
     ))
     return x
 
-main()
+if __name__ == '__main__':
+    main()

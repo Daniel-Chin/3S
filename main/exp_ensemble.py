@@ -11,7 +11,7 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 
 EXP_NAME = 'ensemble'
-N_RAND_INITS = 4
+N_RAND_INITS = 16
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -96,7 +96,8 @@ template.vicreg_invariance_on_Y = None
 
 for rnn_ensemble in (
     1, 
-    2, 4, 8, 16, 
+    # 2, 4, 8, 
+    16, 
 ):
     hP = template.copy()
     hP.rnn_ensemble = rnn_ensemble

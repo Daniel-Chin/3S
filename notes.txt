@@ -904,8 +904,7 @@ next {
 }
 1/4 {
     2023_m01_d03@05_40_32_weight_decay
-        1e-9: self-recon looks good. linear proj imrpoved, ~50%. 
-        note: weight decay also applies to RNN. bigger RNN? 
+        1e-9: self-recon looks good. 
     decided not to do:
         try time aug, e.g. stretch (int / float ratio), reverse
         because: doesn't generalize to music or real videos. 
@@ -929,15 +928,21 @@ next {
             compared to mse, 
                 the recons are prone to be blank. MSE encourages weak guesses, but the weak guesses turn out to be wrong anyways. 
                 Overall, it is not clear whether it will benefit final disen. ablate for now, and later if we see a similar need, we can try l1 again. 
-    2023_m01_d03@23_48_11_weight_decay
-        weight decay still seems to kill disen. 
-        weight decay encourages RNN collapse. 
-        next: 
-            smaller weight decay VS 0. 
-            only apply weight decay to vae. 
-                Only if bigger RNN doesn't work! 
     2023_m01_d04@01_32_48_vvrnn_static
         p >> 0.05. safe to ablate. 
+}
+1/6 {
+    2023_m01_d03@05_30_15_four_shots
+        four shots are not enough. 
+        symm helps a little bit. 
+    2023_m01_d05@03_02_11_weight_decay
+        其实做错了，我忘了 pred loss 关掉了。。。
+        2023_m01_d03@05_40_32_weight_decay 就已经说明 1e-9 够小了。
+        重新打开 pred loss. 
+    2023_m01_d05@02_35_28_2b_train_set_size
+        bigger train size doesn't fight overfitting. 
+        trying weight decay. 
+        trying 1024 dataset. Rationale: one ball traj needed 32 datapoints. Maybe two ball should need 32^2=1024 datapoints. 
 }
 next {
     exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好

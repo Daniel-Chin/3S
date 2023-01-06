@@ -4,23 +4,23 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/bounce/train'
-VALIDATE_SET_PATH = '../datasets/bounce/validate'
+TRAIN_SET_PATH    = '../datasets/two_body/train'
+VALIDATE_SET_PATH = '../datasets/two_body/validate'
 VALIDATE_SET_SIZE = 64
-SEQ_LEN = 20
-ACTUAL_DIM = 3
+SEQ_LEN = 25
+ACTUAL_DIM = 6
 
-EXP_NAME = 'batch_norm'
-N_RAND_INITS = 8
+EXP_NAME = '2b_weight_decay'
+N_RAND_INITS = 6
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'encoder_batch_norm,batch_size'
+        self.variable_name = 'weight_decay,train_set_size'
         self.variable_value = (
-            hyperParams.encoder_batch_norm, 
-            hyperParams.batch_size, 
+            hyperParams.weight_decay, 
+            hyperParams.train_set_size, 
         )
     
     @lru_cache(1)
@@ -57,9 +57,8 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    3, [
-        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
-        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
+    6, [
+        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
     ], 
 )
 template.supervise_rnn = False
@@ -67,7 +66,7 @@ template.supervise_vae = False
 template.supervise_vae_only_xy = False
 template.variational_rnn = True
 template.vvrnn = False
-template.vvrnn_static = -25
+template.vvrnn_static = None
 template.rnn_min_context = 5
 template.energy_noise_std = 1
 template.rnn_width = 32
@@ -75,12 +74,13 @@ template.residual = False
 template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
+template.rnn_ensemble = 1
 template.vae_channels = [64, 128, 256]
 template.deep_spread = True
 template.relu_leak = False
 template.vae_kernel_size = 4
 template.vae_is_actually_ae = False
-template.encoder_batch_norm = False
+template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
@@ -97,10 +97,14 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-for batch_size in (16, 32):
-    for ebn in (False, True):
-        hP = template.copy()
-        hP.batch_size = batch_size
-        hP.encoder_batch_norm = ebn
-        hP.ready(globals())
-        GROUPS.append(MyExpGroup(hP))
+for wd, tss in [
+    # (0, 64), 
+    (0, 1024), 
+    (1e-9, 64), 
+    (1e-9, 1024), 
+]:
+    hP = template.copy()
+    hP.weight_decay = wd
+    hP.train_set_size = tss
+    hP.ready(globals())
+    GROUPS.append(MyExpGroup(hP))

@@ -67,7 +67,7 @@ template.supervise_vae = False
 template.supervise_vae_only_xy = False
 template.variational_rnn = True
 template.vvrnn = False
-template.vvrnn_static = -25
+template.vvrnn_static = None
 template.rnn_min_context = 5
 template.energy_noise_std = 1
 template.rnn_width = 32
@@ -85,7 +85,7 @@ template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
-template.weight_decay = 0   # 1e-6
+template.weight_decay = 0
 template.lr_diminish = None
 template.train_set_size = 64
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
@@ -104,15 +104,12 @@ for weight_decay, rnn_width in [
     # (1e-9, 64), 
     # (1e-10, 32), 
     # (1e-10, 64), 
-    (1e-10, 128), 
-    (1e-10, 256), 
+    (1e-9, 32), 
+    # (1e-9, 64), 
     (0, 32), 
 ]:
     hP = template.copy()
     hP.weight_decay = weight_decay
     hP.rnn_width = rnn_width
-    hP.lossWeightTree['predict']['z'].weight = 0
-    hP.lossWeightTree['predict']['image'].weight = 0
-    hP.lossWeightTree['predict'].weight = 0
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

@@ -2,6 +2,7 @@
 
 import os
 from os import path
+import subprocess as sp
 
 def main():
     os.chdir('../experiments')
@@ -34,9 +35,38 @@ def main():
     os.system('git commit -m "auto commit exp"')
     os.system('git push')
 
-def tar(name):
-    print('taring', name, '...')
-    os.system(f'tar -czf "{name}.tar.gz" "{name}"')
+template = 'vae_epoch_%d.pt'
+prefix, suffix = template.split('%d')
+def tar(exp_dir_name):
+    print('taring', exp_dir_name, '...')
+    with sp.Popen(
+        ['tar', '-czfv', exp_dir_name + '.tar.gz', '-T', '-'], 
+        stdin=sp.PIPE, 
+    ) as p:
+        paths = [exp_dir_name]
+        def eat(name: str):
+            p.stdin.write(path.join(*paths, name).encode())
+            p.stdin.write('\n'.encode())
+
+        for name in os.listdir(exp_dir_name):
+            if path.isfile(name):
+                eat(name)
+            else:
+                if name == '__pycache__':
+                    continue
+                paths.append(name)
+                max_epoch = -1
+                for name in os.listdir(path.join(*paths)):
+                    if not name.startswith(prefix):
+                        eat(name)
+                        continue
+                    _, name = name.split(prefix)
+                    name, _ = name.split(suffix)
+                    epoch = int(name)
+                    max_epoch = max(max_epoch, epoch)
+                assert max_epoch != -1
+                eat(template % max_epoch)
+                paths.pop(-1)
 
 def doAll():
     os.system('git add .')

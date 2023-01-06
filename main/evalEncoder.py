@@ -43,7 +43,7 @@ def main(experiment_path, lock_epoch):
     Y: List[List[torch.Tensor]] = [[] for _ in range(n_rand_inits)]
     for group in groups:
         print(group.name())
-        group.hyperParams.print(depth=1)
+        group.hyperParams.print(depth=1, exclude=['experiment_globals'])
         group.hyperParams.fillDefaults()
         for rand_init_i in range(n_rand_inits):
             print(f'{rand_init_i = }')

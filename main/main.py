@@ -53,7 +53,7 @@ def main(continue_exp_dir=None):
     )
     with GPUUtilizationReporter(interval=10):
         runExperiment(
-            args.exp_py_path, requireModelClasses, oneEpoch, 
+            exp_py_path, requireModelClasses, oneEpoch, 
             trainSet, validateSet, continue_from=continue_exp_dir, 
         )
 

@@ -17,8 +17,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = '0'
-        self.variable_value = 0
+        self.variable_name = 'batch_size'
+        self.variable_value = hyperParams.batch_size
     
     @lru_cache(1)
     def name(self):
@@ -64,7 +64,7 @@ template.supervise_vae = False
 template.supervise_vae_only_xy = False
 template.variational_rnn = True
 template.vvrnn = False
-template.vvrnn_static = -25
+template.vvrnn_static = None
 template.rnn_min_context = 5
 template.energy_noise_std = 1
 template.rnn_width = 32
@@ -82,7 +82,7 @@ template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
-template.weight_decay = 0   # 1e-6
+template.weight_decay = 0
 template.lr_diminish = None
 template.train_set_size = 64
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
@@ -95,25 +95,28 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-hP = template.copy()
-hP.lossWeightTree['vicreg'].weight = 1
-hP.lossWeightTree['vicreg']['variance'].weight = 25
-hP.lossWeightTree['vicreg']['invariance'].weight = 25
-hP.lossWeightTree['vicreg']['covariance'].weight = 1
-hP.vicreg_expander_identity = False
-hP.vicreg_expander_widths = [64, 64, 64]
-hP.vicreg_invariance_on_Y = False
-hP.weight_decay = 1e-6
-hP.lossWeightTree['self_recon'].weight = 0
-hP.lossWeightTree['kld'].weight = 0
-hP.lossWeightTree['predict'].weight = 0
-hP.lossWeightTree['predict']['image'].weight = 0
-hP.lossWeightTree['predict']['z'].weight = 0
-hP.vae_is_actually_ae = True
-hP.variational_rnn = False
-hP.vvrnn = False
-hP.vvrnn_static = None
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
+vicreg = template.copy()
+vicreg.lossWeightTree['vicreg'].weight = 1
+vicreg.lossWeightTree['vicreg']['variance'].weight = 25
+vicreg.lossWeightTree['vicreg']['invariance'].weight = 25
+vicreg.lossWeightTree['vicreg']['covariance'].weight = 1
+vicreg.vicreg_expander_identity = False
+vicreg.vicreg_expander_widths = [64, 64, 64]
+vicreg.vicreg_invariance_on_Y = False
+vicreg.weight_decay = 1e-9
+vicreg.lossWeightTree['self_recon'].weight = 0
+vicreg.lossWeightTree['kld'].weight = 0
+vicreg.lossWeightTree['predict'].weight = 0
+vicreg.lossWeightTree['predict']['image'].weight = 0
+vicreg.lossWeightTree['predict']['z'].weight = 0
+vicreg.vae_is_actually_ae = True
+vicreg.variational_rnn = False
 
-assert len(GROUPS) == 1
+for bs in (
+    16, 
+    32, 64, 
+):
+    hP = vicreg.copy()
+    hP.batch_size = bs
+    hP.ready(globals())
+    GROUPS.append(MyExpGroup(hP))

@@ -40,7 +40,7 @@ prefix, suffix = template.split('%d')
 def tar(exp_dir_name):
     print('taring', exp_dir_name, '...')
     with sp.Popen(
-        ['tar', '-vczf', exp_dir_name + '.tar.gz', '-T', '-'], 
+        ['tar', '-czf', exp_dir_name + '.tar.gz', '-T', '-'], 
         stdin=sp.PIPE, 
     ) as p:
         paths = [exp_dir_name]
@@ -54,7 +54,7 @@ def tar(exp_dir_name):
             else:
                 if name == '__pycache__':
                     continue
-                print('  doing', name)
+                # print('  doing', name)
                 paths.append(name)
                 max_epoch = -1
                 for name in os.listdir(path.join(*paths)):
@@ -69,9 +69,9 @@ def tar(exp_dir_name):
                 eat(template % max_epoch)
                 paths.pop(-1)
         p.stdin.close()
-        print('  waiting...')
+        # print('  waiting...')
         p.wait()
-    print('  exit')
+    # print('  exit')
 
 def doAll():
     os.system('git add .')

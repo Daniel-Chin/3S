@@ -49,11 +49,12 @@ def tar(exp_dir_name):
             p.stdin.write('\n'.encode())
 
         for name in os.listdir(exp_dir_name):
-            if path.isfile(name):
+            if path.isfile(path.join(*paths, name)):
                 eat(name)
             else:
                 if name == '__pycache__':
                     continue
+                print('  doing', name)
                 paths.append(name)
                 max_epoch = -1
                 for name in os.listdir(path.join(*paths)):
@@ -67,6 +68,10 @@ def tar(exp_dir_name):
                 assert max_epoch != -1
                 eat(template % max_epoch)
                 paths.pop(-1)
+        p.stdin.close()
+        print('  waiting...')
+        p.wait()
+    print('  exit')
 
 def doAll():
     os.system('git add .')

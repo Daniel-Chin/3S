@@ -50,9 +50,10 @@ def oneEpoch(
         trainLoader    = dataLoader(
             trainSet,    hParams.batch_size, hParams.train_set_size, 
         )
-        validateLoader = dataLoader(
-            validateSet, hParams.batch_size, experiment.VALIDATE_SET_SIZE, 
-        )
+        with hParams.eval():
+            validateLoader = dataLoader(
+                validateSet, hParams.batch_size, experiment.VALIDATE_SET_SIZE, 
+            )
 
         vae.train()
         [x.train() for x in predRnns]

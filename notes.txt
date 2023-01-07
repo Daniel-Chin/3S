@@ -944,6 +944,10 @@ next {
         trying weight decay. 
         trying 1024 dataset. Rationale: one ball traj needed 32 datapoints. Maybe two ball should need 32^2=1024 datapoints. 
 }
+1/7 {
+    2023_m01_d06@00_49_15_weight_decay
+        1e-9 is okay! 
+}
 next {
     exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
         可不可以这样做：
@@ -951,10 +955,9 @@ next {
         rnn pred: 随机抽选 batch 中一个 traj, 扩增 batch_size 次。
 }
 todo {
-    vicreg
-        batch norm the encoder? 
+    colored ball dataset
+    run exps
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
-    ablate vvrnn_static. this is also good for paper publishing. 
 
     compare SAMPLE_TRANS vs COMPOSE_TRANS in two body. 
     try RNN ensemble

@@ -113,4 +113,6 @@ hP.vvrnn_static = None
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 
+raise Exception('We need to copy from vicreg vanilla and change params. ')
+
 assert len(GROUPS) == 1

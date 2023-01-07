@@ -1,3 +1,6 @@
+The entire env takes about 15G with ubuntu sigularity.  
+Therefore, you may want to allocate ~25G space.  
+
 - pyTorch
   - We use pytorch 1.13.1 with cuda 11.6
   - For latest, https://pytorch.org/get-started/
@@ -10,6 +13,11 @@ pip install -U GitPython
 pip install -U matplotlib
 pip install -U opencv-python
 pip install -U pynvml
+```
+
+For xj Repo, you need additional  
+```
+pip install -U scikit-learn
 ```
 
 - `torchWork` from https://github.com/Daniel-Chin/torchWork

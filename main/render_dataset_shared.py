@@ -2,6 +2,7 @@ import time
 from typing import List
 import json
 from abc import ABCMeta, abstractmethod
+from random import random
 
 import numpy as np
 from OpenGL.GL import *
@@ -49,6 +50,7 @@ class BallViewer(metaclass=ABCMeta):
         self.frames: List[Image.Image] = None
         self.will_reset = True
         self.leave_trace = False
+        self.random_color = False
         self.initGlut()
     
     def reset(self):
@@ -114,6 +116,8 @@ class BallViewer(metaclass=ABCMeta):
             (0., 1., 0.), 
             (1., 0., 1.), 
         )):
+            if self.random_color:
+                color = (random(), random(), random())
             self.makeBall(*body.position, self.ball_radius * scale, color)
 
     def saveVideo(self):

@@ -12,14 +12,16 @@ from physics_bounce import *
 from template_bounce import SEQ_LEN
 
 PATH = path.join(
-    '../datasets/bounce', 
+    '../datasets/bounce_flash_color', 
+    # '../datasets/bounce', 
     # '../datasets/bounce_leave_view', 
-    'train', 
-    # 'validate', 
+    # 'train', 
+    'validate', 
 )
 
 # REJECTABLE_START = 6
 REJECTABLE_START = np.inf
+RANDOM_COLOR = True
 
 SPF = .2
 DT = .15
@@ -32,6 +34,10 @@ EYE = np.array([0.0, -2.0, 4.0])  # 眼睛的位置（默认z轴的正方向）
 LOOK_AT = np.array([0.0, 10.0, 0.0])  # 瞄准方向的参考点（默认在坐标原点）
 
 class BounceViewer(BallViewer):
+    def __init__(self, running_mode, SEQ_LEN, ball_radius, eye, look_at, SPF) -> None:
+        super().__init__(running_mode, SEQ_LEN, ball_radius, eye, look_at, SPF)
+        self.random_color = RANDOM_COLOR
+
     def getTrajectory(self):
         return oneLegalRun(DT, self.SEQ_LEN, REJECTABLE_START)
 
@@ -56,7 +62,7 @@ class BounceViewer(BallViewer):
                     center[0] + np.cos(theta) * radius, 
                     center[1] + np.sin(theta) * radius, 
                     z, 
-                    0.5
+                    0.5, 
                 )
 
 def main():

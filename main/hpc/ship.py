@@ -27,7 +27,7 @@ def main():
         for exp in exps:
             doOne(exp)
     else:
-        if input('Do all? y/n: ').lower == 'y':
+        if input('Do all? y/n: ').lower() == 'y':
             doAll()
         else:
             print('did nothing.')

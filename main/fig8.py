@@ -22,16 +22,39 @@ class USING_METRIC:
 #     suptitle = '\n(height locked)'
 
 EXPERIMENT_PATH = path.join('./experiments', '''
-2022_m12_d19@07_44_07_train_size_c_max_batch
+2023_m01_d04@01_22_50_sps
 '''.strip())
 LOCK_EPOCH = None
+N_GROUPS_PER_SYMM = 6
+
+def COL_TITLE(group: MyExpGroup):
+    # return f'rnn,batch = {(group.hyperParams.rnn_width, group.hyperParams.batch_size)}', ''
+    return f'{group.hyperParams.rnn_width}, {group.hyperParams.batch_size}', '\n rnn_width, batch_size'
+    # return f'|train set| = {group.hyperParams.train_set_size}', ''
+    # return f'vae channels = \n{group.hyperParams.vae_channels}', ''
 
 def main(experiment_path, lock_epoch):
     exp_name, n_rand_inits, groups, experiment = loadExperiment(path.join(
         experiment_path, EXPERIMENT_PY_FILENAME, 
     ))
     groups: List[MyExpGroup]
+
+    # permutate
+    groups = [*groups[::2], *groups[1::2]]
+
     print(f'{exp_name = }')
+    print(*[x.variable_value for x in groups], sep='\n')
+
+    fig, axes = plt.subplots(1, N_GROUPS_PER_SYMM, sharey=True)
+    X = [1, 2]
+    for col_i, ax in enumerate(axes):
+        # change together: 3g958hpf598
+        assert 'yes' in groups[col_i                    ].variable_value
+        assert 'no'  in groups[col_i + N_GROUPS_PER_SYMM].variable_value
+        title, var_names = COL_TITLE(groups[col_i])
+        assert title == COL_TITLE(groups[col_i + N_GROUPS_PER_SYMM])[0]
+        ax.set_title(title)
+
     dataset = Dataset(
         experiment.VALIDATE_SET_PATH, 
         experiment.VALIDATE_SET_SIZE, experiment.SEQ_LEN, 
@@ -60,10 +83,9 @@ def main(experiment_path, lock_epoch):
                 Z, _ = vae.encode(image_set)
                 mse = USING_METRIC.method(Z, traj_set)
             Y[i_group].append(mse)
-    fig, axes = plt.subplots(1, 5, sharey=True)
-    X = [1, 2]
+
     for col_i, ax in enumerate(axes):
-        Ys = (Y[col_i], Y[col_i + 5])
+        Ys = (Y[col_i], Y[col_i + N_GROUPS_PER_SYMM])
         # for x, y in zip(X, Ys):
         #     ax.plot(
         #         [x] * n_rand_inits, y, linestyle='none', 
@@ -71,16 +93,18 @@ def main(experiment_path, lock_epoch):
         #         marker='o', markersize=10, 
         #     )
         ax.boxplot(Ys)
+        
         ax.set_xticks(X)
-        ax.set_xticklabels(['symm', 'no symm', ])
-        assert 'yes' in groups[col_i    ].variable_value
-        assert 'no'  in groups[col_i + 5].variable_value
+        # change together: 3g958hpf598
+        ax.set_xticklabels([
+            'symm', 
+            'no symm', 
+        ])
         ax.set_xlim(.8, 2.2)
-        ax.set_title(f'|train set| = {groups[col_i].hyperParams.train_set_size}')
-        # ax.set_title(f'vae channels = \n{groups[col_i].hyperParams.vae_channels}')
     axes[0].set_ylabel('MSE')
     plt.suptitle('Linear projection MSE (↓)' 
         + USING_METRIC.suptitle
+        + var_names
     )
     plt.tight_layout()
     plt.savefig(path.join(

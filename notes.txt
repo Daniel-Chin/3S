@@ -956,6 +956,26 @@ next {
         ensemble looks consistently weaker, in terms of all losses. 
         the reason is not clear. 
         Still, we should try ensemble with vicreg. 
+    2023_m01_d04@01_22_50_sps
+        is sps effective? 
+            yes. 
+        is baseline strong enough? 
+            no. 
+        SPS's effect is more pronounced as RNN size increases. 
+            Note: even when comparing 64RNN VS 128RNN+symm, 
+            symm still wins. 
+            symm allows you to over-parametrize by at least 4x # of parameters. 
+    2023_m01_d07@10_28_29_decode_flash_color
+        just as I guessed, the self-recon can recon the ball location, even on validation set. 
+        contrary to my previous guess, the VAE is still tempted to recon the color! It's not the expected optimal solution "a gray ball with black shadow". 
+        The RNN cannot predict the trajectory. Disen fails. 
+        This result will render VICReg a valuable contribution, if VICReg succeeds. 
+    2023_m01_d06@00_50_02_2b_weight_decay
+        // This exp is to be compared with 2023_m01_d05@02_35_28_2b_train_set_size. 
+        // Either weight decay or 1024 train set successfully inhibits overfitting. 1024 train set has a larger effect. 
+        // in terms of image pred, 1024 train set is better. 
+        omg, but the training did not finish. 
+            I forgot to control for batch #. I controled epoch # instead. 
 }
 next {
     exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好

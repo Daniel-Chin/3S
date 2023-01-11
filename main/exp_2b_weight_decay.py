@@ -106,5 +106,7 @@ for wd, tss in [
     hP = template.copy()
     hP.weight_decay = wd
     hP.train_set_size = tss
+    hP.max_epoch = 16000 * 64 // tss
+    hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

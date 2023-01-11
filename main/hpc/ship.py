@@ -87,7 +87,7 @@ def doAll():
         if path.isdir(node):
             all_dir.add(path.normpath(node))
         elif ext.lower() == '.gz':
-            _base, tar = path.splitext(base)
+            _base, _tar = path.splitext(base)
             all_gz.add(path.normpath(_base))
         else:
             print('Warning: unknown file:', node)

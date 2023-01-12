@@ -4,24 +4,21 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/bounce/train'
-VALIDATE_SET_PATH = '../datasets/bounce/validate'
+TRAIN_SET_PATH    = '../datasets/two_body_no_orbit/train'
+VALIDATE_SET_PATH = '../datasets/two_body_no_orbit/validate'
 VALIDATE_SET_SIZE = 64
-SEQ_LEN = 20
-ACTUAL_DIM = 3
+SEQ_LEN = 25
+ACTUAL_DIM = 6
 
-EXP_NAME = 'weight_decay'
+EXP_NAME = '2b_norbit'
 N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'weight_decay,rnn_width'
-        self.variable_value = (
-            hyperParams.weight_decay, 
-            hyperParams.rnn_width, 
-        )
+        self.variable_name = '0'
+        self.variable_value = 0
     
     @lru_cache(1)
     def name(self):
@@ -57,9 +54,8 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    3, [
-        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
-        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
+    6, [
+        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
     ], 
 )
 template.supervise_rnn = False
@@ -85,7 +81,7 @@ template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
-template.weight_decay = 0
+template.weight_decay = 1e-9
 template.lr_diminish = None
 template.train_set_size = 64
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
@@ -98,18 +94,8 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-for weight_decay, rnn_width in [
-    # 1e-6, 
-    # 1e-7, 1e-8, 1e-9, 
-    # (1e-9, 64), 
-    # (1e-10, 32), 
-    # (1e-10, 64), 
-    (1e-9, 32), 
-    # (1e-9, 64), 
-    (0, 32), 
-]:
-    hP = template.copy()
-    hP.weight_decay = weight_decay
-    hP.rnn_width = rnn_width
-    hP.ready(globals())
-    GROUPS.append(MyExpGroup(hP))
+hP = template.copy()
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+assert len(GROUPS) == 1

@@ -977,6 +977,12 @@ next {
         omg, but the training did not finish. 
             I forgot to control for batch #. I controled epoch # instead. 
 }
+1/12 {
+    2023_m01_d11@00_13_45_2b_weight_decay
+        disen success! 
+        near z=0, image is blurry. Because we excluded training data where two balls hide each other. 
+        comapred with 2023_m01_d05@02_35_28_2b_train_set_size, we know weight_decay is necessary for VAE generalization. 
+}
 next {
     exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
         可不可以这样做：

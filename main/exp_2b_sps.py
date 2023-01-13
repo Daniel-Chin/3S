@@ -92,7 +92,8 @@ template.vicreg_expander_widths = None
 template.vicreg_invariance_on_Y = None
 
 # modifying template
-# template.xxx = xxx
+template.sched_sampling = LinearScheduledSampling(16000)
+template.max_epoch = template.sched_sampling.duration
 
 ours = template.copy()
 ours.ready(globals())

@@ -1,33 +1,24 @@
-'''
-Why are 
-2023_m01_d12@20_20_40_2b_sps, and
-2023_m01_d11@00_13_45_2b_weight_decay 
-give inconsistent results?
-'''
 from functools import lru_cache
 from symmetry_transforms import *
 from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/two_body/train'
-VALIDATE_SET_PATH = '../datasets/two_body/validate'
+TRAIN_SET_PATH    = '../datasets/bounce/train'
+VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
-SEQ_LEN = 25
-ACTUAL_DIM = 6
+SEQ_LEN = 20
+ACTUAL_DIM = 3
 
-EXP_NAME = '2b_insanity'
+EXP_NAME = 'train_set_size'
 N_RAND_INITS = 6
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'weight_decay,train_set_size'
-        self.variable_value = (
-            hyperParams.weight_decay, 
-            hyperParams.train_set_size, 
-        )
+        self.variable_name = 'train_set_size'
+        self.variable_value = hyperParams.train_set_size
     
     @lru_cache(1)
     def name(self):
@@ -63,8 +54,9 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    6, [
-        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
+    3, [
+        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
     ], 
 )
 template.supervise_rnn = False
@@ -90,7 +82,7 @@ template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
-template.weight_decay = 0   # 1e-6
+template.weight_decay = 0
 template.lr_diminish = None
 template.train_set_size = 64
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
@@ -103,16 +95,10 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-for wd, tss in [
-    # (0, 64), 
-    # (0, 1024), 
-    (1e-9, 64), 
-    (1e-9, 1024), 
+for tss in [
+    64, 256, 1024, 
 ]:
     hP = template.copy()
-    hP.weight_decay = wd
     hP.train_set_size = tss
-    hP.max_epoch = 16000 * 64 // tss
-    hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

@@ -18,53 +18,60 @@ class Dataset(torch.utils.data.Dataset):
     ) -> None:
         super().__init__()
 
-        prev_cwd = os.getcwd()
-        os.chdir(dataset_path)
-        video_set = torch.zeros((
-            size, 
-            SEQ_LEN, 
-            IMG_N_CHANNELS, 
-            RESOLUTION, 
-            RESOLUTION, 
-        ))
-        label_set = torch.zeros((
-            size, 
-            SEQ_LEN, 
-            ACTUAL_DIM, 
-        ))
-        for data_i in tqdm.trange(size, desc='load dataset'):
-            with open(os.path.join(
-                str(data_i), TRAJ_FILENAME, 
-            ), 'r') as f:
-                trajectory: List[List[Body]] = []
-                for bodies_json in json.load(f):
-                    bodies = []
-                    trajectory.append(bodies)
-                    for body_json in bodies_json:
-                        bodies.append(Body().fromJSON(body_json))
-            for t in range(SEQ_LEN):
-                for body_i, body in enumerate(trajectory[t]):
-                    label_set[
-                        data_i, t, 3 * body_i : 3 * (body_i + 1)
-                    ] = torch.from_numpy(body.position)
-                img = Image.open(os.path.join(
-                    str(data_i), f'{t}.png', 
-                ))
-                torchImg = img2Tensor(img)
-                for c in range(IMG_N_CHANNELS):
-                    video_set[
-                        data_i, t, c, :, :
-                    ] = torchImg[:, :, c]
-        os.chdir(prev_cwd)
-
-        if device is not None:
-            print(f'Moving dataset to {device}...', flush=True)
-            video_set = video_set.to(device)
-            label_set = label_set.to(device)
-
         self.size = size
-        self.video_set = video_set
-        self.label_set = label_set
+        self.SEQ_LEN = SEQ_LEN
+        self.ACTUAL_DIM = ACTUAL_DIM
+        self.device = device
+        self.video_set = None
+        self.label_set = None
+
+        if dataset_path is not None:
+            prev_cwd = os.getcwd()
+            os.chdir(dataset_path)
+            video_set = torch.zeros((
+                size, 
+                SEQ_LEN, 
+                IMG_N_CHANNELS, 
+                RESOLUTION, 
+                RESOLUTION, 
+            ))
+            label_set = torch.zeros((
+                size, 
+                SEQ_LEN, 
+                ACTUAL_DIM, 
+            ))
+            for data_i in tqdm.trange(size, desc='load dataset'):
+                with open(os.path.join(
+                    str(data_i), TRAJ_FILENAME, 
+                ), 'r') as f:
+                    trajectory: List[List[Body]] = []
+                    for bodies_json in json.load(f):
+                        bodies = []
+                        trajectory.append(bodies)
+                        for body_json in bodies_json:
+                            bodies.append(Body().fromJSON(body_json))
+                for t in range(SEQ_LEN):
+                    for body_i, body in enumerate(trajectory[t]):
+                        label_set[
+                            data_i, t, 3 * body_i : 3 * (body_i + 1)
+                        ] = torch.from_numpy(body.position)
+                    img = Image.open(os.path.join(
+                        str(data_i), f'{t}.png', 
+                    ))
+                    torchImg = img2Tensor(img)
+                    for c in range(IMG_N_CHANNELS):
+                        video_set[
+                            data_i, t, c, :, :
+                        ] = torchImg[:, :, c]
+            os.chdir(prev_cwd)
+
+            if device is not None:
+                print(f'Moving dataset to {device}...', flush=True)
+                video_set = video_set.to(device)
+                label_set = label_set.to(device)
+
+            self.video_set = video_set
+            self.label_set = label_set
     
     def __len__(self):
         return self.size
@@ -74,6 +81,25 @@ class Dataset(torch.utils.data.Dataset):
             self.video_set[index, :, :, :, :], 
             self.label_set[index, :, :], 
         )
+    
+    def copy(self):
+        other = __class__(
+            None, self.size, self.SEQ_LEN, self.ACTUAL_DIM, 
+            self.device, 
+        )
+        other.video_set = self.video_set
+        other.label_set = self.label_set
+        return other
+    
+    def truncate(self, new_size: int):
+        if new_size == self.size:
+            return self
+        assert new_size < self.size
+        other = self.copy()
+        other.size = new_size
+        other.video_set = other.video_set[:new_size, ...]
+        other.label_set = other.label_set[:new_size, ...]
+        return other
 
 def img2Tensor(img):
     np_img = np.asarray(img)
@@ -92,7 +118,7 @@ def PersistentLoader(dataset, batch_size):
                 break
             yield video_batch, traj_batch
 
-def dataLoader(dataset, batch_size, set_size=None):
+def dataLoader(dataset: Dataset, batch_size, set_size=None):
     n_batches = None
     if set_size is not None:
         if set_size % batch_size:
@@ -100,8 +126,12 @@ def dataLoader(dataset, batch_size, set_size=None):
             batch_size = set_size
         n_batches = set_size // batch_size
     batch_i = 0
+    if set_size is None:
+        truncatedDataset = dataset
+    else:
+        truncatedDataset = dataset.truncate(set_size)
     for batch in torch.utils.data.DataLoader(
-        dataset, batch_size, shuffle=True, num_workers=0, 
+        truncatedDataset, batch_size, shuffle=True, num_workers=0, 
     ):
         batch: torch.Tensor
         yield batch

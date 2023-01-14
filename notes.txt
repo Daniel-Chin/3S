@@ -983,6 +983,10 @@ next {
         near z=0, image is blurry. Because we excluded training data where two balls hide each other. 
         comapred with 2023_m01_d05@02_35_28_2b_train_set_size, we know weight_decay is necessary for VAE generalization. 
 }
+1/14 {
+    My code has a bug where train_set_size does not apply correctly due to batch suffling!!!
+    Just fixed the bug. Let's redo all exps about train set size.
+}
 next {
     exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
         可不可以这样做：

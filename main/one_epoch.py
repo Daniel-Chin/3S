@@ -11,24 +11,8 @@ from shared import *
 from forward_pass import forward
 from vae import VAE
 from rnn import PredRNN, EnergyRNN
-from load_dataset import Dataset
+from load_dataset import Dataset, dataLoader
 from video_eval import videoEval
-
-def dataLoader(dataset, batch_size, set_size=None):
-    n_batches = None
-    if set_size is not None:
-        if set_size % batch_size:
-            assert set_size < batch_size
-            batch_size = set_size
-        n_batches = set_size // batch_size
-    batch_i = 0
-    for batch in torch.utils.data.DataLoader(
-        dataset, batch_size, shuffle=True, num_workers=0, 
-    ):
-        yield batch
-        batch_i += 1
-        if n_batches is not None and batch_i >= n_batches:
-            return
 
 def oneEpoch(
     group_name: str, epoch: int, 

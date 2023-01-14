@@ -2,9 +2,11 @@ from os import path
 from typing import List
 
 import torch
+from torch.nn import functional as F
 from torchWork import loadExperiment, DEVICE
 from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModels
 from matplotlib import pyplot as plt
+from tqdm import tqdm
 
 from load_dataset import Dataset
 from vae import VAE
@@ -23,6 +25,9 @@ def main(experiment_path, lock_epoch):
     ))
     groups: List[MyExpGroup]
     print(f'{exp_name = }')
+
+    # Manual filtering
+    # n_rand_inits = 6
 
     max_dataset_size = 0
     for group in groups:
@@ -60,27 +65,57 @@ def main(experiment_path, lock_epoch):
             infoProbeDatasets_g.append((
                 infoProbeTrainSet, infoProbeValidateSet, 
             ))
-
+    collapse_mse = collapseBaselineMSE(infoProbeValidateSet)
     for i in range(99):
-        kw = dict(n_epochs=10)
+        kw = dict(n_epochs=200)
         if i == 0:
             pass
         else:
+            def nE(x):
+                kw['n_epochs'] = x
             from console import console
             console({**globals(), **locals()})
+        print('training info probes...')
         for group, infoProbeDatasets_g in zip(groups, infoProbeDatasets):
             for rand_init_i, (
                 infoProbeTrainSet, infoProbeValidateSet, 
-            ) in enumerate(infoProbeDatasets_g):
+            ) in tqdm(
+                *[enumerate(infoProbeDatasets_g)], 
+                desc=group.variable_value, 
+            ):
                 train_losses, validate_losses = probe(
                     experiment, group.hyperParams, 
                     infoProbeTrainSet, infoProbeValidateSet, 
                     **kw, 
                 )
-                plt.plot(   train_losses, c='r', label='train'),
-                plt.plot(validate_losses, c='b', label='validate')
-        plt.legend()
+                lineTrain, = plt.plot(
+                    train_losses,    
+                    c='r', linewidth=1, 
+                )
+                lineValid, = plt.plot(
+                    validate_losses, 
+                    c='b', linewidth=1, 
+                )
+        lineCollapse = plt.axhline(
+            collapse_mse, c='k', linewidth=1, 
+        )
+        plt.axhline(
+            0, c='g', linewidth=1, 
+        )
+        plt.legend(
+            [lineTrain, lineValid, lineCollapse], 
+            ['train', 'validate', 'full collapse'], 
+        )
+        # plt.ylim(0, 4)
+        print('plot showing...')
         plt.show()
+
+def collapseBaselineMSE(dataset: InfoProbeDataset):
+    traj = dataset.traj[0, :, :]
+    return F.mse_loss(
+        traj.mean(dim=0).unsqueeze(0).repeat((traj.shape[0], 1)), 
+        traj, 
+    )
 
 if __name__ == '__main__':
     main(EXP_PATH, LOCK_EPOCH)

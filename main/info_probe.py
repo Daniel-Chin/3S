@@ -11,6 +11,7 @@ class InfoProbeNetwork(nn.Module):
     def __init__(
         self, experiment, hyperParams: HyperParams, 
     ) -> None:
+        super().__init__()
         fcs = []
         c0 = hyperParams.symm.latent_dim
         for c1 in hyperParams.vae_channels:
@@ -18,7 +19,10 @@ class InfoProbeNetwork(nn.Module):
             fcs.append(nn.ReLU())
             c0 = c1
         fcs.append(nn.Linear(c0, experiment.ACTUAL_DIM))
-        self.forward = nn.Sequential(*fcs)
+        self._forward = nn.Sequential(*fcs)
+    
+    def forward(self, /, x):
+        return self._forward(x)
 
 class InfoProbeDataset(torch.utils.data.Dataset):
     def __init__(
@@ -77,15 +81,17 @@ def probe(
             )
         
         probeNetwork.train()
-        train_losses = []
+        in_epoch_train_losses = []
         for z, traj in trainLoader:
             traj_hat = probeNetwork.forward(z)
             train_loss = F.mse_loss(traj_hat, traj)
             adam.zero_grad()
             train_loss.backward()
             adam.step()
-            train_losses.append(train_loss.detach())
-        epoch_train_loss = torch.stack(train_losses).detach().mean().cpu()
+            in_epoch_train_losses.append(train_loss.detach())
+        epoch_train_loss = torch.stack(
+            in_epoch_train_losses, 
+        ).detach().mean().cpu()
 
         probeNetwork.eval()
         with torch.no_grad():

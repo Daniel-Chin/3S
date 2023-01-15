@@ -10,15 +10,15 @@ VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
 
-EXP_NAME = 'vicreg_vanilla'
+EXP_NAME = 'vicreg_misc'
 N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'batch_size'
-        self.variable_value = hyperParams.batch_size
+        self.variable_name = 'nickname'
+        self.variable_value = hyperParams.nickname
     
     @lru_cache(1)
     def name(self):
@@ -104,6 +104,7 @@ vicreg.vicreg_expander_identity = False
 vicreg.vicreg_expander_widths = [64, 64, 64]
 vicreg.vicreg_invariance_on_Y = False
 vicreg.weight_decay = 1e-9
+vicreg.batch_size = 32
 vicreg.lossWeightTree['self_recon'].weight = 0
 vicreg.lossWeightTree['kld'].weight = 0
 vicreg.lossWeightTree['predict'].weight = 0
@@ -112,11 +113,52 @@ vicreg.lossWeightTree['predict']['z'].weight = 0
 vicreg.vae_is_actually_ae = True
 vicreg.variational_rnn = False
 
-for bs in (
-    16, 
-    32, 64, 
-):
-    hP = vicreg.copy()
-    hP.batch_size = bs
-    hP.ready(globals())
-    GROUPS.append(MyExpGroup(hP))
+hP = vicreg.copy()
+hP.nickname = 'base'
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'batch=128'
+hP.batch_size = 128
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'no_expander'
+hP.vicreg_expander_identity = True
+hP.vicreg_expander_widths = None
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'inv_on_Y'
+hP.vicreg_invariance_on_Y = False
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'e[64,64]'
+hP.vicreg_expander_widths = [64, 64]
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'e[64,64,256]'
+hP.vicreg_expander_widths = [64, 64, 256]
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'vi=10'
+hP.lossWeightTree['vicreg']['variance'].weight = 10
+hP.lossWeightTree['vicreg']['invariance'].weight = 10
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'vi=100'
+hP.lossWeightTree['vicreg']['variance'].weight = 100
+hP.lossWeightTree['vicreg']['invariance'].weight = 100
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))

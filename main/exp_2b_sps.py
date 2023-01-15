@@ -17,8 +17,11 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'symm'
-        self.variable_value = 'yes' if hyperParams.symm == ours.symm else 'no'
+        self.variable_name = 'symm,train_set_size'
+        self.variable_value = (
+            'yes' if hyperParams.symm == ours.symm else 'no', 
+            hyperParams.train_set_size, 
+        )
     
     @lru_cache(1)
     def name(self):
@@ -83,21 +86,18 @@ template.grad_clip = None
 template.optim_name = 'adam'
 template.weight_decay = 1e-9
 template.lr_diminish = None
-template.train_set_size = 64
+template.train_set_size = 1024
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
-template.sched_sampling = LinearScheduledSampling(18000)
+template.sched_sampling = LinearScheduledSampling(1000)
 template.max_epoch = template.sched_sampling.duration
 template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None
 template.vicreg_invariance_on_Y = None
 
 # modifying template
-template.sched_sampling = LinearScheduledSampling(16000)
-template.max_epoch = template.sched_sampling.duration
+# ...
 
 ours = template.copy()
-ours.ready(globals())
-GROUPS.append(MyExpGroup(ours))
 
 baseline = template.copy()
 baseline.symm = SymmetryAssumption(
@@ -105,7 +105,14 @@ baseline.symm = SymmetryAssumption(
         (SAMPLE_TRANS, [Trivial()], {Slice(0, 6)}), 
     ], 
 )
-baseline.ready(globals())
-GROUPS.append(MyExpGroup(baseline))
 
-assert len(GROUPS) == 2
+for tss in (64, 256, 1024):
+    for s in (ours, baseline):
+        hP = template.copy()
+        hP.symm = s.symm
+        hP.train_set_size = tss
+        hP.max_epoch = 1024000 // tss
+        hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
+
+        hP.ready(globals())
+        GROUPS.append(MyExpGroup(hP))

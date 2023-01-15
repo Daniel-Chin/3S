@@ -1,17 +1,22 @@
 from os import path
-from typing import List, Tuple
+from typing import List
+from numbers import Number
 
 import torch
 from torch.nn import functional as F
 from torchWork import loadExperiment, DEVICE
 from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModels
 from matplotlib import pyplot as plt
-from tqdm import tqdm
+import tqdm
 
 from load_dataset import Dataset
 from vae import VAE
 from info_probe import probe, InfoProbeDataset
 from template_bounce import MyExpGroup
+
+CHECK_OVERFIT = 'CHECK_OVERFIT'
+COMPARE_GROUPS = 'COMPARE_GROUPS'
+MODE = COMPARE_GROUPS
 
 try:
     from workspace import EXP_PATH, LOCK_EPOCH
@@ -46,26 +51,6 @@ def main(experiment_path, lock_epoch):
         experiment.ACTUAL_DIM, DEVICE, 
     )
 
-    infoProbeDatasets: List[Tuple[InfoProbeDataset]] = []
-    for group in groups:
-        infoProbeDatasets_g = []
-        infoProbeDatasets.append(infoProbeDatasets_g)
-        for rand_init_i in range(n_rand_inits):
-            epoch, models = loadLatestModels(experiment_path, group, rand_init_i, dict(
-                vae=(VAE, 1), 
-            ), lock_epoch)
-            vae: VAE = models['vae'][0]
-            
-            infoProbeTrainSet = InfoProbeDataset(
-                experiment, group.hyperParams, vae, trainSet, 
-            )
-            infoProbeValidateSet = InfoProbeDataset(
-                experiment, group.hyperParams, vae, validateSet, 
-            )
-            infoProbeDatasets_g.append((
-                infoProbeTrainSet, infoProbeValidateSet, 
-            ))
-    collapse_mse = collapseBaselineMSE(infoProbeValidateSet)
     for i in range(99):
         kw = dict(n_epochs=200)
         if i == 0:
@@ -78,27 +63,57 @@ def main(experiment_path, lock_epoch):
         print('training info probes...')
         Y_train: List[List[torch.Tensor]] = [[] for _ in range(n_rand_inits)]
         Y_valid: List[List[torch.Tensor]] = [[] for _ in range(n_rand_inits)]
-        for rand_init_i, (
-            infoProbeTrainSet, infoProbeValidateSet, 
-        ) in tqdm(
-            [*enumerate(infoProbeDatasets_g)], 
-        ):
-            for group_i, (group, infoProbeDatasets_g) in enumerate(
-                zip(groups, infoProbeDatasets)
-            ):
+        for rand_init_i in tqdm.trange(n_rand_inits):
+            print()
+            for group_i, group in enumerate(groups):
+                infoProbeTrainSet, infoProbeValidateSet = encodeEverything(
+                    experiment, experiment_path, lock_epoch, 
+                    trainSet, validateSet, 
+                    group_i, group, rand_init_i, 
+                )
+                collapse_mse = collapseBaselineMSE(infoProbeValidateSet)
                 train_losses, validate_losses = probe(
                     experiment, group.hyperParams, 
                     infoProbeTrainSet, infoProbeValidateSet, 
                     **kw, 
                 )
-                lineTrain, = plt.plot(
-                    train_losses,    
-                    c='r', linewidth=1, 
+                Y_train[rand_init_i].append(   train_losses)
+                Y_valid[rand_init_i].append(validate_losses)
+        legend_handles = []
+        legend_labels = []
+        if MODE is CHECK_OVERFIT:
+            for rand_init_i in range(n_rand_inits):
+                for group_i, group in enumerate(groups):
+                    lineTrain, = plt.plot(
+                        Y_train[rand_init_i][group_i],
+                        c='r', linewidth=1, 
+                    )
+                    lineValid, = plt.plot(
+                        Y_valid[rand_init_i][group_i],
+                        c='b', linewidth=1, 
+                    )
+            plt.xlabel('Epoch')
+            legend_handles.append(lineTrain)
+            legend_labels.append('train')
+            legend_handles.append(lineValid)
+            legend_labels.append('validate')
+        elif MODE is COMPARE_GROUPS:
+            X = [g.variable_value for g in groups]
+            if not all([isinstance(x, Number) for x in X]):
+                X = range(len(groups))
+            for rand_init_i in range(n_rand_inits):
+                y = []
+                for losses in Y_valid[rand_init_i]:
+                    y.append(losses[-1])
+                plt.plot(
+                    X, y, linestyle='none', 
+                    markerfacecolor='none', markeredgecolor='k', 
+                    marker='o', markersize=10, 
                 )
-                lineValid, = plt.plot(
-                    validate_losses, 
-                    c='b', linewidth=1, 
-                )
+            plt.xticks(X, [g.variable_value for g in groups])
+            plt.xlabel(group.variable_name)
+        plt.ylabel('Info Probe Losses')
+        plt.suptitle(exp_name)
         lineCollapse = plt.axhline(
             collapse_mse, c='k', linewidth=1, 
         )
@@ -106,20 +121,54 @@ def main(experiment_path, lock_epoch):
             0, c='g', linewidth=1, 
         )
         plt.legend(
-            [lineTrain, lineValid, lineCollapse], 
-            ['train', 'validate', 'full collapse'], 
+            [*legend_handles, lineCollapse], 
+            [*legend_labels, 'full collapse'], 
         )
         # plt.ylim(0, 4)
-        print('plot showing...')
-        plt.savefig(path.join(experiment_path, 'auto_info_probe.pdf'))
+        plt.savefig(path.join(
+            experiment_path, f'auto_info_probe_{MODE}.pdf', 
+        ))
         plt.show()
 
+cached_collapse_baseline_mse = None
 def collapseBaselineMSE(dataset: InfoProbeDataset):
-    traj = dataset.traj[0, :, :]
-    return F.mse_loss(
-        traj.mean(dim=0).unsqueeze(0).repeat((traj.shape[0], 1)), 
-        traj, 
-    )
+    global cached_collapse_baseline_mse
+    if cached_collapse_baseline_mse is None:
+        traj = dataset.traj[0, :, :]
+        cached_collapse_baseline_mse = F.mse_loss(
+            traj.mean(dim=0).unsqueeze(0).repeat((traj.shape[0], 1)), 
+            traj, 
+        )
+    return cached_collapse_baseline_mse
+
+cache_encodeEverything = {}
+def encodeEverything(
+    experiment, experiment_path, lock_epoch, 
+    trainSet, validateSet, 
+    group_i, group: MyExpGroup, rand_init_i, 
+):
+    cache_key = (group_i, rand_init_i)
+    if cache_key in cache_encodeEverything:
+        print('Warning f3qp8947gh4: cache hit. ')
+        print('You are probably in an interactive session where the same plot is drawn over and over again.')
+        print('If not, beware: the caching only checks for group_i and rand_init_i. Make sure other inputs are also equal!')
+    else:
+        epoch, models = loadLatestModels(
+            experiment_path, group, rand_init_i, dict(
+                vae=(VAE, 1), 
+            ), lock_epoch, 
+        )
+        vae: VAE = models['vae'][0]
+        
+        infoProbeTrainSet = InfoProbeDataset(
+            experiment, group.hyperParams, vae, trainSet, 
+        )
+        infoProbeValidateSet = InfoProbeDataset(
+            experiment, group.hyperParams, vae, validateSet, 
+        )
+        result = (infoProbeTrainSet, infoProbeValidateSet)
+        cache_encodeEverything[cache_key] = result
+    return cache_encodeEverything[cache_key]
 
 if __name__ == '__main__':
     main(EXP_PATH, LOCK_EPOCH)

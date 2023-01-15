@@ -1,5 +1,5 @@
 from os import path
-from typing import List
+from typing import List, Tuple
 
 import torch
 from torch.nn import functional as F
@@ -27,7 +27,7 @@ def main(experiment_path, lock_epoch):
     print(f'{exp_name = }')
 
     # Manual filtering
-    # n_rand_inits = 6
+    # n_rand_inits = 1
 
     max_dataset_size = 0
     for group in groups:
@@ -46,7 +46,7 @@ def main(experiment_path, lock_epoch):
         experiment.ACTUAL_DIM, DEVICE, 
     )
 
-    infoProbeDatasets = []
+    infoProbeDatasets: List[Tuple[InfoProbeDataset]] = []
     for group in groups:
         infoProbeDatasets_g = []
         infoProbeDatasets.append(infoProbeDatasets_g)
@@ -76,12 +76,15 @@ def main(experiment_path, lock_epoch):
             from console import console
             console({**globals(), **locals()})
         print('training info probes...')
-        for group, infoProbeDatasets_g in zip(groups, infoProbeDatasets):
-            for rand_init_i, (
-                infoProbeTrainSet, infoProbeValidateSet, 
-            ) in tqdm(
-                *[enumerate(infoProbeDatasets_g)], 
-                desc=group.variable_value, 
+        Y_train: List[List[torch.Tensor]] = [[] for _ in range(n_rand_inits)]
+        Y_valid: List[List[torch.Tensor]] = [[] for _ in range(n_rand_inits)]
+        for rand_init_i, (
+            infoProbeTrainSet, infoProbeValidateSet, 
+        ) in tqdm(
+            [*enumerate(infoProbeDatasets_g)], 
+        ):
+            for group_i, (group, infoProbeDatasets_g) in enumerate(
+                zip(groups, infoProbeDatasets)
             ):
                 train_losses, validate_losses = probe(
                     experiment, group.hyperParams, 
@@ -108,6 +111,7 @@ def main(experiment_path, lock_epoch):
         )
         # plt.ylim(0, 4)
         print('plot showing...')
+        plt.savefig(path.join(experiment_path, 'auto_info_probe.pdf'))
         plt.show()
 
 def collapseBaselineMSE(dataset: InfoProbeDataset):

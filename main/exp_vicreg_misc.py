@@ -129,18 +129,6 @@ hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 
 hP = vicreg.copy()
-hP.nickname = 'e[64,64]'
-hP.vicreg_expander_widths = [64, 64]
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
-
-hP = vicreg.copy()
-hP.nickname = 'e[64,64,256]'
-hP.vicreg_expander_widths = [64, 64, 256]
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
-
-hP = vicreg.copy()
 hP.nickname = 'vi=10'
 hP.lossWeightTree['vicreg']['variance'].weight = 10
 hP.lossWeightTree['vicreg']['invariance'].weight = 10

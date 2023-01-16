@@ -991,6 +991,7 @@ next {
     2023_m01_d14@07_06_05_2b_insanity
         train set size does help 2body. 
     info probe dev complete. 
+        see 2023_m01_d14@02_49_46_vae_baseline_for_info_probe/collated_plot.png
         tested on: 
         - succesful disen: linear z yields loss ~= 0.2. 
             2023_m01_d06@00_49_15_weight_decay/auto_info_probe_CHECK_OVERFIT.pdf
@@ -1002,7 +1003,13 @@ next {
         looking at auto_info_probe_COMPARE_GROUPS.pdf
             batch_size >= 64 is significantly better than 32, in terms of z info content. 
 }
+1/16 {
+    2023_m01_d14@21_07_39_vicreg_misc
+        no_expander is significantly stronger. 
+}
 next {
+    arxiv paper:
+        single color exp failed
     exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
         可不可以这样做：
         self-recon: 照常

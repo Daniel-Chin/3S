@@ -113,6 +113,10 @@ vicreg.lossWeightTree['predict']['z'].weight = 0
 vicreg.vae_is_actually_ae = True
 vicreg.variational_rnn = False
 
+# modify vicreg from vanilla
+vicreg.vicreg_expander_identity = True
+vicreg.vicreg_expander_widths = None
+
 hP = vicreg.copy()
 hP.nickname = 'base'
 hP.ready(globals())
@@ -121,19 +125,6 @@ GROUPS.append(MyExpGroup(hP))
 hP = vicreg.copy()
 hP.nickname = 'batch=128'
 hP.batch_size = 128
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
-
-hP = vicreg.copy()
-hP.nickname = 'no_expander'
-hP.vicreg_expander_identity = True
-hP.vicreg_expander_widths = None
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
-
-hP = vicreg.copy()
-hP.nickname = 'inv_on_Y'
-hP.vicreg_invariance_on_Y = False
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 

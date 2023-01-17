@@ -140,7 +140,9 @@ def dataLoader(dataset: Dataset, batch_size, set_size=None):
             return
 
 if __name__ == '__main__':
-    dataset = Dataset('../datasets/bounce/train', 128, 3)
-    loader = PersistentLoader(dataset, 32)
+    # dataset = Dataset('../datasets/bounce/train', 128, 20, 3)
+    # loader = PersistentLoader(dataset, 32)
+    dataset = Dataset('../datasets/bounce/train', 16, 20, 3)
+    loader = dataLoader(dataset, 16, 8)
     for i, (x, y) in enumerate(loader):
         print(i, x.shape, y.shape)

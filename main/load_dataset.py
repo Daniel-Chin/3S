@@ -133,11 +133,11 @@ def dataLoader(dataset: Dataset, batch_size, set_size=None):
     for batch in torch.utils.data.DataLoader(
         truncatedDataset, batch_size, shuffle=True, num_workers=0, 
     ):
+        if n_batches is not None and batch_i + 1 >= n_batches:
+            return
         batch: torch.Tensor
         yield batch
         batch_i += 1
-        if n_batches is not None and batch_i >= n_batches:
-            return
 
 if __name__ == '__main__':
     # dataset = Dataset('../datasets/bounce/train', 128, 20, 3)

@@ -116,10 +116,10 @@ vicreg.variational_rnn = False
 # modify vicreg from vanilla
 vicreg.vicreg_expander_identity = True
 vicreg.vicreg_expander_widths = None
-vicreg.train_set_size = 512
+vicreg.train_set_size = 1024
 
 for bs in [
-    32, 64, 128, 256, 512, 
+    32, 64, 128, 256, 512, 1024, 
 ]:
     hP = vicreg.copy()
     hP.batch_size = bs

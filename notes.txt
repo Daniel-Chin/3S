@@ -1007,6 +1007,13 @@ next {
     2023_m01_d14@21_07_39_vicreg_misc
         no_expander is significantly stronger. 
 }
+1/17 {
+    2023_m01_d16@03_51_16_vicreg_misc
+        big batch size is good.
+        note
+            althought it says batch_size=128, it's actually 64, bounded by training set size. 
+            in fact, that means the behavior is undefined. Maybe big batch_size is not good. We'll see in the next exp. 
+}
 next {
     arxiv paper:
         single color exp failed

@@ -123,6 +123,8 @@ for bs in [
 ]:
     hP = vicreg.copy()
     hP.batch_size = bs
+    hP.max_epoch = 32000 * bs // hP.train_set_size
+    hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))
 

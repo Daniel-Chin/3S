@@ -11,14 +11,17 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 
 EXP_NAME = 'train_set_size'
-N_RAND_INITS = 6
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'train_set_size'
-        self.variable_value = hyperParams.train_set_size
+        self.variable_name = 'symm,train_set_size'
+        self.variable_value = (
+            'yes' if hyperParams.symm == ours.symm else 'no', 
+            hyperParams.train_set_size, 
+        )
     
     @lru_cache(1)
     def name(self):
@@ -95,10 +98,22 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-for tss in [
-    64, 256, 1024, 
-]:
-    hP = template.copy()
-    hP.train_set_size = tss
-    hP.ready(globals())
-    GROUPS.append(MyExpGroup(hP))
+ours = template.copy()
+
+baseline = template.copy()
+baseline.symm = SymmetryAssumption(
+    3, [
+        (SAMPLE_TRANS, [Trivial()], {Slice(0, 3)}), 
+    ], 
+)
+
+for ob in (ours, baseline):
+    for tss in [
+        128, 256, 512, 1024, 
+    ]:
+        hP = ob.copy()
+        hP.train_set_size = tss
+        hP.max_epoch = 1024000 // tss
+        hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
+        hP.ready(globals())
+        GROUPS.append(MyExpGroup(hP))

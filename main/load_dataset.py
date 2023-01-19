@@ -119,25 +119,21 @@ def PersistentLoader(dataset, batch_size):
             yield video_batch, traj_batch
 
 def dataLoader(dataset: Dataset, batch_size, set_size=None):
-    n_batches = None
     if set_size is not None:
         if set_size % batch_size:
             assert set_size < batch_size
             batch_size = set_size
-        n_batches = set_size // batch_size
-    batch_i = 0
     if set_size is None:
         truncatedDataset = dataset
     else:
         truncatedDataset = dataset.truncate(set_size)
     for batch in torch.utils.data.DataLoader(
-        truncatedDataset, batch_size, shuffle=True, num_workers=0, 
+        truncatedDataset, batch_size, shuffle=True, 
+        drop_last=True, 
+        num_workers=0, 
     ):
-        if n_batches is not None and batch_i + 1 >= n_batches:
-            return
         batch: torch.Tensor
         yield batch
-        batch_i += 1
 
 if __name__ == '__main__':
     # dataset = Dataset('../datasets/bounce/train', 128, 20, 3)

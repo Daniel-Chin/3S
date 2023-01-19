@@ -11,7 +11,7 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 
 EXP_NAME = 'vicreg_batch_size'
-N_RAND_INITS = 4
+N_RAND_INITS = 12
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -119,7 +119,7 @@ vicreg.vicreg_expander_widths = None
 vicreg.train_set_size = 1024
 
 for bs in [
-    32, 64, 128, 256, 512, 1024, 
+    256, 512, 
 ]:
     hP = vicreg.copy()
     hP.batch_size = bs

@@ -116,7 +116,7 @@ vicreg.variational_rnn = False
 # modify vicreg from vanilla
 vicreg.vicreg_expander_identity = True
 vicreg.vicreg_expander_widths = None
-vicreg.train_set_size = 1024
+vicreg.train_set_size = 512
 
 for bs in [
     256, 512, 

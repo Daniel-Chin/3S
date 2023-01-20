@@ -1017,12 +1017,15 @@ next {
 1/19 {
     2023_m01_d14@07_05_47_train_set_size
         yeah, after fixing the bug, larger dataset leads to better performance. 
+    2023_m01_d14@21_00_35_2b_sps
+        SPS effect is not large
     HEY! The batch size experiment doesn't control # of batches! 
         ...
 }
 next {
+    2body: calibrate using one labeled traj. 
     arxiv paper:
-        single color exp failed
+        single color exp: change hyper params
     exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
         可不可以这样做：
         self-recon: 照常

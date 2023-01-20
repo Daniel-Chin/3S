@@ -9,6 +9,7 @@ VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
+SLOW_EVAL_EPOCH_INTERVAL = 2000
 
 EXP_NAME = 'vicreg_vi'
 N_RAND_INITS = 12

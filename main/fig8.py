@@ -21,10 +21,12 @@ class USING_METRIC:
 #     method = projectionMSELockHeight
 #     suptitle = '\n(height locked)'
 
-EXPERIMENT_PATH = path.join('./experiments', '''
-2023_m01_d04@01_22_50_sps
-'''.strip())
-LOCK_EPOCH = None
+try:
+    from workspace import EXP_PATH, LOCK_EPOCH
+except ImportError:
+    EXP_PATH = input('EXP_PATH=')
+    LOCK_EPOCH = None
+
 N_GROUPS_PER_SYMM = 6
 
 def COL_TITLE(group: MyExpGroup):
@@ -113,4 +115,4 @@ def main(experiment_path, lock_epoch):
     plt.show()
 
 if __name__ == '__main__':
-    main(EXPERIMENT_PATH, LOCK_EPOCH)
+    main(EXP_PATH, LOCK_EPOCH)

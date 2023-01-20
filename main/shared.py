@@ -3,7 +3,6 @@ __all__ = [
     'RESOLUTION', 
     'IMG_N_CHANNELS', 
     'ENTIRE_DATASET_IN_DEVICE', 
-    'SLOW_EVAL_EPOCH_INTERVAL', 
     
     'HyperParams', 'torch2PIL', 'torch2np', 
     'reparameterize', 
@@ -27,7 +26,6 @@ TRAJ_FILENAME = 'trajectory.json'
 RESOLUTION = 32
 IMG_N_CHANNELS = 3
 ENTIRE_DATASET_IN_DEVICE = True
-SLOW_EVAL_EPOCH_INTERVAL = 1000
 
 class HyperParams(BaseHyperParams):
     def __init__(self) -> None:

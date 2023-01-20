@@ -9,6 +9,7 @@ VALIDATE_SET_PATH = '../datasets/two_body/validate'
 VALIDATE_SET_SIZE = 64
 SEQ_LEN = 25
 ACTUAL_DIM = 6
+SLOW_EVAL_EPOCH_INTERVAL = 100
 
 EXP_NAME = ...
 N_RAND_INITS = ...

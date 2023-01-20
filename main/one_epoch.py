@@ -116,7 +116,7 @@ def oneEpoch(
             if epoch % 8 == 0:
                 lossLogger.compressor.flush()
 
-        if epoch % SLOW_EVAL_EPOCH_INTERVAL == 0:
+        if epoch % experiment.SLOW_EVAL_EPOCH_INTERVAL == 0:
             with profiler('save checkpoints'):
                 saveModels(models, epoch, save_path)
             if hParams.lossWeightTree['vicreg'].weight == 0:

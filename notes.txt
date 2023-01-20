@@ -1019,6 +1019,9 @@ next {
         yeah, after fixing the bug, larger dataset leads to better performance. 
     2023_m01_d14@21_00_35_2b_sps
         SPS effect is not large
+    multi body 的 significance:
+        - system DoF (6) > augment DoF (3)
+        - system DoF can be unknown. What to do? this required some fundamental change to SPS. 
     HEY! The batch size experiment doesn't control # of batches! 
         ...
 }
@@ -1032,8 +1035,12 @@ next {
         rnn pred: 随机抽选 batch 中一个 traj, 扩增 batch_size 次。
 }
 todo {
+    bring back identity:aug ratio, as a hyperParam. Use 1:4 in both bounce and 2body. 
+    compare 1:4 with 1:1. Is 1:1 really better?
+    vary rnn_width to see if it improves 2body
     try ensemble with vicreg
     info probe
+    in the meantime, compare VICReg with VICReg+SPS
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
 
     compare SAMPLE_TRANS vs COMPOSE_TRANS in two body. 

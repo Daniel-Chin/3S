@@ -27,12 +27,10 @@ except ImportError:
     EXP_PATH = input('EXP_PATH=')
     LOCK_EPOCH = None
 
-N_GROUPS_PER_SYMM = 6
-
 def COL_TITLE(group: MyExpGroup):
     # return f'rnn,batch = {(group.hyperParams.rnn_width, group.hyperParams.batch_size)}', ''
-    return f'{group.hyperParams.rnn_width}, {group.hyperParams.batch_size}', '\n rnn_width, batch_size'
-    # return f'|train set| = {group.hyperParams.train_set_size}', ''
+    # return f'{group.hyperParams.rnn_width}, {group.hyperParams.batch_size}', '\n rnn_width, batch_size'
+    return f'|train set| = {group.hyperParams.train_set_size}', ''
     # return f'vae channels = \n{group.hyperParams.vae_channels}', ''
 
 def main(experiment_path, lock_epoch):
@@ -40,6 +38,7 @@ def main(experiment_path, lock_epoch):
         experiment_path, EXPERIMENT_PY_FILENAME, 
     ))
     groups: List[MyExpGroup]
+    n_groups_per_symm = len(groups) // 2
 
     # permutate
     groups = [*groups[::2], *groups[1::2]]
@@ -47,14 +46,14 @@ def main(experiment_path, lock_epoch):
     print(f'{exp_name = }')
     print(*[x.variable_value for x in groups], sep='\n')
 
-    fig, axes = plt.subplots(1, N_GROUPS_PER_SYMM, sharey=True)
+    fig, axes = plt.subplots(1, n_groups_per_symm, sharey=True)
     X = [1, 2]
     for col_i, ax in enumerate(axes):
         # change together: 3g958hpf598
         assert 'yes' in groups[col_i                    ].variable_value
-        assert 'no'  in groups[col_i + N_GROUPS_PER_SYMM].variable_value
+        assert 'no'  in groups[col_i + n_groups_per_symm].variable_value
         title, var_names = COL_TITLE(groups[col_i])
-        assert title == COL_TITLE(groups[col_i + N_GROUPS_PER_SYMM])[0]
+        assert title == COL_TITLE(groups[col_i + n_groups_per_symm])[0]
         ax.set_title(title)
 
     dataset = Dataset(
@@ -87,7 +86,7 @@ def main(experiment_path, lock_epoch):
             Y[i_group].append(mse)
 
     for col_i, ax in enumerate(axes):
-        Ys = (Y[col_i], Y[col_i + N_GROUPS_PER_SYMM])
+        Ys = (Y[col_i], Y[col_i + n_groups_per_symm])
         # for x, y in zip(X, Ys):
         #     ax.plot(
         #         [x] * n_rand_inits, y, linestyle='none', 
@@ -103,6 +102,7 @@ def main(experiment_path, lock_epoch):
             'no symm', 
         ])
         ax.set_xlim(.8, 2.2)
+        ax.set_ylim(0, 1)
     axes[0].set_ylabel('MSE')
     plt.suptitle('Linear projection MSE (↓)' 
         + USING_METRIC.suptitle

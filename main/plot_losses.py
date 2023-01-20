@@ -40,8 +40,8 @@ lossTypes = [
 ]
 plotLosses = PlotLosses(
     path.join(EXP_PATH, EXPERIMENT_PY_FILENAME), 
-    lossTypes, 
-    average_over=100, epoch_start=1000, 
+    lossTypes, using_epoch_not_batch=False, 
+    average_over=1600, start=1600, 
     which_legend=0, linewidth=1, 
 )
 fig = next(plotLosses)

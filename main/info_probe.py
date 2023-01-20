@@ -48,8 +48,8 @@ class InfoProbeDataset(torch.utils.data.Dataset):
                 mu, _ = vae.encode(flat_video_batch)
                 z.append(mu)
                 traj.append(flat_traj_batch)
-            self.z = torch.stack(z).detach()
-            self.traj = torch.stack(traj).detach()
+            self.z = torch.concat(z).detach()
+            self.traj = torch.concat(traj).detach()
         self.size = self.z.shape[0]
     
     def __len__(self):
@@ -73,11 +73,11 @@ def probe(
     validate_losses = []
     for epoch in range(n_epochs):
         trainLoader    = dataLoader(
-            trainSet,    hParams.batch_size, None, 
+            trainSet, 512, None, 
         )
         with hParams.eval():
             validateLoader = dataLoader(
-                validateSet, hParams.batch_size, None, 
+                validateSet, 512, None, 
             )
         
         probeNetwork.train()

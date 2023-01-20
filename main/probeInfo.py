@@ -52,7 +52,7 @@ def main(experiment_path, lock_epoch):
     )
 
     for i in range(99):
-        kw = dict(n_epochs=200)
+        kw = dict(n_epochs=4)
         if i == 0:
             pass
         else:
@@ -134,7 +134,7 @@ cached_collapse_baseline_mse = None
 def collapseBaselineMSE(dataset: InfoProbeDataset):
     global cached_collapse_baseline_mse
     if cached_collapse_baseline_mse is None:
-        traj = dataset.traj[0, :, :]
+        traj = dataset.traj
         cached_collapse_baseline_mse = F.mse_loss(
             traj.mean(dim=0).unsqueeze(0).repeat((traj.shape[0], 1)), 
             traj, 

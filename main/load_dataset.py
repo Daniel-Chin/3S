@@ -119,6 +119,7 @@ def PersistentLoader(dataset, batch_size):
             yield video_batch, traj_batch
 
 def dataLoader(dataset: Dataset, batch_size, set_size=None):
+    batch_size = min(batch_size, dataset.size)
     if set_size is not None:
         if set_size % batch_size:
             assert set_size < batch_size

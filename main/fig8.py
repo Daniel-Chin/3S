@@ -40,8 +40,8 @@ def main(experiment_path, lock_epoch):
     groups: List[MyExpGroup]
     n_groups_per_symm = len(groups) // 2
 
-    # permutate
-    groups = [*groups[::2], *groups[1::2]]
+    # permute
+    # groups = [*groups[::2], *groups[1::2]]
 
     print(f'{exp_name = }')
     print(*[x.variable_value for x in groups], sep='\n')

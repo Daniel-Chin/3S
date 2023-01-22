@@ -104,7 +104,7 @@ vicreg.lossWeightTree['vicreg']['covariance'].weight = 1
 vicreg.vicreg_expander_identity = False
 vicreg.vicreg_expander_widths = [64, 64, 64]
 vicreg.vicreg_invariance_on_Y = False
-vicreg.weight_decay = 1e-9
+vicreg.weight_decay = 1e-9  # to tweak
 vicreg.batch_size = 32
 vicreg.lossWeightTree['self_recon'].weight = 0
 vicreg.lossWeightTree['kld'].weight = 0
@@ -123,7 +123,7 @@ vicreg.max_epoch = 32000
 vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 
 for vi in [
-    10, 25, 100, 
+    200, 400, 800, 
 ]:
     hP = vicreg.copy()
     hP.lossWeightTree['vicreg']['variance'].weight = vi

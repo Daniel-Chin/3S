@@ -1022,6 +1022,12 @@ next {
     multi body 的 significance:
         - system DoF (6) > augment DoF (3)
         - system DoF can be unknown. What to do? this required some fundamental change to SPS. 
+}
+1/22 {
+    2023_m01_d18@20_07_27_train_set_size
+        bigger train set size -> better disen. 1024 is best. 
+        smaller train set size -> SPS effect more prominent. 
+        in the current very-good hyper param, the baseline is so strong there's no advantage for SPS when train set size is large. See 2023_m01_d04@01_22_50_sps
     HEY! The batch size experiment doesn't control # of batches! 
         ...
 }

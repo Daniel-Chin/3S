@@ -1028,8 +1028,10 @@ next {
         bigger train set size -> better disen. 1024 is best. 
         smaller train set size -> SPS effect more prominent. 
         in the current very-good hyper param, the baseline is so strong there's no advantage for SPS when train set size is large. See 2023_m01_d04@01_22_50_sps
-    HEY! The batch size experiment doesn't control # of batches! 
-        ...
+    2023_m01_d20@06_35_01_2b_rnn_width
+        Damn, bigger RNN didn't help image pred at all. 
+        disen is bad. 
+        is that task too hard? impossible for any prior model? What should we do? 
 }
 next {
     2body: calibrate using one labeled traj. 

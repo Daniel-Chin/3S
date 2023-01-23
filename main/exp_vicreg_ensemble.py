@@ -18,8 +18,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'vi'
-        self.variable_value = hyperParams.lossWeightTree['vicreg']['invariance'].weight
+        self.variable_name = 'rnn_ensemble'
+        self.variable_value = hyperParams.rnn_ensemble
     
     @lru_cache(1)
     def name(self):

@@ -169,7 +169,7 @@ class SymmetryAssumption:
         return cattor.cat(dim=1)
     
     def sample(self) -> TUT:
-        if random() < self.identity_prob:
+        if random.random() < self.identity_prob:
             return identity, identity
         
         # instantiate

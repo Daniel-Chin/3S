@@ -9,16 +9,17 @@ VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
+SLOW_EVAL_EPOCH_INTERVAL = 1000
 
-EXP_NAME = 'k_vs_epoch'
-N_RAND_INITS = 30
+EXP_NAME = 'K'
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'K,epoch'
-        self.variable_value = hyperParams.K, hyperParams.max_epoch
+        self.variable_name = 'K'
+        self.variable_value = hyperParams.K
     
     @lru_cache(1)
     def name(self):
@@ -45,6 +46,11 @@ template.lossWeightTree = LossWeightTree('total', 1, [
             LossWeightTree('decode', 0, None), 
         ]), 
     ]), 
+    LossWeightTree('vicreg', 0, [
+        LossWeightTree('variance', 0, None), 
+        LossWeightTree('invariance', 0, None), 
+        LossWeightTree('covariance', 0, None), 
+    ]), 
     LossWeightTree('symm_self_consistency', 0, None), 
 ])
 template.lr = 0.001
@@ -53,13 +59,14 @@ template.symm = SymmetryAssumption(
         (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
         (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
     ], 
+    .1, 
 )
 template.supervise_rnn = False
 template.supervise_vae = False
 template.supervise_vae_only_xy = False
 template.variational_rnn = True
 template.vvrnn = False
-template.vvrnn_static = -25
+template.vvrnn_static = None
 template.rnn_min_context = 5
 template.energy_noise_std = 1
 template.rnn_width = 32
@@ -67,28 +74,31 @@ template.residual = False
 template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
+template.rnn_ensemble = 1
 template.vae_channels = [64, 128, 256]
 template.deep_spread = True
 template.relu_leak = False
 template.vae_kernel_size = 4
+template.vae_is_actually_ae = False
+template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
+template.weight_decay = 0
 template.lr_diminish = None
-template.train_set_size = 128
-template.image_loss = 'mse'
-template.sched_sampling = None
-template.max_epoch = None
-template.K = None
+template.train_set_size = 64
+template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
+template.sched_sampling = LinearScheduledSampling(18000)
+template.max_epoch = template.sched_sampling.duration
+template.vicreg_expander_identity = None
+template.vicreg_expander_widths = None
+template.vicreg_invariance_on_Y = None
 
 # modifying template
 # template.xxx = xxx
 
-for i in range(3):
-    ratio = 2 ** i
+for K in [1, 4, template.batch_size]:
     hP = template.copy()
-    hP.K = ratio
-    hP.max_epoch = 8000 // ratio
-    hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
-    hP.ready()
+    hP.K = K
+    hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

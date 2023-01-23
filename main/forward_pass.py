@@ -86,19 +86,20 @@ def forward(
     if hParams.supervise_rnn:
         flat_z = flat_traj_batch
     
-    trans, untrans = hParams.symm.sample()
-    flat_z_transed = trans(flat_z)
-
     # restore time axis
     z = flat_z.view(
         batch_size, SEQ_LEN, hParams.symm.latent_dim, 
     )
-    z_transed = flat_z_transed.view(
-        batch_size, SEQ_LEN, hParams.symm.latent_dim, 
-    )
-    
+
     # rnn forward pass
     min_context = hParams.rnn_min_context
+    perm = torch.randperm(hParams.batch_size)
+    small_batch_size = hParams.batch_size // hParams.K
+    idx = perm[: small_batch_size]
+    sampled_z = z[idx, :, :]
+    sampled_flat_z = sampled_z.view(
+        small_batch_size * SEQ_LEN, hParams.symm.latent_dim, 
+    )
 
     lossTree.predict.image = []
     lossTree.predict.z     = []
@@ -108,6 +109,17 @@ def forward(
     lossTree.vicreg.covariance = []
     for predRnn in predRnns:
         for K_i in range(hParams.K):
+        # The current implementation of K > 1 is inefficient. 
+        # That is because some batch size is wasted. 
+        # If we turn out to use K > 1, optimize. 
+            trans, untrans = hParams.symm.sample()
+            flat_z_transed = trans(sampled_flat_z)
+
+            # restore time axis
+            z_transed = flat_z_transed.view(
+                batch_size, SEQ_LEN, hParams.symm.latent_dim, 
+            )
+            
             flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
                 predRnn, z_transed, untrans, 
                 batch_size, experiment, hParams, epoch, batch_i, profiler, 

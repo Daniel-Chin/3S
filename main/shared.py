@@ -173,6 +173,8 @@ class HyperParams(BaseHyperParams):
             assert self.lossWeightTree['kld'].weight == 0
         if self.variational_rnn:
             assert not self.vae_is_actually_ae
+        x = self.batch_size / self.K
+        assert abs(x - int(x)) < 1e-6
         self.OptimClass = {
             'adam': torch.optim.Adam, 
         }[self.optim_name]

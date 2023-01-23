@@ -1035,17 +1035,18 @@ next {
 }
 1/23 {
     brought back identity:aug ratio, as a hyperParam. Using identity prob=0.1 in both bounce and 2body. 
+    I changed the semantics of hParam.K
+        This is a breaking change. Previous experiments' definition of K should refer to commit b856ec5963aee0cab9b9a8d3d689626c736ecf61. 
 }
 next {
     arxiv paper:
         ...
 }
 todo {
-    2body: calibrate using one labeled traj. 
     compare 1:4 with 1:1. Is 1:1 really better?
-    vary rnn_width to see if it improves 2body
+        // underway
+    2body: calibrate using one labeled traj. 
     try ensemble with vicreg
-    info probe
     in the meantime, compare VICReg with VICReg+SPS
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
         self-recon: 照常

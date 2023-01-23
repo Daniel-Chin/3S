@@ -133,7 +133,7 @@ def dataLoader(dataset: Dataset, batch_size, set_size=None):
         drop_last=True, 
         num_workers=0, 
     ):
-        batch: torch.Tensor
+        batch: List[torch.Tensor]
         yield batch
 
 if __name__ == '__main__':

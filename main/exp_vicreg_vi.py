@@ -59,6 +59,7 @@ template.symm = SymmetryAssumption(
         (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
         (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
     ], 
+    .1, 
 )
 template.supervise_rnn = False
 template.supervise_vae = False
@@ -123,7 +124,7 @@ vicreg.max_epoch = 32000
 vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 
 for vi in [
-    200, 400, 800, 
+    15, 25, 35, 
 ]:
     hP = vicreg.copy()
     hP.lossWeightTree['vicreg']['variance'].weight = vi

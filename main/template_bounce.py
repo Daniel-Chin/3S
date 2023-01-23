@@ -70,6 +70,7 @@ template.vvrnn_static = None
 template.rnn_min_context = 5
 template.energy_noise_std = 1
 template.rnn_width = 32
+template.rnn_depth = 1
 template.residual = False
 template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False

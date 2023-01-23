@@ -49,6 +49,7 @@ class HyperParams(BaseHyperParams):
         self.energy_noise_std: float = None
 
         self.rnn_width: int = None
+        self.rnn_depth: int = None
         self.residual: Optional[float] = None
         self.jepa_stop_grad_l_encoder: bool = None
         self.jepa_stop_grad_r_encoder: bool = None
@@ -140,6 +141,8 @@ class HyperParams(BaseHyperParams):
             self.vicreg_expander_identity = None
             self.vicreg_expander_widths = None
             self.vicreg_invariance_on_Y = None
+        if self.rnn_depth is None:
+            self.rnn_depth = 1
 
     def ready(self, experiment_globals):
         self.experiment_globals = experiment_globals

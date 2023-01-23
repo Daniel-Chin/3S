@@ -11,15 +11,15 @@ SEQ_LEN = 25
 ACTUAL_DIM = 6
 SLOW_EVAL_EPOCH_INTERVAL = 100
 
-EXP_NAME = ...
-N_RAND_INITS = ...
+EXP_NAME = 'rnn_depth'
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.WHAT
+        self.variable_name = 'rnn_depth'
+        self.variable_value = hyperParams.rnn_depth
     
     @lru_cache(1)
     def name(self):
@@ -97,9 +97,22 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-# hP = template.copy()
-# hP.xxx = xxx
-# hP.ready(globals())
-# GROUPS.append(MyExpGroup(hP))
+hP = template.copy()
+hP.rnn_depth = 1
+hP.rnn_width = 32
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 0
+hP = template.copy()
+hP.rnn_depth = 2
+hP.rnn_width = 32
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.rnn_depth = 2
+hP.rnn_width = 64
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+assert len(GROUPS) == 2

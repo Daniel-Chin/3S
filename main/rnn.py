@@ -48,10 +48,13 @@ class EnergyRNN(nn.Module):
         self.hParams = hyperParams
         hidden_dim = hyperParams.rnn_width
 
-        self.updateHidden = nn.Sequential(
-            nn.Linear(hidden_dim + hyperParams.symm.latent_dim, hidden_dim), 
-            nn.Tanh(), 
-        )
+        modules = []
+        d = hidden_dim + hyperParams.symm.latent_dim
+        for _ in range(hyperParams.rnn_depth):
+            modules.append(nn.Linear(d, hidden_dim))
+            modules.append(nn.Tanh())
+            d = hidden_dim
+        self.updateHidden = nn.Sequential(*modules)
         
         self.projHead = nn.Linear(hidden_dim, 1)
 

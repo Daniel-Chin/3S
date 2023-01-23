@@ -59,6 +59,7 @@ template.symm = SymmetryAssumption(
         (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
         (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
     ], 
+    .1, 
 )
 template.supervise_rnn = False
 template.supervise_vae = False

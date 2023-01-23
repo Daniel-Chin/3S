@@ -4,22 +4,22 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/two_body/train'
-VALIDATE_SET_PATH = '../datasets/two_body/validate'
+TRAIN_SET_PATH    = '../datasets/bounce/train'
+VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
-SEQ_LEN = 25
-ACTUAL_DIM = 6
-SLOW_EVAL_EPOCH_INTERVAL = 100
+SEQ_LEN = 20
+ACTUAL_DIM = 3
+SLOW_EVAL_EPOCH_INTERVAL = 1000
 
-EXP_NAME = ...
-N_RAND_INITS = ...
+EXP_NAME = 'k_1_k_4'
+N_RAND_INITS = 12
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.WHAT
+        self.variable_name = 'identity_prob'
+        self.variable_value = hyperParams.symm.identity_prob
     
     @lru_cache(1)
     def name(self):
@@ -55,8 +55,9 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    6, [
-        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
+    3, [
+        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
     ], 
     .1, 
 )
@@ -83,11 +84,11 @@ template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
-template.weight_decay = 1e-9
+template.weight_decay = 0
 template.lr_diminish = None
-template.train_set_size = 1024
+template.train_set_size = 64
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
-template.sched_sampling = LinearScheduledSampling(1000)
+template.sched_sampling = LinearScheduledSampling(18000)
 template.max_epoch = template.sched_sampling.duration
 template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None
@@ -96,9 +97,8 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-# hP = template.copy()
-# hP.xxx = xxx
-# hP.ready(globals())
-# GROUPS.append(MyExpGroup(hP))
-
-assert len(GROUPS) == 0
+for ip in [.5, .2]:
+    hP = template.copy()
+    hP.symm.identity_prob = ip
+    hP.ready(globals())
+    GROUPS.append(MyExpGroup(hP))

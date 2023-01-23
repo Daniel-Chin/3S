@@ -134,9 +134,11 @@ class SymmetryAssumption:
     def __init__(
         self, latent_dim: int, 
         rule: List[Tuple[HowTransCombine, List[Group], Set[Slice]]], 
+        identity_prob: float = 0.0, 
     ) -> None:
         self.latent_dim = latent_dim
         self.rule = rule
+        self.identity_prob = identity_prob
 
         dim_set = set()
         for _, _, slice_set in self.rule:
@@ -147,7 +149,7 @@ class SymmetryAssumption:
         assert dim_set == set(range(self.latent_dim))
     
     def __repr__(self) -> str:
-        return f'<symm {self.rule}>'
+        return f'<symm {self.rule} I={self.identity_prob}>'
     
     def apply(
         self, x: torch.Tensor, /, 
@@ -167,6 +169,9 @@ class SymmetryAssumption:
         return cattor.cat(dim=1)
     
     def sample(self) -> TUT:
+        if random() < self.identity_prob:
+            return identity, identity
+        
         # instantiate
         instance: __class__.Instance = []
         for howCombine, group_seq, slice_set in self.rule:
@@ -193,6 +198,7 @@ class SymmetryAssumption:
         return __class__(
             self.latent_dim, 
             deepcopy(self.rule), 
+            self.identity_prob, 
         )
     
     def __eq__(self, other):
@@ -200,6 +206,7 @@ class SymmetryAssumption:
         return (
             self.latent_dim == other.latent_dim 
             and self.rule == other.rule
+            and self.identity_prob == other.identity_prob
         )
 
 class GusMethod(SymmetryAssumption):

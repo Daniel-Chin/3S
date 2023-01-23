@@ -1033,23 +1033,23 @@ next {
         disen is bad. 
         is that task too hard? impossible for any prior model? What should we do? 
 }
+1/23 {
+    brought back identity:aug ratio, as a hyperParam. Using identity prob=0.1 in both bounce and 2body. 
+}
 next {
-    2body: calibrate using one labeled traj. 
     arxiv paper:
-        single color exp: change hyper params
-    exp: 一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
-        可不可以这样做：
-        self-recon: 照常
-        rnn pred: 随机抽选 batch 中一个 traj, 扩增 batch_size 次。
+        ...
 }
 todo {
-    bring back identity:aug ratio, as a hyperParam. Use 1:4 in both bounce and 2body. 
+    2body: calibrate using one labeled traj. 
     compare 1:4 with 1:1. Is 1:1 really better?
     vary rnn_width to see if it improves 2body
     try ensemble with vicreg
     info probe
     in the meantime, compare VICReg with VICReg+SPS
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
+        self-recon: 照常
+        rnn pred: 随机抽选 batch 中一个 traj, 扩增 batch_size 次。
 
     compare SAMPLE_TRANS vs COMPOSE_TRANS in two body. 
 }

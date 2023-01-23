@@ -12,7 +12,7 @@ ACTUAL_DIM = 6
 SLOW_EVAL_EPOCH_INTERVAL = 100
 
 EXP_NAME = 'rnn_depth'
-N_RAND_INITS = 1
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:

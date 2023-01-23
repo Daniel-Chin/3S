@@ -12,14 +12,17 @@ ACTUAL_DIM = 6
 SLOW_EVAL_EPOCH_INTERVAL = 100
 
 EXP_NAME = 'rnn_depth'
-N_RAND_INITS = 8
+N_RAND_INITS = 1
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'rnn_depth'
-        self.variable_value = hyperParams.rnn_depth
+        self.variable_name = 'rnn_depth,width'
+        self.variable_value = (
+            hyperParams.rnn_depth, 
+            hyperParams.rnn_width, 
+        )
     
     @lru_cache(1)
     def name(self):
@@ -115,4 +118,4 @@ hP.rnn_width = 64
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 
-assert len(GROUPS) == 2
+assert len(GROUPS) == 3

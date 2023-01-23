@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_K.py
+exp_2b_rnn_depth.py
 '''.strip()
 # op = input('Which exp? ')
 

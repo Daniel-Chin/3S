@@ -97,8 +97,10 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-for tss in [16, 32]:
+for tss in [16, 32, 64]:
     hP = template.copy()
     hP.train_set_size = tss
+    hP.max_epoch = 64 * 18000 // tss
+    hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

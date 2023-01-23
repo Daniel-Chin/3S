@@ -93,13 +93,20 @@ def forward(
 
     # rnn forward pass
     min_context = hParams.rnn_min_context
-    perm = torch.randperm(hParams.batch_size)
-    small_batch_size = hParams.batch_size // hParams.K
-    idx = perm[: small_batch_size]
-    sampled_z = z[idx, :, :]
-    sampled_flat_z = sampled_z.view(
-        small_batch_size * SEQ_LEN, hParams.symm.latent_dim, 
-    )
+    if validating or hParams.K == 1:
+        small_batch_size = batch_size
+        sampled_z = z
+        sampled_flat_z = flat_z
+        sample_video_batch = video_batch
+    else:
+        small_batch_size = batch_size // hParams.K
+        perm = torch.randperm(batch_size)
+        idx = perm[: small_batch_size]
+        sampled_z = z[idx, :, :]
+        sampled_flat_z = sampled_z.view(
+            small_batch_size * SEQ_LEN, hParams.symm.latent_dim, 
+        )
+        sample_video_batch = video_batch[idx, :, :, :, :]
 
     lossTree.predict.image = []
     lossTree.predict.z     = []
@@ -117,12 +124,12 @@ def forward(
 
             # restore time axis
             z_transed = flat_z_transed.view(
-                batch_size, SEQ_LEN, hParams.symm.latent_dim, 
+                small_batch_size, SEQ_LEN, hParams.symm.latent_dim, 
             )
             
             flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
                 predRnn, z_transed, untrans, 
-                batch_size, experiment, hParams, epoch, batch_i, profiler, 
+                small_batch_size, experiment, hParams, epoch, batch_i, profiler, 
             )
 
             # predict image
@@ -132,18 +139,18 @@ def forward(
                 or hParams.lossWeightTree['predict']['image'].weight != 0
             ):
                 z_hat_aug = flat_z_hat_aug.view(
-                    batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
+                    small_batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
                 )
                 with profiler('good'):
                     flat_predictions = vae.decode(r_flat_z_hat_aug)
                 img_predictions = flat_predictions.view(
-                    batch_size, SEQ_LEN - min_context, 
+                    small_batch_size, SEQ_LEN - min_context, 
                     IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
                 )
                 with profiler('good'):
                     lossTree.predict.image.append(imgCriterion(
                         img_predictions, 
-                        video_batch[:, min_context:, :, :, :], 
+                        sample_video_batch[:, min_context:, :, :, :], 
                     ))
             else:
                 img_predictions = None
@@ -159,21 +166,21 @@ def forward(
                 if hParams.jepa_stop_grad_l_encoder:
                     flat_z_hat_aug, r_flat_z_hat_aug, log_var = rnnForward(
                         predRnn, z_transed.detach(), untrans, 
-                        batch_size, experiment, hParams, epoch, batch_i, profiler, 
+                        small_batch_size, experiment, hParams, epoch, batch_i, profiler, 
                     )
                 z_hat_aug = flat_z_hat_aug.view(
-                    batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
+                    small_batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
                 )
-                _z = z[:, min_context:, :]
+                _z = sampled_z[:, min_context:, :]
                 if hParams.jepa_stop_grad_r_encoder:
                     _z = _z.detach()
                 if hParams.lossWeightTree['vicreg'].weight:
                     flat_emb_r = vae.expander(_z.reshape(
-                        batch_size * (SEQ_LEN - min_context), 
+                        small_batch_size * (SEQ_LEN - min_context), 
                         hParams.symm.latent_dim, 
                     ))
                     flat_emb_l = vae.expander(z_hat_aug.reshape(
-                        batch_size * (SEQ_LEN - min_context), 
+                        small_batch_size * (SEQ_LEN - min_context), 
                         hParams.symm.latent_dim, 
                     ))
 
@@ -199,8 +206,8 @@ def forward(
                         # covariance
                         flat_emb_l = flat_emb_l - flat_emb_l.mean(dim=0)
                         flat_emb_r = flat_emb_r - flat_emb_r.mean(dim=0)
-                        cov_emb_l = (flat_emb_l.T @ flat_emb_l) / (batch_size - 1)
-                        cov_emb_r = (flat_emb_r.T @ flat_emb_r) / (batch_size - 1)
+                        cov_emb_l = (flat_emb_l.T @ flat_emb_l) / (small_batch_size - 1)
+                        cov_emb_r = (flat_emb_r.T @ flat_emb_r) / (small_batch_size - 1)
                         lossTree.vicreg.covariance.append(
                             (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_l).pow_(2).sum() / hParams.vicreg_emb_dim + 
                             (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_r).pow_(2).sum() / hParams.vicreg_emb_dim
@@ -228,7 +235,7 @@ def forward(
     if hParams.vvrnn or hParams.vvrnn_static is not None:
         mean_square_vrnn_std = torch.exp(
             0.5 * log_var
-        ).norm(2).cpu() ** 2 / batch_size
+        ).norm(2).cpu() ** 2 / small_batch_size
     else:
         mean_square_vrnn_std = torch.tensor(0, device=CPU)
 

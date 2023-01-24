@@ -1042,6 +1042,12 @@ next {
     2023_m01_d22@20_45_36_k_1_k_4
         when writing the paper submitted to ICLR23, we found that some exp hinted that K=1 seemed better than K=4. 
         Today's exp shows that such an effect doesn't exist. 
+    developed supervise calibration for evalDecoder. 
+        in 2023_m01_d04@01_22_50_sps, both eval_encoder and supervise_calibrate_eval_decoder show advantage for SPS in groups with larger rnn_width. Perfect hyperParam (rnn_width=32) results in strong baseline (no symm) that can disen. 
+        for 2body, it shows the current hyperParams without symm has surprisingly good linearity. (as always.)
+        maybe when rnn_width=64, the effect of SPS is more prominent, as with 2023_m01_d04@01_22_50_sps. 
+
+        4-shot calibration is enough. 64-shot is better at reducing confounding in 2body. 
 }
 next {
     arxiv paper:

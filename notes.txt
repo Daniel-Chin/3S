@@ -1057,6 +1057,7 @@ next {
             raises lin proj mse mid-training. 
             lowers invariance mid-training. 
             Why??? 
+    change: K does not scale loss weights any more. 
 }
 next {
     arxiv paper:

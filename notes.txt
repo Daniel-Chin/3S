@@ -1058,6 +1058,8 @@ next {
             lowers invariance mid-training. 
             Why??? 
     change: K does not scale loss weights any more. 
+    2023_m01_d23@04_32_42_rnn_depth
+        no use. 
 }
 next {
     arxiv paper:

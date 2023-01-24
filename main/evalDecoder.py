@@ -214,8 +214,8 @@ def main(experiment_path, lock_epoch):
             experiment_path, EXPERIMENT_PY_FILENAME, 
         ))
         groups: List[MyExpGroup]
-        # groups = [groups[3]]
-        # print(groups[0].variable_value)
+        # groups = groups[-10:-6]
+        # print(*[group.variable_value for group in groups])
         # n_rand_inits = 7
         # print(f'forced {n_rand_inits = }')
         # input('enter...')

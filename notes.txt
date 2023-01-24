@@ -1048,6 +1048,15 @@ next {
         maybe when rnn_width=64, the effect of SPS is more prominent, as with 2023_m01_d04@01_22_50_sps. 
 
         4-shot calibration is enough. 64-shot is better at reducing confounding in 2body. 
+    2023_m01_d22@20_45_33_vicreg_no_sps
+        both have linearity MSE ~= 0.36
+        prolly because i haven't make vicreg capture enough info, and SPS has not kicked in. 
+        Also, note that our toy dataset favors VICReg a lot (unintentionally (we didn't even know about VICReg!)) because the ground-truth covariance is actaully 0. Unlike 2body. 
+        merged.png
+            SPS significantly lowers validation covariance loss. 
+            raises lin proj mse mid-training. 
+            lowers invariance mid-training. 
+            Why??? 
 }
 next {
     arxiv paper:

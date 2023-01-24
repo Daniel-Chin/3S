@@ -1,6 +1,7 @@
 import os
 import json
 from typing import List
+from functools import lru_cache
 
 import numpy as np
 import torch
@@ -136,6 +137,7 @@ def dataLoader(dataset: Dataset, batch_size, set_size=None):
         batch: List[torch.Tensor]
         yield batch
 
+@lru_cache()
 def getImageSet(*args, **kw):
     # flatten the videos to images. 
     dataset = Dataset(*args, **kw)
@@ -149,10 +151,18 @@ def getImageSet(*args, **kw):
     )
     return image_set, traj_set
 
+def printStats(*args):
+    _, traj_set = getImageSet(*args)
+    print('mean:', traj_set.mean(dim=0))
+    print('std: ', traj_set.std (dim=0))
+
 if __name__ == '__main__':
     # dataset = Dataset('../datasets/bounce/train', 128, 20, 3)
     # loader = PersistentLoader(dataset, 32)
-    dataset = Dataset('../datasets/bounce/train', 16, 20, 3)
-    loader = dataLoader(dataset, 16, 8)
-    for i, (x, y) in enumerate(loader):
-        print(i, x.shape, y.shape)
+
+    # dataset = Dataset('../datasets/bounce/train', 16, 20, 3)
+    # loader = dataLoader(dataset, 16, 8)
+    # for i, (x, y) in enumerate(loader):
+    #     print(i, x.shape, y.shape)
+
+    printStats('../datasets/bounce/validate', 16, 20, 3)

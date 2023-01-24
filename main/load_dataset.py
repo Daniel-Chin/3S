@@ -136,6 +136,19 @@ def dataLoader(dataset: Dataset, batch_size, set_size=None):
         batch: List[torch.Tensor]
         yield batch
 
+def getImageSet(*args, **kw):
+    # flatten the videos to images. 
+    dataset = Dataset(*args, **kw)
+    _shape = dataset.video_set.shape
+    image_set = dataset.video_set.view(
+        _shape[0] * _shape[1], _shape[2], _shape[3], _shape[4], 
+    )
+    _shape = dataset.label_set.shape
+    traj_set = dataset.label_set.view(
+        _shape[0] * _shape[1], _shape[2], 
+    )
+    return image_set, traj_set
+
 if __name__ == '__main__':
     # dataset = Dataset('../datasets/bounce/train', 128, 20, 3)
     # loader = PersistentLoader(dataset, 32)

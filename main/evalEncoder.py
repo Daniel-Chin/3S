@@ -8,7 +8,7 @@ from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModel
 from matplotlib import pyplot as plt
 
 from vae import VAE
-from load_dataset import Dataset
+from load_dataset import getImageSet
 from template_bounce import MyExpGroup
 from linearity_metric import projectionMSE
 
@@ -24,18 +24,10 @@ def main(experiment_path, lock_epoch):
     ))
     groups: List[MyExpGroup]
     print(f'{exp_name = }')
-    dataset = Dataset(
+    image_set, traj_set = getImageSet(
         experiment.VALIDATE_SET_PATH, 
         experiment.VALIDATE_SET_SIZE, experiment.SEQ_LEN, 
         experiment.ACTUAL_DIM, DEVICE, 
-    )
-    _shape = dataset.video_set.shape
-    image_set = dataset.video_set.view(
-        _shape[0] * _shape[1], _shape[2], _shape[3], _shape[4], 
-    )
-    _shape = dataset.label_set.shape
-    traj_set = dataset.label_set.view(
-        _shape[0] * _shape[1], _shape[2], 
     )
     X = [g.variable_value for g in groups]
     if not all([isinstance(x, Number) for x in X]):

@@ -221,7 +221,7 @@ def forward(
                         lossTree.predict.z.append(z_loss)
     def _aggregate(x):
         if x:
-            return torch.stack(x).sum().cpu() / hParams.rnn_ensemble
+            return torch.stack(x).mean().cpu()
         else:
             return torch.tensor(0)
     lossTree.predict.image     = _aggregate(lossTree.predict.image    )

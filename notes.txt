@@ -1038,6 +1038,11 @@ next {
     I changed the semantics of hParam.K
         This is a breaking change. Previous experiments' definition of K should refer to commit b856ec5963aee0cab9b9a8d3d689626c736ecf61. 
 }
+1/24 {
+    2023_m01_d22@20_45_36_k_1_k_4
+        when writing the paper submitted to ICLR23, we found that some exp hinted that K=1 seemed better than K=4. 
+        Today's exp shows that such an effect doesn't exist. 
+}
 next {
     arxiv paper:
         ...
@@ -1048,10 +1053,14 @@ todo {
         // underway
     2body: calibrate using one labeled traj. 
     try ensemble with vicreg
+        // underway
     in the meantime, compare VICReg with VICReg+SPS
+        // underway
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
         self-recon: 照常
         rnn pred: 随机抽选 batch 中一个 traj, 扩增 batch_size 次。
+        // underway
+    ! ② cycle loss experiment
 
     compare SAMPLE_TRANS vs COMPOSE_TRANS in two body. 
 }

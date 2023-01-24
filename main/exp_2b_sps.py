@@ -18,10 +18,9 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'rnn_depth,width'
+        self.variable_name = 'symm'
         self.variable_value = (
-            hyperParams.rnn_depth, 
-            hyperParams.rnn_width, 
+            'yes' if hyperParams.symm == ours.symm else 'no'
         )
     
     @lru_cache(1)
@@ -98,24 +97,20 @@ template.vicreg_expander_widths = None
 template.vicreg_invariance_on_Y = None
 
 # modifying template
-# template.xxx = xxx
+template.rnn_width = 64
 
-hP = template.copy()
-hP.rnn_depth = 1
-hP.rnn_width = 32
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
+ours = template.copy()
 
-hP = template.copy()
-hP.rnn_depth = 2
-hP.rnn_width = 32
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
+baseline = template.copy()
+baseline.symm = SymmetryAssumption(
+    6, [
+        (SAMPLE_TRANS, [Trivial()], {Slice(0, 6)}), 
+    ], 
+)
 
-hP = template.copy()
-hP.rnn_depth = 2
-hP.rnn_width = 64
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
+for s in (ours, baseline):
+    hP = template.copy()
+    hP.symm = s.symm
 
-assert len(GROUPS) == 3
+    hP.ready(globals())
+    GROUPS.append(MyExpGroup(hP))

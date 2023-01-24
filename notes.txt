@@ -1057,7 +1057,6 @@ todo {
     try GRU with 2body
     compare 1:4 with 1:1. Is 1:1 really better?
         // underway
-    2body: calibrate using one labeled traj. 
     try ensemble with vicreg
         // underway
     in the meantime, compare VICReg with VICReg+SPS

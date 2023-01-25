@@ -98,7 +98,7 @@ template.vicreg_expander_widths = None
 template.vicreg_invariance_on_Y = None
 
 # modifying template
-template.rnn_width = 64
+template.rnn_width = 128
 
 ours = template.copy()
 

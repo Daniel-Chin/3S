@@ -1,4 +1,3 @@
-from os import path
 from functools import lru_cache
 
 from torchWork import LossWeightTree, ExperimentGroup
@@ -13,8 +12,7 @@ SEQ_LEN = 25
 ACTUAL_DIM = 6
 SLOW_EVAL_EPOCH_INTERVAL = 100
 
-fn, _ = path.splitext(path.basename(__file__))
-EXP_NAME = fn.split('exp_', 1)[1]
+EXP_NAME = ...
 N_RAND_INITS = ...
 
 class MyExpGroup(ExperimentGroup):

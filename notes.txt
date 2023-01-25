@@ -1081,6 +1081,10 @@ next {
         but, currently, enough info about the balls' precise location is already available in the pixels' precise color. 
         So maybe high-res dataset wouldn't make a diff. 
         Prioritize on testing vrnn. 
+    2023_m01_d24@19_48_18_2b_compose_vs_sample
+        sample has lower z pred loss. 
+        For linearity, p = 0.138106798. insignificant. 
+        we will use sample. Gus likes it. 
 }
 next {
     arxiv paper:
@@ -1096,9 +1100,6 @@ todo {
         rnn pred: 随机抽选 batch 中一个 traj, 扩增 batch_size 次。
         // underway
     ! ② cycle loss experiment
-
-    compare SAMPLE_TRANS vs COMPOSE_TRANS in two body. 
-        // underway
 }
 archive {
     有些结， 升一维就能解开。 暂时升一维， 等会儿降回来？

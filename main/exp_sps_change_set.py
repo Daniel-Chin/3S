@@ -4,14 +4,14 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/two_body/train'
-VALIDATE_SET_PATH = '../datasets/two_body/validate'
+TRAIN_SET_PATH    = '../datasets/bounce/train'
+VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
 SEQ_LEN = 25
 ACTUAL_DIM = 6
 SLOW_EVAL_EPOCH_INTERVAL = 100
 
-EXP_NAME = 'rnn_depth'
+EXP_NAME = '2b_sps'
 N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
@@ -57,8 +57,9 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    6, [
-        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
+    3, [
+        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
     ], 
     .1, 
 )
@@ -103,12 +104,15 @@ ours = template.copy()
 
 baseline = template.copy()
 baseline.symm = SymmetryAssumption(
-    6, [
-        (SAMPLE_TRANS, [Trivial()], {Slice(0, 6)}), 
+    3, [
+        (SAMPLE_TRANS, [Trivial()], {Slice(0, 3)}), 
     ], 
 )
 
-for s in (ours, baseline):
+for s in (
+    ours, 
+    baseline, 
+):
     hP = template.copy()
     hP.symm = s.symm
 

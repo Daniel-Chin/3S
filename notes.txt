@@ -1070,6 +1070,13 @@ next {
         no z loss: disen is worse. 
         image pred loss is lower, but judging from the videos, it's not effective. 
         Inspired by this, let's start to tune some weights for 2b. 
+    2023_m01_d24@08_38_49_2b_sps
+        even with larger RNN, sps still shows no disen advantage. 
+        SPS 倒是显著降低了 validate image pred loss... 
+        see evalDecoder. 
+        This is strange. in 1Ball bounce, w/o symm you easily see U-turns in the z space, when evalDecoder. 
+        But in 2b, w/o symm is almost straight. 
+        other differences from 1B bounce include: weight_decay
 }
 next {
     arxiv paper:

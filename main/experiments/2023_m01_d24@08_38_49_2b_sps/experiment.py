@@ -11,7 +11,7 @@ SEQ_LEN = 25
 ACTUAL_DIM = 6
 SLOW_EVAL_EPOCH_INTERVAL = 100
 
-EXP_NAME = 'rnn_depth'
+EXP_NAME = '2b_sps'
 N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):

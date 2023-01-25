@@ -1,6 +1,7 @@
 #!/bin/python3
 
 import os
+from os import path
 from datetime import datetime
 from subprocess import Popen
 
@@ -9,11 +10,14 @@ from torchWork import loadExperiment
 
 SBATCH_FILENAME = 'auto.sbatch'
 
-def getExpName(experiment_py_path):
-    exp_name, n_rand_inits, groups, experiment = loadExperiment(
-        experiment_py_path, 
-    )
-    return experiment.EXP_NAME
+def getExpName(experiment_py_path: str):
+    fn, _ = path.splitext(path.basename(experiment_py_path))
+    return fn.split('exp_', 1)[1]
+    # KEYWORD = 'EXP_NAME = '
+    # with open(experiment_py_path, 'r') as f:
+    #     for line in f:
+    #         if line.startswith(KEYWORD):
+    #             return line.split(KEYWORD)[1]
 
 def main():
     args = ArgParser()

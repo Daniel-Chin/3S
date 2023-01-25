@@ -2,4 +2,5 @@
 
 source /scratch/$USER/py_env/symmEnv/select_images
 cd ..
-singularity exec --overlay /scratch/$USER/py_env/$ENV_NAME/$OVERLAY:ro /scratch/work/public/singularity/$SINGULARITY /bin/bash -c 'source /ext3/env.sh; python3 smart_sb.py $1'
+echo loading...
+singularity exec --overlay /scratch/$USER/py_env/$ENV_NAME/$OVERLAY:ro /scratch/work/public/singularity/$SINGULARITY /bin/bash -c "source /ext3/env.sh; python3 smart_sb.py $1"

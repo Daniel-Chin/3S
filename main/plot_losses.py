@@ -18,11 +18,11 @@ lossTypes = [
     # LossType('train',    'loss_root.supervise.vae.encode'), 
     # LossType('train',    'loss_root.supervise.vae.decode'), 
     # LossType('train',    'loss_root.self_recon'), 
-    # LossType('validate', 'loss_root.self_recon'), 
+    LossType('validate', 'loss_root.self_recon'), 
 
     # LossType('train',    'loss_root.predict.z'), 
-    # LossType('validate', 'loss_root.predict.z'), 
-    LossType('train',    'loss_root.predict.image'), 
+    LossType('validate', 'loss_root.predict.z'), 
+    # LossType('train',    'loss_root.predict.image'), 
     LossType('validate', 'loss_root.predict.image'), 
 
     # LossType('validate', 'loss_root.seq_energy.real'), 

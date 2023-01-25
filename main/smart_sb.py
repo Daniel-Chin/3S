@@ -6,7 +6,6 @@ from datetime import datetime
 from subprocess import Popen
 
 from arg_parser import ArgParser
-from torchWork import loadExperiment
 
 SBATCH_FILENAME = 'auto.sbatch'
 

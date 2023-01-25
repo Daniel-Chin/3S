@@ -9,7 +9,7 @@ VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
 SEQ_LEN = 20
 ACTUAL_DIM = 3
-SLOW_EVAL_EPOCH_INTERVAL = 100
+SLOW_EVAL_EPOCH_INTERVAL = 1000
 
 EXP_NAME = 'sps_change_set'
 N_RAND_INITS = 8
@@ -54,6 +54,7 @@ template.lossWeightTree = LossWeightTree('total', 1, [
         LossWeightTree('covariance', 0, None), 
     ]), 
     LossWeightTree('symm_self_consistency', 0, None), 
+    LossWeightTree('cycle', 0, None), 
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
@@ -87,11 +88,11 @@ template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
-template.weight_decay = 1e-9
+template.weight_decay = 0
 template.lr_diminish = None
-template.train_set_size = 1024
+template.train_set_size = 64
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
-template.sched_sampling = LinearScheduledSampling(1000)
+template.sched_sampling = LinearScheduledSampling(18000)
 template.max_epoch = template.sched_sampling.duration
 template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None

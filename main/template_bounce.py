@@ -55,6 +55,7 @@ template.lossWeightTree = LossWeightTree('total', 1, [
         LossWeightTree('covariance', 0, None), 
     ]), 
     LossWeightTree('symm_self_consistency', 0, None), 
+    LossWeightTree('cycle', 0, None), 
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(

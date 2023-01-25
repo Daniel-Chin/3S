@@ -81,13 +81,15 @@ def forward(
             ).cpu()
         del my_slice, to_decode, my_z_hat, my_z
 
-    if not hParams.variational_rnn:
-        flat_z = mu
+    if hParams.variational_rnn:
+        flat_z_for_rnn = flat_z
+    else:
+        flat_z_for_rnn = mu
     if hParams.supervise_rnn:
-        flat_z = flat_traj_batch
+        flat_z_for_rnn = flat_traj_batch
     
     # restore time axis
-    z = flat_z.view(
+    z = flat_z_for_rnn.view(
         batch_size, SEQ_LEN, hParams.symm.latent_dim, 
     )
 
@@ -96,7 +98,7 @@ def forward(
     if validating or hParams.K == 1:
         small_batch_size = batch_size
         sampled_z = z
-        sampled_flat_z = flat_z
+        sampled_flat_z = flat_z_for_rnn
         sample_video_batch = video_batch
     else:
         small_batch_size = batch_size // hParams.K
@@ -293,6 +295,11 @@ def forward(
         lossTree.seq_energy.fake = (
             1 - noise_energy.clamp(max=+1).mean().cpu()
         )
+    
+    # cycle consistency
+    if hParams.lossWeightTree['cycle'].weight != 0:
+        cycled_z = vae.encode(vae.decode(flat_z))
+        lossTree.cycle = F.mse_loss(cycled_z, flat_z).cpu()
 
     with profiler('eval_linearity'):
         linear_proj_mse = projectionMSE(

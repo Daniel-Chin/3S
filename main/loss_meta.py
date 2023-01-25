@@ -39,6 +39,7 @@ def main():
             'invariance', 
             'covariance', 
         ]), 
+        'cycle', 
     ])
     with open('losses.py', 'w') as f:
         loss_tree.writeCode(f, absLossRoot)

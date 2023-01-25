@@ -4,22 +4,22 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/bounce/train'
-VALIDATE_SET_PATH = '../datasets/bounce/validate'
+TRAIN_SET_PATH    = '../datasets/two_body/train'
+VALIDATE_SET_PATH = '../datasets/two_body/validate'
 VALIDATE_SET_SIZE = 64
-SEQ_LEN = 20
-ACTUAL_DIM = 3
-SLOW_EVAL_EPOCH_INTERVAL = 1000
+SEQ_LEN = 25
+ACTUAL_DIM = 6
+SLOW_EVAL_EPOCH_INTERVAL = 100
 
-EXP_NAME = 'k_1_k_4'
-N_RAND_INITS = 12
+EXP_NAME = '2b_loss_w'
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'identity_prob'
-        self.variable_value = hyperParams.symm.identity_prob
+        self.variable_name = ''
+        self.variable_value = hyperParams.nickname
     
     @lru_cache(1)
     def name(self):
@@ -55,9 +55,8 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    3, [
-        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
-        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
+    6, [
+        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
     ], 
     .1, 
 )
@@ -70,6 +69,7 @@ template.vvrnn_static = None
 template.rnn_min_context = 5
 template.energy_noise_std = 1
 template.rnn_width = 32
+template.rnn_depth = 1
 template.residual = False
 template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
@@ -84,11 +84,11 @@ template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
-template.weight_decay = 0
+template.weight_decay = 1e-9
 template.lr_diminish = None
-template.train_set_size = 64
+template.train_set_size = 1024
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
-template.sched_sampling = LinearScheduledSampling(18000)
+template.sched_sampling = LinearScheduledSampling(1000)
 template.max_epoch = template.sched_sampling.duration
 template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None
@@ -97,8 +97,36 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-for ip in [.5, .2]:
-    hP = template.copy()
-    hP.symm.identity_prob = ip
-    hP.ready(globals())
-    GROUPS.append(MyExpGroup(hP))
+hP = template.copy()
+hP.nickname = 'recon_v'
+hP.lossWeightTree['self_recon'].weight = .6
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.nickname = 'ae'
+hP.vae_is_actually_ae = True
+hP.lossWeightTree['kld'].weight = 0
+hP.variational_rnn = False
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.nickname = 'z_v'
+hP.lossWeightTree['predict']['z'].weight = 1.5e-3
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.nickname = 'z_^'
+hP.lossWeightTree['predict']['z'].weight = 9e-3
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.nickname = 'img_pred_^'
+hP.lossWeightTree['predict']['image'].weight = 6
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+assert len(GROUPS) == 5

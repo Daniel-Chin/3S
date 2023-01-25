@@ -4,22 +4,22 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/bounce/train'
-VALIDATE_SET_PATH = '../datasets/bounce/validate'
+TRAIN_SET_PATH    = '../datasets/two_body/train'
+VALIDATE_SET_PATH = '../datasets/two_body/validate'
 VALIDATE_SET_SIZE = 64
-SEQ_LEN = 20
-ACTUAL_DIM = 3
-SLOW_EVAL_EPOCH_INTERVAL = 1000
+SEQ_LEN = 25
+ACTUAL_DIM = 6
+SLOW_EVAL_EPOCH_INTERVAL = 100
 
-EXP_NAME = 'small_set'
+EXP_NAME = '2b_compose_vs_sample'
 N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'train_set_size'
-        self.variable_value = hyperParams.train_set_size
+        self.variable_name = ''
+        self.variable_value = hyperParams.symm.rule[0][0]
     
     @lru_cache(1)
     def name(self):
@@ -55,9 +55,8 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    3, [
-        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
-        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
+    6, [
+        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
     ], 
     .1, 
 )
@@ -70,6 +69,7 @@ template.vvrnn_static = None
 template.rnn_min_context = 5
 template.energy_noise_std = 1
 template.rnn_width = 32
+template.rnn_depth = 1
 template.residual = False
 template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
@@ -84,11 +84,11 @@ template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
-template.weight_decay = 0
+template.weight_decay = 1e-9
 template.lr_diminish = None
-template.train_set_size = 64
+template.train_set_size = 1024
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
-template.sched_sampling = LinearScheduledSampling(18000)
+template.sched_sampling = LinearScheduledSampling(1000)
 template.max_epoch = template.sched_sampling.duration
 template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None
@@ -97,10 +97,18 @@ template.vicreg_invariance_on_Y = None
 # modifying template
 # template.xxx = xxx
 
-for tss in [16, 32, 64]:
-    hP = template.copy()
-    hP.train_set_size = tss
-    hP.max_epoch = 64 * 18000 // tss
-    hP.sched_sampling = LinearScheduledSampling(hP.max_epoch)
-    hP.ready(globals())
-    GROUPS.append(MyExpGroup(hP))
+hP = template.copy()
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
+hP.symm = SymmetryAssumption(
+    6, [
+        (COMPOSE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
+    ], 
+    .1, 
+)
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+assert len(GROUPS) == 2

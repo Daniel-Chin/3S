@@ -1061,17 +1061,24 @@ next {
     2023_m01_d23@04_32_42_rnn_depth
         no use. 
 }
+1/25 {
+    2023_m01_d23@10_27_50_small_set
+        train set size 32, 16 are too weak. disen prob < 10%. 
+        all losses are weak too. 
+        64 is good. Compared to 1024, it shows the advantage of repr aug. 
+    2023_m01_d24@08_38_49_2b_no_z_loss
+        no z loss: disen is worse. 
+        image pred loss is lower, but judging from the videos, it's not effective. 
+        Inspired by this, let's start to tune some weights for 2b. 
+}
 next {
     arxiv paper:
         ...
 }
 todo {
     try GRU with 2body
-    compare 1:4 with 1:1. Is 1:1 really better?
-        // underway
+    try high-res 2b dataset
     try ensemble with vicreg
-        // underway
-    in the meantime, compare VICReg with VICReg+SPS
         // underway
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
         self-recon: 照常

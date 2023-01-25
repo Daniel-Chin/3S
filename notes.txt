@@ -1077,6 +1077,10 @@ next {
         This is strange. in 1Ball bounce, w/o symm you easily see U-turns in the z space, when evalDecoder. 
         But in 2b, w/o symm is almost straight. 
         other differences from 1B bounce include: weight_decay
+    I thought about trying a high-res 2b dataset
+        but, currently, enough info about the balls' precise location is already available in the pixels' precise color. 
+        So maybe high-res dataset wouldn't make a diff. 
+        Prioritize on testing vrnn. 
 }
 next {
     arxiv paper:
@@ -1084,7 +1088,7 @@ next {
 }
 todo {
     try GRU with 2body
-    try high-res 2b dataset
+    try vrnn=False with VAE in 2b
     try ensemble with vicreg
         // underway
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好

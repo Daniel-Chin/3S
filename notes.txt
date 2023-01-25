@@ -1091,6 +1091,12 @@ next {
         ...
 }
 todo {
+    arxiv paper:
+        loss table:
+            保留两位小数
+            std 用 科学计数法
+            字符一样的就不要加粗
+            beta-VAE pred N/A
     try GRU with 2body
     try vrnn=False with VAE in 2b
     try ensemble with vicreg

@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_2b_rnn_depth.py
+exp_vicreg_cycle.py
 '''.strip()
 # op = input('Which exp? ')
 

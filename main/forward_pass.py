@@ -298,7 +298,7 @@ def forward(
     
     # cycle consistency
     if hParams.lossWeightTree['cycle'].weight != 0:
-        cycled_z = vae.encode(vae.decode(flat_z))
+        cycled_z, _ = vae.encode(vae.decode(flat_z))
         lossTree.cycle = F.mse_loss(cycled_z, flat_z).cpu()
 
     with profiler('eval_linearity'):

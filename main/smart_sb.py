@@ -5,15 +5,15 @@ from datetime import datetime
 from subprocess import Popen
 
 from arg_parser import ArgParser
+from torchWork import loadExperiment
 
 SBATCH_FILENAME = 'auto.sbatch'
 
 def getExpName(experiment_py_path):
-    KEYWORD = 'EXP_NAME = '
-    with open(experiment_py_path, 'r') as f:
-        for line in f:
-            if line.startswith(KEYWORD):
-                return line.split(KEYWORD)[1]
+    exp_name, n_rand_inits, groups, experiment = loadExperiment(
+        experiment_py_path, 
+    )
+    return experiment.EXP_NAME
 
 def main():
     args = ArgParser()

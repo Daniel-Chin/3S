@@ -1,8 +1,10 @@
+from os import path
 from functools import lru_cache
-from symmetry_transforms import *
+
 from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
+from symmetry_transforms import *
 
 TRAIN_SET_PATH    = '../datasets/two_body/train'
 VALIDATE_SET_PATH = '../datasets/two_body/validate'
@@ -11,7 +13,8 @@ SEQ_LEN = 25
 ACTUAL_DIM = 6
 SLOW_EVAL_EPOCH_INTERVAL = 100
 
-EXP_NAME = ...
+fn, _ = path.splitext(path.basename(__file__))
+EXP_NAME = fn.split('exp_', 1)[1]
 N_RAND_INITS = ...
 
 class MyExpGroup(ExperimentGroup):

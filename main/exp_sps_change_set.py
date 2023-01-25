@@ -7,7 +7,7 @@ from shared import *
 TRAIN_SET_PATH    = '../datasets/bounce/train'
 VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
-SEQ_LEN = 25
+SEQ_LEN = 20
 ACTUAL_DIM = 3
 SLOW_EVAL_EPOCH_INTERVAL = 100
 

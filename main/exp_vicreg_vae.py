@@ -12,15 +12,15 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 SLOW_EVAL_EPOCH_INTERVAL = 2000
 
-EXP_NAME = ...
-N_RAND_INITS = ...
+EXP_NAME = 'vicreg_vae'
+N_RAND_INITS = 6
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.WHAT
+        self.variable_name = 'ae'
+        self.variable_value = hyperParams.vae_is_actually_ae
     
     @lru_cache(1)
     def name(self):

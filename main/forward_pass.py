@@ -116,6 +116,8 @@ def forward(
     lossTree.vicreg.variance = []
     lossTree.vicreg.invariance = []
     lossTree.vicreg.covariance = []
+    z_std_l = []
+    z_std_r = []
     for predRnn in predRnns:
         for K_i in range(hParams.K):
         # The current implementation of K > 1 is inefficient. 
@@ -177,12 +179,13 @@ def forward(
                 if hParams.jepa_stop_grad_r_encoder:
                     _z = _z.detach()
                 if hParams.lossWeightTree['vicreg'].weight:
+                    flat_batch_size = small_batch_size * (SEQ_LEN - min_context)
                     flat_emb_r = vae.expander(_z.reshape(
-                        small_batch_size * (SEQ_LEN - min_context), 
+                        flat_batch_size, 
                         hParams.symm.latent_dim, 
                     ))
                     flat_emb_l = vae.expander(z_hat_aug.reshape(
-                        small_batch_size * (SEQ_LEN - min_context), 
+                        flat_batch_size, 
                         hParams.symm.latent_dim, 
                     ))
 
@@ -204,12 +207,14 @@ def forward(
                             torch.mean(F.relu(1 - std_emb_l)) +
                             torch.mean(F.relu(1 - std_emb_r))
                         )
+                        z_std_l.append(std_emb_l)
+                        z_std_r.append(std_emb_r)
 
                         # covariance
                         flat_emb_l = flat_emb_l - flat_emb_l.mean(dim=0)
                         flat_emb_r = flat_emb_r - flat_emb_r.mean(dim=0)
-                        cov_emb_l = (flat_emb_l.T @ flat_emb_l) / (small_batch_size - 1)
-                        cov_emb_r = (flat_emb_r.T @ flat_emb_r) / (small_batch_size - 1)
+                        cov_emb_l = (flat_emb_l.T @ flat_emb_l) / (flat_batch_size - 1)
+                        cov_emb_r = (flat_emb_r.T @ flat_emb_r) / (flat_batch_size - 1)
                         lossTree.vicreg.covariance.append(
                             (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_l).pow_(2).sum() / hParams.vicreg_emb_dim + 
                             (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_r).pow_(2).sum() / hParams.vicreg_emb_dim
@@ -225,19 +230,22 @@ def forward(
         if x:
             return torch.stack(x).mean().cpu()
         else:
-            return torch.tensor(0)
+            return torch.tensor(0, device=CPU)
     lossTree.predict.image     = _aggregate(lossTree.predict.image    )
     lossTree.predict.z         = _aggregate(lossTree.predict.z        )
     lossTree.supervise.rnn     = _aggregate(lossTree.supervise.rnn    )
     lossTree.vicreg.variance   = _aggregate(lossTree.vicreg.variance  )
     lossTree.vicreg.invariance = _aggregate(lossTree.vicreg.invariance)
     lossTree.vicreg.covariance = _aggregate(lossTree.vicreg.covariance)
+    z_std_l = _aggregate(z_std_l)
+    z_std_r = _aggregate(z_std_r)
     del _aggregate
 
     if hParams.vvrnn or hParams.vvrnn_static is not None:
         mean_square_vrnn_std = torch.exp(
             0.5 * log_var
         ).norm(2).cpu() ** 2 / small_batch_size
+        # isn't this wrong? |log_var| is prolly flat_small_batch_size. 
     else:
         mean_square_vrnn_std = torch.tensor(0, device=CPU)
 
@@ -313,6 +321,8 @@ def forward(
         [
             ('mean_square_vrnn_std', mean_square_vrnn_std.detach()), 
             ('linear_proj_mse', linear_proj_mse.detach())
+            ('z_std_l', z_std_l.detach())
+            ('z_std_r', z_std_r.detach())
         ], 
     )
 

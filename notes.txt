@@ -1094,6 +1094,8 @@ next {
         using 35. 
     exp_vicreg_sanity.py
         check the validate covariance loss when we do decode. 
+    exp_vicreg_vae.py
+        since VICReg has been overfitting very badly, let's see if variational rnn can fight that. 
 }
 next {
     arxiv paper:
@@ -1101,6 +1103,9 @@ next {
 }
 todo {
     apply V and C only on should-be-independent data. 
+    C loss=200 is apparently impossible. even with the incorrect batch size, it should <= 2 * 3 / 2 * 2 * 20 = 80. 
+        UNLESS the validate-set z variance is > 1. Note the hinge loss on V. 
+        let's log the z variance. 
     arxiv paper:
         loss table:
             保留两位小数

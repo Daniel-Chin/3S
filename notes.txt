@@ -1101,12 +1101,19 @@ next {
             because setting variance=1 just sets the scale. There is no overspecification. Changing from variance to cross-traj variance does the same thing. There should be a loss weight equivalence. 
         covariance:
             if we center the whole batch, then do cross-traj covariance, it is mathematically equivalent. So, we center each video frame across the batch, then take the covariance of the whole batch. 
+    2023_m01_d25@22_30_29_vicreg_vae
+        no effect. 
+        VAE+VRNN only regularizes the RNN here. There's no decoder, and the V doesn't regularize the encoder. 
+        Maybe cycle loss + VAE will help regularize the encoder. 
 }
 next {
     arxiv paper:
         ...
 }
 todo {
+    cycle loss + VAE VRNN
+    about sps:
+        two things are diff. weight decay. train set size. 
     apply V and C only on should-be-independent data. 
     C loss=200 is apparently impossible. even with the incorrect batch size, it should <= 2 * 3 / 2 * 2 * 20 = 80. 
         UNLESS the validate-set z variance is > 1. Note the hinge loss on V. 

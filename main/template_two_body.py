@@ -37,7 +37,7 @@ template.lossWeightTree = LossWeightTree('total', 1, [
         LossWeightTree('fake', 0, None), 
     ]), 
     LossWeightTree('predict', 1, [
-        LossWeightTree('z', 3.84e-3, None), 
+        LossWeightTree('z', 9e-3, None), 
         LossWeightTree('image', 2.62144, None), 
     ]), 
     LossWeightTree('supervise', 0, [

@@ -12,7 +12,7 @@ ACTUAL_DIM = 6
 SLOW_EVAL_EPOCH_INTERVAL = 100
 
 EXP_NAME = '2b_loss_w'
-N_RAND_INITS = 8
+N_RAND_INITS = 6
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -36,7 +36,7 @@ template.lossWeightTree = LossWeightTree('total', 1, [
         LossWeightTree('fake', 0, None), 
     ]), 
     LossWeightTree('predict', 1, [
-        LossWeightTree('z', 3.84e-3, None), 
+        LossWeightTree('z', 9e-3, None), 
         LossWeightTree('image', 2.62144, None), 
     ]), 
     LossWeightTree('supervise', 0, [
@@ -98,8 +98,13 @@ template.vicreg_invariance_on_Y = None
 # template.xxx = xxx
 
 hP = template.copy()
+hP.nickname = 'base'
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = template.copy()
 hP.nickname = 'recon_v'
-hP.lossWeightTree['self_recon'].weight = .6
+hP.lossWeightTree['self_recon'].weight *= .33
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 
@@ -111,22 +116,20 @@ hP.variational_rnn = False
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 
-hP = template.copy()
-hP.nickname = 'z_v'
-hP.lossWeightTree['predict']['z'].weight = 1.5e-3
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
+# hP = template.copy()
+# hP.nickname = 'z_v'
+# hP.lossWeightTree['predict']['z'].weight *= .33
+# hP.ready(globals())
+# GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
 hP.nickname = 'z_^'
-hP.lossWeightTree['predict']['z'].weight = 9e-3
+hP.lossWeightTree['predict']['z'].weight *= 3
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 
 hP = template.copy()
 hP.nickname = 'img_pred_^'
-hP.lossWeightTree['predict']['image'].weight = 6
+hP.lossWeightTree['predict']['image'].weight *= 3
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
-
-assert len(GROUPS) == 5

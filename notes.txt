@@ -1096,6 +1096,11 @@ next {
         check the validate covariance loss when we do decode. 
     exp_vicreg_vae.py
         since VICReg has been overfitting very badly, let's see if variational rnn can fight that. 
+    implemented cross-traj VICReg: 
+        variance: prolly equivalent. 
+            because setting variance=1 just sets the scale. There is no overspecification. Changing from variance to cross-traj variance does the same thing. There should be a loss weight equivalence. 
+        covariance:
+            if we center the whole batch, then do cross-traj covariance, it is mathematically equivalent. So, we center each video frame across the batch, then take the covariance of the whole batch. 
 }
 next {
     arxiv paper:

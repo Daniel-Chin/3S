@@ -84,6 +84,7 @@ class HyperParams(BaseHyperParams):
         # That "Y" follows the symbols defined in the vicreg paper. 
         # In this source code, vicreg's Y is `z`, 
         # and vicreg's Z is `emb_l` and `emb_r`. 
+        self.vicreg_cross_traj: bool = None
 
         
         self.imgCriterion: Callable[

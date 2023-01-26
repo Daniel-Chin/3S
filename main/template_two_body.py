@@ -95,6 +95,7 @@ template.max_epoch = template.sched_sampling.duration
 template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None
 template.vicreg_invariance_on_Y = None
+template.vicreg_cross_traj = None
 
 # modifying template
 # template.xxx = xxx

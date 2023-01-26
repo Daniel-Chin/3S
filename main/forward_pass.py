@@ -201,20 +201,47 @@ def forward(
                         del l, r
                     
                         # variance
-                        std_emb_l = torch.sqrt(flat_emb_l.var(dim=0) + 1e-4)
-                        std_emb_r = torch.sqrt(flat_emb_r.var(dim=0) + 1e-4)
+                        if not hParams.vicreg_cross_traj:
+                            std_emb_l = torch.sqrt(flat_emb_l.var(dim=0) + 1e-4)
+                            std_emb_r = torch.sqrt(flat_emb_r.var(dim=0) + 1e-4)
+                        else:   # should be equivalent
+                            emb_l = flat_emb_l.view(
+                                small_batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
+                            )
+                            emb_r = flat_emb_r.view(
+                                small_batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
+                            )
+                            std_emb_l = torch.sqrt(emb_l.var(dim=0).mean(dim=0) + 1e-4)
+                            std_emb_r = torch.sqrt(emb_r.var(dim=0).mean(dim=0) + 1e-4)
                         lossTree.vicreg.variance.append(
-                            torch.mean(F.relu(1 - std_emb_l)) +
-                            torch.mean(F.relu(1 - std_emb_r))
+                            F.relu(1 - std_emb_l).mean() +
+                            F.relu(1 - std_emb_r).mean()
                         )
-                        z_std_l.append(std_emb_l)
-                        z_std_r.append(std_emb_r)
+                        z_std_l.append(std_emb_l.mean())
+                        z_std_r.append(std_emb_r.mean())
 
                         # covariance
-                        flat_emb_l = flat_emb_l - flat_emb_l.mean(dim=0)
-                        flat_emb_r = flat_emb_r - flat_emb_r.mean(dim=0)
+                        if not hParams.vicreg_cross_traj:
+                            flat_emb_l = flat_emb_l - flat_emb_l.mean(dim=0)
+                            flat_emb_r = flat_emb_r - flat_emb_r.mean(dim=0)
+                        else:
+                            emb_l = flat_emb_l.view(
+                                small_batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
+                            )
+                            emb_r = flat_emb_r.view(
+                                small_batch_size, SEQ_LEN - min_context, hParams.symm.latent_dim, 
+                            )
+                            emb_l = emb_l - emb_l.mean(dim=0)
+                            emb_r = emb_r - emb_r.mean(dim=0)
+                            flat_emb_l = emb_l.view(
+                                flat_batch_size, hParams.symm.latent_dim, 
+                            )
+                            flat_emb_r = emb_r.view(
+                                flat_batch_size, hParams.symm.latent_dim, 
+                            )
                         cov_emb_l = (flat_emb_l.T @ flat_emb_l) / (flat_batch_size - 1)
                         cov_emb_r = (flat_emb_r.T @ flat_emb_r) / (flat_batch_size - 1)
+
                         lossTree.vicreg.covariance.append(
                             (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_l).pow_(2).sum() / hParams.vicreg_emb_dim + 
                             (offDiagonalMask2d(hParams.vicreg_emb_dim) * cov_emb_r).pow_(2).sum() / hParams.vicreg_emb_dim
@@ -320,9 +347,9 @@ def forward(
         tryDetach(z), tryDetach(z_hat_aug), 
         [
             ('mean_square_vrnn_std', mean_square_vrnn_std.detach()), 
-            ('linear_proj_mse', linear_proj_mse.detach())
-            ('z_std_l', z_std_l.detach())
-            ('z_std_r', z_std_r.detach())
+            ('linear_proj_mse', linear_proj_mse.detach()), 
+            ('z_std_l', z_std_l.detach()), 
+            ('z_std_r', z_std_r.detach()), 
         ], 
     )
 

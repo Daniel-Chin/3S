@@ -96,6 +96,7 @@ template.max_epoch = template.sched_sampling.duration
 template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None
 template.vicreg_invariance_on_Y = None
+template.vicreg_cross_traj = None
 
 # vicreg is different from template
 vicreg = template.copy()
@@ -106,6 +107,7 @@ vicreg.lossWeightTree['vicreg']['covariance'].weight = 1
 vicreg.vicreg_expander_identity = False
 vicreg.vicreg_expander_widths = [64, 64, 64]
 vicreg.vicreg_invariance_on_Y = False
+vicreg.vicreg_cross_traj = False
 vicreg.weight_decay = 1e-9  # to tweak
 vicreg.batch_size = 32
 vicreg.lossWeightTree['self_recon'].weight = 0

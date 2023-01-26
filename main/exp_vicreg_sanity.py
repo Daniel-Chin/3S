@@ -12,8 +12,8 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 SLOW_EVAL_EPOCH_INTERVAL = 2000
 
-EXP_NAME = ...
-N_RAND_INITS = ...
+EXP_NAME = 'vicreg_sanity'
+N_RAND_INITS = 4
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -126,10 +126,7 @@ vicreg.batch_size = 512
 vicreg.max_epoch = 32000
 vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 
-for xxx in [
-    ..., 
-]:
-    hP = vicreg.copy()
-    hP.xxx = xxx
-    hP.ready(globals())
-    GROUPS.append(MyExpGroup(hP))
+hP = vicreg.copy()
+hP.lossWeightTree['self_recon'].weight = 35 / 2
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))

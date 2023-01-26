@@ -1,8 +1,9 @@
 from functools import lru_cache
-from symmetry_transforms import *
+
 from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
+from symmetry_transforms import *
 
 TRAIN_SET_PATH    = '../datasets/bounce/train'
 VALIDATE_SET_PATH = '../datasets/bounce/validate'
@@ -11,14 +12,14 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 SLOW_EVAL_EPOCH_INTERVAL = 2000
 
-EXP_NAME = 'vicreg_vi'
-N_RAND_INITS = 12
+EXP_NAME = 'vicreg_i_loss'
+N_RAND_INITS = 6
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'vi'
+        self.variable_name = 'I_loss_w'
         self.variable_value = hyperParams.lossWeightTree['vicreg']['invariance'].weight
     
     @lru_cache(1)
@@ -52,6 +53,7 @@ template.lossWeightTree = LossWeightTree('total', 1, [
         LossWeightTree('covariance', 0, None), 
     ]), 
     LossWeightTree('symm_self_consistency', 0, None), 
+    LossWeightTree('cycle', 0, None), 
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
@@ -70,6 +72,7 @@ template.vvrnn_static = None
 template.rnn_min_context = 5
 template.energy_noise_std = 1
 template.rnn_width = 32
+template.rnn_depth = 1
 template.residual = False
 template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
@@ -94,9 +97,7 @@ template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None
 template.vicreg_invariance_on_Y = None
 
-# modifying template
-# template.xxx = xxx
-
+# vicreg is different from template
 vicreg = template.copy()
 vicreg.lossWeightTree['vicreg'].weight = 1
 vicreg.lossWeightTree['vicreg']['variance'].weight = 25
@@ -116,6 +117,8 @@ vicreg.vae_is_actually_ae = True
 vicreg.variational_rnn = False
 
 # modify vicreg from vanilla
+vicreg.lossWeightTree['vicreg']['variance'].weight = 35
+vicreg.lossWeightTree['vicreg']['invariance'].weight = 35
 vicreg.vicreg_expander_identity = True
 vicreg.vicreg_expander_widths = None
 vicreg.train_set_size = 512
@@ -123,11 +126,10 @@ vicreg.batch_size = 512
 vicreg.max_epoch = 32000
 vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 
-for vi in [
-    15, 25, 35, 
+for i in [
+    35, 25, 10, 
 ]:
     hP = vicreg.copy()
-    hP.lossWeightTree['vicreg']['variance'].weight = vi
-    hP.lossWeightTree['vicreg']['invariance'].weight = vi
+    hP.lossWeightTree['vicreg']['invariance'].weight = i
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

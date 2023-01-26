@@ -1088,11 +1088,19 @@ next {
     2023_m01_d22@20_45_33_vicreg_ensemble
         no use. 
 }
+1/26 {
+    2023_m01_d22@20_45_37_vicreg_vi
+        vi loss weight = 35 is significantly but slightly better. 
+        using 35. 
+    exp_vicreg_sanity.py
+        check the validate covariance loss when we do decode. 
+}
 next {
     arxiv paper:
         ...
 }
 todo {
+    apply V and C only on should-be-independent data. 
     arxiv paper:
         loss table:
             保留两位小数

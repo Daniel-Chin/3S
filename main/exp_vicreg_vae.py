@@ -126,10 +126,9 @@ vicreg.batch_size = 512
 vicreg.max_epoch = 32000
 vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 
-for xxx in [
-    ..., 
-]:
-    hP = vicreg.copy()
-    hP.xxx = xxx
-    hP.ready(globals())
-    GROUPS.append(MyExpGroup(hP))
+hP = vicreg.copy()
+hP.vae_is_actually_ae = False
+hP.lossWeightTree['kld'].weight = 3.2e-7
+hP.variational_rnn = True
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))

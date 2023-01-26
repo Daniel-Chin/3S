@@ -21,7 +21,7 @@ from supervise_calibrate import superviseCalibrate
 from template_bounce import MyExpGroup
 
 try:
-    from workspace import EXP_PATH, LOCK_EPOCH
+    from workspace import EXP_PATH, LOCK_EPOCH, filterGroups, CAP_N_RAND_INITS
 except ImportError:
     EXP_PATH = input('EXP_PATH=')
     LOCK_EPOCH = None
@@ -214,11 +214,19 @@ def main(experiment_path, lock_epoch):
             experiment_path, EXPERIMENT_PY_FILENAME, 
         ))
         groups: List[MyExpGroup]
-        # groups = groups[-10:-6]
-        # print(*[group.variable_value for group in groups])
-        # n_rand_inits = 7
-        # print(f'forced {n_rand_inits = }')
-        # input('enter...')
+        did_override = False
+        _groups = filterGroups(groups)
+        if _groups != groups:
+            groups = _groups
+            print('Taking exp groups:')
+            print(' ', *[group.variable_value for group in groups])
+            did_override = True
+        if CAP_N_RAND_INITS is not None and n_rand_inits > CAP_N_RAND_INITS:
+            n_rand_inits = CAP_N_RAND_INITS
+            print(f'Forced {n_rand_inits = }')
+            did_override = True
+        if did_override:
+            input('Enter...')
         print(f'{exp_name = }')
         ui = UI(groups, n_rand_inits, experiment_path, lock_epoch, experiment)
         ui.win.mainloop()

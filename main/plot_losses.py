@@ -5,42 +5,42 @@ from torchWork.plot_losses import PlotLosses, LossType
 from torchWork.experiment_control import EXPERIMENT_PY_FILENAME
 
 try:
-    from workspace import EXP_PATH
+    from workspace import EXP_PATH, LOSS_TYPES_TO_PLOT
 except ImportError:
     EXP_PATH = input('EXP_PATH=')
+    LOSS_TYPES_TO_PLOT = [  # the fallback
+        # LossType('validate', 'loss_root.supervise.vae'), 
+        # LossType('validate', 'loss_root.supervise.rnn'), 
 
-lossTypes = [
-    # LossType('validate', 'loss_root.supervise.vae'), 
-    # LossType('validate', 'loss_root.supervise.rnn'), 
+        # LossType('validate', 'loss_root.supervise.vae.encode'), 
+        # LossType('validate', 'loss_root.supervise.vae.decode'), 
+        # LossType('train',    'loss_root.supervise.vae.encode'), 
+        # LossType('train',    'loss_root.supervise.vae.decode'), 
+        # LossType('train',    'loss_root.self_recon'), 
+        # LossType('validate', 'loss_root.self_recon'), 
 
-    # LossType('validate', 'loss_root.supervise.vae.encode'), 
-    # LossType('validate', 'loss_root.supervise.vae.decode'), 
-    # LossType('train',    'loss_root.supervise.vae.encode'), 
-    # LossType('train',    'loss_root.supervise.vae.decode'), 
-    # LossType('train',    'loss_root.self_recon'), 
-    LossType('validate', 'loss_root.self_recon'), 
+        # LossType('train',    'loss_root.predict.z'), 
+        # LossType('validate', 'loss_root.predict.z'), 
+        # LossType('train',    'loss_root.predict.image'), 
+        # LossType('validate', 'loss_root.predict.image'), 
 
-    # LossType('train',    'loss_root.predict.z'), 
-    LossType('validate', 'loss_root.predict.z'), 
-    # LossType('train',    'loss_root.predict.image'), 
-    LossType('validate', 'loss_root.predict.image'), 
+        # LossType('validate', 'loss_root.seq_energy.real'), 
+        # LossType('validate', 'loss_root.seq_energy.fake'), 
 
-    # LossType('validate', 'loss_root.seq_energy.real'), 
-    # LossType('validate', 'loss_root.seq_energy.fake'), 
+        # LossType('train', 'loss_root.vicreg.invariance'), 
+        # LossType('train', 'loss_root.vicreg.variance'), 
+        # LossType('train', 'loss_root.vicreg.covariance'), 
+        LossType('validate', 'loss_root.vicreg.invariance'), 
+        LossType('validate', 'loss_root.vicreg.variance'), 
+        LossType('validate', 'loss_root.vicreg.covariance'), 
 
-    # LossType('train', 'loss_root.vicreg.invariance'), 
-    # LossType('train', 'loss_root.vicreg.variance'), 
-    # LossType('train', 'loss_root.vicreg.covariance'), 
-    # LossType('validate', 'loss_root.vicreg.invariance'), 
-    # LossType('validate', 'loss_root.vicreg.variance'), 
-    # LossType('validate', 'loss_root.vicreg.covariance'), 
+        # LossType('train',    'linear_proj_mse'), 
+        LossType('validate', 'linear_proj_mse'), 
+    ]
 
-    # LossType('train',    'linear_proj_mse'), 
-    LossType('validate', 'linear_proj_mse'), 
-]
 plotLosses = PlotLosses(
     path.join(EXP_PATH, EXPERIMENT_PY_FILENAME), 
-    lossTypes, using_epoch_not_batch=False, 
+    LOSS_TYPES_TO_PLOT, using_epoch_not_batch=False, 
     average_over=1600, start=1600, 
     which_legend=0, linewidth=.5, 
 )
@@ -49,13 +49,14 @@ fig = next(plotLosses)
 # given dataset coord std ~= 1, mse should be in (0, 1). 
 # when z collapses, mse is unstable and can give 1e+34. 
 # so cap it to (0, 1) in the plot.
-assert lossTypes[-1].loss_name == 'linear_proj_mse'
-fig.axes[-1].set_ylim(0, 1)
+if LOSS_TYPES_TO_PLOT[-1].loss_name == 'linear_proj_mse':
+    fig.axes[-1].set_ylim(0, 1)
 
 plt.savefig(path.join(EXP_PATH, 'auto_plot_loss.pdf'))
 plt.show()
 
+# # Plot one group at a time:
 # for fig in plotLosses:
-#     assert lossTypes[-1].loss_name == 'linear_proj_mse'
-#     fig.axes[-1].set_ylim(0, 1)
+#     if LOSS_TYPES_TO_PLOT[-1].loss_name == 'linear_proj_mse':
+#         fig.axes[-1].set_ylim(0, 1)
 #     plt.show()

@@ -1085,6 +1085,8 @@ next {
         sample has lower z pred loss. 
         For linearity, p = 0.138106798. insignificant. 
         we will use sample. Gus likes it. 
+    2023_m01_d22@20_45_33_vicreg_ensemble
+        no use. 
 }
 next {
     arxiv paper:
@@ -1099,13 +1101,12 @@ todo {
             beta-VAE pred N/A
     try GRU with 2body
     try vrnn=False with VAE in 2b
-    try ensemble with vicreg
-        // underway
     一次只学一个 traj 的 n 个 aug 要比 n 个 traj 的一个 aug 好
         self-recon: 照常
         rnn pred: 随机抽选 batch 中一个 traj, 扩增 batch_size 次。
         // underway
-    ! ② cycle loss experiment
+    ② cycle loss experiment
+        // underway
 }
 archive {
     有些结， 升一维就能解开。 暂时升一维， 等会儿降回来？

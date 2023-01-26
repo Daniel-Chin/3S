@@ -4,14 +4,14 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 
-TRAIN_SET_PATH    = '../datasets/bounce/train'
-VALIDATE_SET_PATH = '../datasets/bounce/validate'
+TRAIN_SET_PATH    = '../datasets/two_body/train'
+VALIDATE_SET_PATH = '../datasets/two_body/validate'
 VALIDATE_SET_SIZE = 64
-SEQ_LEN = 20
-ACTUAL_DIM = 3
-SLOW_EVAL_EPOCH_INTERVAL = 1000
+SEQ_LEN = 25
+ACTUAL_DIM = 6
+SLOW_EVAL_EPOCH_INTERVAL = 100
 
-EXP_NAME = 'sps_change_set'
+EXP_NAME = 'sps_2b'
 N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
@@ -28,7 +28,6 @@ class MyExpGroup(ExperimentGroup):
         return f'{self.variable_name}={self.variable_value}'
 
 GROUPS = []
-
 template = HyperParams()
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1.31072, None), 
@@ -38,7 +37,7 @@ template.lossWeightTree = LossWeightTree('total', 1, [
         LossWeightTree('fake', 0, None), 
     ]), 
     LossWeightTree('predict', 1, [
-        LossWeightTree('z', 3.84e-3, None), 
+        LossWeightTree('z', 9e-3, None), 
         LossWeightTree('image', 2.62144, None), 
     ]), 
     LossWeightTree('supervise', 0, [
@@ -58,9 +57,8 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    3, [
-        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
-        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
+    6, [
+        (SAMPLE_TRANS, [Translate(3, 1), Rotate(3)], {Slice(0, 3), Slice(3, 6)}), 
     ], 
     .1, 
 )
@@ -88,15 +86,16 @@ template.encoder_batch_norm = True
 template.batch_size = 16
 template.grad_clip = None
 template.optim_name = 'adam'
-template.weight_decay = 0
+template.weight_decay = 1e-9
 template.lr_diminish = None
-template.train_set_size = 64
+template.train_set_size = 1024
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
-template.sched_sampling = LinearScheduledSampling(18000)
+template.sched_sampling = LinearScheduledSampling(1000)
 template.max_epoch = template.sched_sampling.duration
 template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None
 template.vicreg_invariance_on_Y = None
+template.vicreg_cross_traj = None
 
 # modifying template
 template.rnn_width = 128
@@ -105,8 +104,8 @@ ours = template.copy()
 
 baseline = template.copy()
 baseline.symm = SymmetryAssumption(
-    3, [
-        (SAMPLE_TRANS, [Trivial()], {Slice(0, 3)}), 
+    6, [
+        (SAMPLE_TRANS, [Trivial()], {Slice(0, 6)}), 
     ], 
 )
 

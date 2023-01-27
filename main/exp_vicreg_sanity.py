@@ -12,8 +12,8 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 SLOW_EVAL_EPOCH_INTERVAL = 1000
 
-EXP_NAME = ...
-N_RAND_INITS = ...
+EXP_NAME = 'vicreg_sanity'
+N_RAND_INITS = 4
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:

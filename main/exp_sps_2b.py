@@ -99,6 +99,10 @@ template.vicreg_cross_traj = None
 
 # modifying template
 template.rnn_width = 128
+template.train_set_size = 256
+template.max_epoch = 4000
+template.sched_sampling = LinearScheduledSampling(template.max_epoch)
+SLOW_EVAL_EPOCH_INTERVAL = 400
 
 ours = template.copy()
 

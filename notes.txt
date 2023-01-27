@@ -1111,6 +1111,8 @@ next {
         nothing helps!
     2023_m01_d26@07_55_35_sps_2b
         no sig diff. train set too large? 
+    2023_m01_d25@06_07_15_vicreg_cycle
+        cycle encourages collapse. less info content. higher V loss. 
 }
 next {
     arxiv paper:
@@ -1119,7 +1121,7 @@ next {
 todo {
     cycle loss + VAE VRNN
     about sps:
-        two things are diff. weight decay. train set size. 
+        two things are diff. weight decay. train set size. also try batch_size=64. 
     apply V and C only on should-be-independent data. 
     C loss=200 is apparently impossible. even with the incorrect batch size, it should <= 2 * 3 / 2 * 2 * 20 = 80. 
         UNLESS the validate-set z variance is > 1. Note the hinge loss on V. 

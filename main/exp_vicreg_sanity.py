@@ -122,6 +122,7 @@ vicreg.max_epoch = 32000
 vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 SLOW_EVAL_EPOCH_INTERVAL = 2000
 vicreg.lossWeightTree['predict']['z'].weight = 0
+vicreg.lossWeightTree['kld'].weight = 0
 
 hP = vicreg
 

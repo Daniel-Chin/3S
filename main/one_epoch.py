@@ -119,7 +119,7 @@ def oneEpoch(
         if epoch % experiment.SLOW_EVAL_EPOCH_INTERVAL == 0:
             with profiler('save checkpoints'):
                 saveModels(models, epoch, save_path)
-            if hParams.lossWeightTree['vicreg'].weight == 0:
+            if hParams.lossWeightTree['self_recon'].weight:
                 with profiler('video eval'):
                     for name, dataset in [
                         ('train', trainSet), 

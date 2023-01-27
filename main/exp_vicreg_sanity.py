@@ -19,8 +19,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.WHAT
+        self.variable_name = '0'
+        self.variable_value = 0
     
     @lru_cache(1)
     def name(self):
@@ -121,6 +121,7 @@ vicreg.batch_size = 512
 vicreg.max_epoch = 32000
 vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 SLOW_EVAL_EPOCH_INTERVAL = 2000
+vicreg.lossWeightTree['predict']['z'].weight = 0
 
 hP = vicreg
 

@@ -1,8 +1,9 @@
 from functools import lru_cache
-from symmetry_transforms import *
+
 from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
+from symmetry_transforms import *
 
 TRAIN_SET_PATH    = '../datasets/bounce/train'
 VALIDATE_SET_PATH = '../datasets/bounce/validate'
@@ -52,6 +53,7 @@ template.lossWeightTree = LossWeightTree('total', 1, [
         LossWeightTree('covariance', 0, None), 
     ]), 
     LossWeightTree('symm_self_consistency', 0, None), 
+    LossWeightTree('cycle', 0, None), 
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
@@ -70,6 +72,7 @@ template.vvrnn_static = None
 template.rnn_min_context = 5
 template.energy_noise_std = 1
 template.rnn_width = 32
+template.rnn_depth = 1
 template.residual = False
 template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
@@ -93,6 +96,7 @@ template.max_epoch = template.sched_sampling.duration
 template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None
 template.vicreg_invariance_on_Y = None
+template.vicreg_cross_traj = None
 
 # modifying template
 # template.xxx = xxx

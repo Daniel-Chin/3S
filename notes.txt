@@ -1113,6 +1113,8 @@ next {
         no sig diff. train set too large? 
     2023_m01_d25@06_07_15_vicreg_cycle
         cycle encourages collapse. less info content. higher V loss. 
+    2023_m01_d25@22_05_40_vicreg_i_loss
+        25 is best.
 }
 next {
     arxiv paper:

@@ -1119,6 +1119,11 @@ next {
         ...
 }
 todo {
+    overleaf
+        ball decode fig: 3, remove AEs, figure*
+        format the exp group names...
+            SPS_{VAE}
+        table: round to e-4
     cycle loss + VAE VRNN
     about sps:
         two things are diff. weight decay. train set size. also try batch_size=64. 

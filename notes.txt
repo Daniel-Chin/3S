@@ -1106,6 +1106,8 @@ next {
         VAE+VRNN only regularizes the RNN here. There's no decoder, and the V doesn't regularize the encoder. 
         Maybe cycle loss + VAE will help regularize the encoder. 
             (only when decoder produces in-dist data.)
+    2023_m01_d27@21_48_55_ae
+        AE is better than VAE...
 }
 1/27 {
     2023_m01_d25@21_13_22_2b_loss_w

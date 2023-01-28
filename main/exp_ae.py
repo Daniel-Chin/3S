@@ -103,6 +103,7 @@ template.vicreg_cross_traj = None
 
 hP = template.copy()
 hP.vae_is_actually_ae = True
+hP.lossWeightTree['kld'].weight = 0
 hP.variational_rnn = False
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))

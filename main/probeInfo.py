@@ -19,7 +19,7 @@ COMPARE_GROUPS = 'COMPARE_GROUPS'
 MODE = COMPARE_GROUPS
 
 try:
-    from workspace import EXP_PATH, LOCK_EPOCH
+    from workspace import EXP_PATH, LOCK_EPOCH, N_SUP_CALIBRATE_EPOCHS
 except ImportError:
     EXP_PATH = input('EXP_PATH=')
     LOCK_EPOCH = None
@@ -52,7 +52,7 @@ def main(experiment_path, lock_epoch):
     )
 
     for i in range(99):
-        kw = dict(n_epochs=4)
+        kw = dict(n_epochs=N_SUP_CALIBRATE_EPOCHS)
         if i == 0:
             pass
         else:

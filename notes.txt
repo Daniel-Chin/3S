@@ -1116,11 +1116,25 @@ next {
     2023_m01_d25@22_05_40_vicreg_i_loss
         25 is best.
 }
+1/28 {
+    2023_m01_d24@19_40_53_K
+        loss log is corrupted. HPC killed the process mid file write.
+            the continue-train code had a problem of re-logging logged epochs after the last available checkpoint too. 
+        results show K=4 is sig better than K=1.
+        Very very interesting. 
+        Note that here, in a batch, we are also doing self-recon loss on samples unseen by the RNN. 
+        Let's refactor the augmentation now. 
+            BATCH_SHARE_AUG
+            NEW_K
+            GPU_MAX_BATCH_SIZE_FOR_AUG
+}
 next {
     arxiv paper:
         ...
 }
 todo {
+    refactor K
+        see 2023_m01_d24@19_40_53_K notes. 
     overleaf
         ball decode fig: 3, remove AEs, figure*
         format the exp group names...

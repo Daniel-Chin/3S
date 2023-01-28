@@ -100,7 +100,8 @@ template.vicreg_cross_traj = None
 
 # modifying template
 vicreg = template.copy()
-vicreg.lossWeightTree['vicreg'].weight = .01
+vicreg.lossWeightTree['vicreg'].weight = 1e-9
+vicreg.lossWeightTree['predict']['z'].weight = 0
 vicreg.lossWeightTree['vicreg']['variance'].weight = 25
 vicreg.lossWeightTree['vicreg']['invariance'].weight = 25
 vicreg.lossWeightTree['vicreg']['covariance'].weight = 1
@@ -108,21 +109,13 @@ vicreg.vicreg_expander_identity = False
 vicreg.vicreg_expander_widths = [64, 64, 64]
 vicreg.vicreg_invariance_on_Y = False
 vicreg.vicreg_cross_traj = False
-vicreg.weight_decay = 1e-9  # to tweak
-vicreg.batch_size = 32
 vicreg.vae_is_actually_ae = True
+vicreg.lossWeightTree['kld'].weight = 0
 vicreg.variational_rnn = False
 vicreg.lossWeightTree['vicreg']['variance'].weight = 35
 vicreg.lossWeightTree['vicreg']['invariance'].weight = 35
 vicreg.vicreg_expander_identity = True
 vicreg.vicreg_expander_widths = None
-vicreg.train_set_size = 512
-vicreg.batch_size = 512
-vicreg.max_epoch = 32000
-vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
-SLOW_EVAL_EPOCH_INTERVAL = 2000
-vicreg.lossWeightTree['predict']['z'].weight = 0
-vicreg.lossWeightTree['kld'].weight = 0
 
 hP = vicreg
 

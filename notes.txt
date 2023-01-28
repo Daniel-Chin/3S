@@ -1127,6 +1127,19 @@ next {
             BATCH_SHARE_AUG
             NEW_K
             GPU_MAX_BATCH_SIZE_FOR_AUG
+    2023_m01_d26@06_31_58_vicreg_cross_traj
+        as expected, no use. 
+        logged z_std is working. C loss is ~ 1. z_std ~= 1. 
+    2023_m01_d26@19_31_47_2b_vrnn
+        vrnn helps disen. 
+        Even for image pred, non-vrnn doesn't show advantage. 
+    2023_m01_d26@19_33_54_sps_2b
+        set too small, VAE has trouble interpolating. 
+        baseline is still super strong!
+    2023_m01_d26@19_57_57_vicreg_sanity
+        decoded ball is blurry, and z_height seems lost. 
+        info content is low. 
+        so we need to further approach template_bounce. 
 }
 next {
     arxiv paper:

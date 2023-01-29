@@ -103,6 +103,7 @@ template.train_set_size = 512
 template.max_epoch = 8000
 template.sched_sampling = LinearScheduledSampling(template.max_epoch)
 template.batch_size = 64
+template.weight_decay = 0
 SLOW_EVAL_EPOCH_INTERVAL = 800
 
 ours = template.copy()

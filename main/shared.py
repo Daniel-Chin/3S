@@ -206,11 +206,15 @@ class HyperParams(BaseHyperParams):
         self.sched_sampling = None
         saved_batch_size = self.batch_size
         self.batch_size = self.experiment_globals['VALIDATE_SET_SIZE']
+        saved_vicreg_emb_dim = self.vicreg_emb_dim
+        if self.vicreg_emb_dim is None:
+            self.vicreg_emb_dim = self.symm.latent_dim
         try:
             yield
         finally:
             self.sched_sampling = saved_sched_sampling
             self.batch_size = saved_batch_size
+            self.vicreg_emb_dim = saved_vicreg_emb_dim
 
 def torch2np(torchImg: torch.Tensor) -> np.ndarray:
     return (

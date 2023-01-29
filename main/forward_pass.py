@@ -180,11 +180,15 @@ def forward(
                     _z = _z.detach()
                 if validating or hParams.lossWeightTree['vicreg'].weight:
                     flat_batch_size = small_batch_size * (SEQ_LEN - min_context)
-                    flat_emb_r = vae.expander(_z.reshape(
+                    if validating:
+                        expander = identity
+                    else:
+                        expander = vae.expander
+                    flat_emb_r = expander(_z.reshape(
                         flat_batch_size, 
                         hParams.symm.latent_dim, 
                     ))
-                    flat_emb_l = vae.expander(z_hat_aug.reshape(
+                    flat_emb_l = expander(z_hat_aug.reshape(
                         flat_batch_size, 
                         hParams.symm.latent_dim, 
                     ))

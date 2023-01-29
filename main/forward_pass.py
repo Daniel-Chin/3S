@@ -178,7 +178,7 @@ def forward(
                 _z = sampled_z[:, min_context:, :]
                 if hParams.jepa_stop_grad_r_encoder:
                     _z = _z.detach()
-                if hParams.lossWeightTree['vicreg'].weight:
+                if validating or hParams.lossWeightTree['vicreg'].weight:
                     flat_batch_size = small_batch_size * (SEQ_LEN - min_context)
                     flat_emb_r = vae.expander(_z.reshape(
                         flat_batch_size, 

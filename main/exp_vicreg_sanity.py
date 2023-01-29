@@ -98,24 +98,12 @@ template.vicreg_expander_widths = None
 template.vicreg_invariance_on_Y = None
 template.vicreg_cross_traj = None
 
-# modifying template
-vicreg = template.copy()
-vicreg.lossWeightTree['vicreg'].weight = 1e-9
-vicreg.lossWeightTree['predict']['z'].weight = 0
-vicreg.lossWeightTree['vicreg']['variance'].weight = 25
-vicreg.lossWeightTree['vicreg']['invariance'].weight = 25
-vicreg.lossWeightTree['vicreg']['covariance'].weight = 1
-vicreg.vicreg_expander_identity = False
-vicreg.vicreg_expander_widths = [64, 64, 64]
-vicreg.vicreg_invariance_on_Y = False
-vicreg.vicreg_cross_traj = False
-vicreg.vae_is_actually_ae = True
-vicreg.lossWeightTree['kld'].weight = 0
-vicreg.variational_rnn = False
-vicreg.lossWeightTree['vicreg']['variance'].weight = 35
-vicreg.lossWeightTree['vicreg']['invariance'].weight = 35
-vicreg.vicreg_expander_identity = True
-vicreg.vicreg_expander_widths = None
+ae = template.copy()
+ae.vae_is_actually_ae = True
+ae.lossWeightTree['kld'].weight = 0
+ae.variational_rnn = False
+
+vicreg = ae.copy()
 
 hP = vicreg
 

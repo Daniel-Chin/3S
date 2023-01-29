@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_vicreg_cross_traj.py
+exp_vicreg_sanity.py
 '''.strip()
 # op = input('Which exp? ')
 

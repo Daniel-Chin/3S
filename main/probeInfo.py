@@ -14,12 +14,11 @@ from vae import VAE
 from info_probe import probe, InfoProbeDataset
 from template_bounce import MyExpGroup
 
-CHECK_OVERFIT = 'CHECK_OVERFIT'
-COMPARE_GROUPS = 'COMPARE_GROUPS'
-MODE = CHECK_OVERFIT
-
 try:
-    from workspace import EXP_PATH, LOCK_EPOCH, N_SUP_CALIBRATE_EPOCHS
+    from workspace import (
+        EXP_PATH, LOCK_EPOCH, SUP_CALIBRATE_N_EPOCHS, 
+        SUP_CALIBRATE_MODE, CHECK_OVERFIT, COMPARE_GROUPS, 
+    )
 except ImportError:
     EXP_PATH = input('EXP_PATH=')
     LOCK_EPOCH = None
@@ -52,7 +51,7 @@ def main(experiment_path, lock_epoch):
     )
 
     for i in range(99):
-        kw = dict(n_epochs=N_SUP_CALIBRATE_EPOCHS)
+        kw = dict(n_epochs=SUP_CALIBRATE_N_EPOCHS)
         if i == 0:
             pass
         else:
@@ -81,7 +80,7 @@ def main(experiment_path, lock_epoch):
                 Y_valid[rand_init_i].append(validate_losses)
         legend_handles = []
         legend_labels = []
-        if MODE is CHECK_OVERFIT:
+        if SUP_CALIBRATE_MODE is CHECK_OVERFIT:
             for rand_init_i in range(n_rand_inits):
                 for group_i, group in enumerate(groups):
                     lineTrain, = plt.plot(
@@ -97,7 +96,7 @@ def main(experiment_path, lock_epoch):
             legend_labels.append('train')
             legend_handles.append(lineValid)
             legend_labels.append('validate')
-        elif MODE is COMPARE_GROUPS:
+        elif SUP_CALIBRATE_MODE is COMPARE_GROUPS:
             X = [g.variable_value for g in groups]
             if not all([isinstance(x, Number) for x in X]):
                 X = range(len(groups))
@@ -126,7 +125,7 @@ def main(experiment_path, lock_epoch):
         )
         # plt.ylim(0, 4)
         plt.savefig(path.join(
-            experiment_path, f'auto_info_probe_{MODE}.pdf', 
+            experiment_path, f'auto_info_probe_{SUP_CALIBRATE_MODE}.pdf', 
         ))
         plt.show()
 

@@ -1154,6 +1154,13 @@ next {
     2023_m01_d28@07_48_27_ae
         two-tail P = 0.560606786
         no significant diff. 
+    2023_m01_d29@01_04_33_vicreg
+        std_z(decode) ~= std_z(vicreg) * 0.7
+        as a result, V(vicreg) > V(decode). 
+        0.7 * C(vicreg) ~= C(decode). 
+        0.7 * I(vicreg) > I(decode) significantly. 
+        RNN cannot predict the z well enough. 
+        This is quite interesting to think about. For now, try random hParam changes. 
 }
 next {
     arxiv paper:

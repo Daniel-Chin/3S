@@ -12,15 +12,15 @@ SEQ_LEN = 20
 ACTUAL_DIM = 3
 SLOW_EVAL_EPOCH_INTERVAL = 2000
 
-EXP_NAME = 'vicreg'
-N_RAND_INITS = 12
+EXP_NAME = 'vicreg_misc'
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = '0'
-        self.variable_value = 0
+        self.variable_name = 'nickname'
+        self.variable_value = hyperParams.nickname
     
     @lru_cache(1)
     def name(self):
@@ -129,5 +129,61 @@ vicreg.max_epoch = 32000
 vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 
 hP = vicreg.copy()
+hP.nickname = 'base'
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'rnn_64'
+hP.rnn_width = 64
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'rnn_128'
+hP.rnn_width = 128
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'vae_big'
+hP.vae_channels = [128, 256, 256]
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'w_decay_-8'
+hP.weight_decay = 1e-8
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'w_decay_0'
+hP.weight_decay = 0
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'context_4'
+hP.rnn_min_context = 4
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'context_6'
+hP.rnn_min_context = 6
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'residual'
+hP.residual = True
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = vicreg.copy()
+hP.nickname = 'dropout'
+hP.dropout = .5
+hP.rnn_width = 128
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))

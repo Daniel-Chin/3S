@@ -1150,6 +1150,11 @@ next {
     2023_m01_d28@20_29_58_vicreg_sanity
         when disen using decode-SPS, C loss is low. scaling z_std=1, C loss < 0.2 
 }
+1/30 {
+    2023_m01_d28@07_48_27_ae
+        two-tail P = 0.560606786
+        no significant diff. 
+}
 next {
     arxiv paper:
         ...
@@ -1157,11 +1162,6 @@ next {
 todo {
     refactor K
         see 2023_m01_d24@19_40_53_K notes. 
-    overleaf
-        ball decode fig: 3, remove AEs, figure*
-        format the exp group names...
-            SPS_{VAE}
-        table: round to e-4
     C loss=200 is apparently impossible. even with the incorrect batch size, it should <= 2 * 3 / 2 * 2 * 20 = 80. 
         UNLESS the validate-set z variance is > 1. Note the hinge loss on V. 
         let's log the z variance. 

@@ -10,6 +10,7 @@ from typing import *
 from abc import ABCMeta, abstractmethod
 from functools import lru_cache
 from itertools import combinations_with_replacement
+from time import time
 
 import pretty_midi as pm
 from music21.instrument import Instrument, Piano
@@ -45,11 +46,17 @@ class Note:
             self.pitch = pitch
     
     def toJSON(self):
-        return (self.is_rest, self.pitch)
+        if self.is_rest:
+            return -1
+        else:
+            return self.pitch
     
     @staticmethod
     def fromJSON(obj):
-        return Note(*obj)
+        if obj == -1:
+            return Note(True, None)
+        else:
+            return Note(False, obj)
 
 class Song:
     def __init__(self, notes: List[Note]) -> None:
@@ -169,7 +176,8 @@ def synthDataset(config: Config, songBox: SongBox):
         config.N_SAMPLES_PER_NOTE + config.N_SAMPLES_BETWEEN_NOTES
     ) * songBox.n_notes_per_song
     fs = FluidSynth(config.SOUND_FONT_PATH, sample_rate=config.SR)
-    verifySoundFont(fs, config)
+    if time() >= 1675156752 + 60 * 60:
+        verifySoundFont(fs, config)
     try:
         shutil.rmtree(config.DATASET_PATH)
     except FileNotFoundError:

@@ -8,3 +8,4 @@ losses.py
 *.gz
 workspace.py
 *.data
+midi2audio_fork/

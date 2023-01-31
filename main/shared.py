@@ -207,14 +207,18 @@ class HyperParams(BaseHyperParams):
         saved_batch_size = self.batch_size
         self.batch_size = self.experiment_globals['VALIDATE_SET_SIZE']
         saved_vicreg_emb_dim = self.vicreg_emb_dim
+        saved_vicreg_invariance_on_Y = self.vicreg_invariance_on_Y
         if self.vicreg_emb_dim is None:
             self.vicreg_emb_dim = self.symm.latent_dim
+        if self.vicreg_invariance_on_Y is None:
+            self.vicreg_invariance_on_Y = True
         try:
             yield
         finally:
             self.sched_sampling = saved_sched_sampling
             self.batch_size = saved_batch_size
             self.vicreg_emb_dim = saved_vicreg_emb_dim
+            self.vicreg_invariance_on_Y = saved_vicreg_invariance_on_Y
 
 def torch2np(torchImg: torch.Tensor) -> np.ndarray:
     return (

@@ -9,7 +9,6 @@ from torchWork.experiment_control import (
 from torchWork.profiler import GPUUtilizationReporter
 
 from shared import *
-from load_dataset import VideoDataset
 from one_epoch import oneEpoch
 from vae import VAE
 from rnn import PredRNN, EnergyRNN

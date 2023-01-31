@@ -1175,10 +1175,11 @@ next {
 todo {
     refactor K
         see 2023_m01_d24@19_40_53_K notes. 
-    C loss=200 is apparently impossible. even with the incorrect batch size, it should <= 2 * 3 / 2 * 2 * 20 = 80. 
-        UNLESS the validate-set z variance is > 1. Note the hinge loss on V. 
-        let's log the z variance. 
     try GRU with 2body
+    Maybe 
+        VICReg should have 2D z for the ground plane. vertical height doesn't have symm, and is not encoded. 
+        maybe VICReg fails because the vertical height is regularized by the decoder losses. 
+    also try VICReg with music. 
 }
 archive {
     有些结， 升一维就能解开。 暂时升一维， 等会儿降回来？

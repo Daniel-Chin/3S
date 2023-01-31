@@ -1,5 +1,33 @@
-#!/bin/bash
+#!/bin/python3
 
-rm ./*.err
-rm ./*.out
-rm ./auto.sbatch
+import os
+import subprocess as sp
+
+def main():
+    os.remove('./auto.sbatch')
+
+    running_jobs = []
+    with sp.Popen(['./sq'], stdout=sp.PIPE) as p:
+        p.wait()
+        while True:
+            line = p.stdout.readline()
+            if line == b'':
+                break
+            line = line.lstrip(' ')
+            first_part = line.split(' ', 1)[0]
+            try:
+                job_id = str(int(first_part))
+            except ValueError:
+                continue
+            running_jobs.append(job_id)
+            print('Running:', job_id)
+    for filename in os.listdir():
+        if filename[-4:] not in ('.out', '.err'):
+            continue
+        if job_id in filename:
+            continue
+        print('rm', filename)
+        input('Confirm...')
+        os.remove(filename)
+
+main()

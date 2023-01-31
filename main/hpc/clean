@@ -4,7 +4,10 @@ import os
 import subprocess as sp
 
 def main():
-    os.remove('./auto.sbatch')
+    try:
+        os.remove('./auto.sbatch')
+    except FileNotFoundError:
+        pass
 
     running_jobs = []
     with sp.Popen(['squeue', '-u', '$USER'], stdout=sp.PIPE) as p:

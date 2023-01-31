@@ -1180,6 +1180,13 @@ todo {
         VICReg should have 2D z for the ground plane. vertical height doesn't have symm, and is not encoded. 
         maybe VICReg fails because the vertical height is regularized by the decoder losses. 
     also try VICReg with music. 
+    natural melody:
+        first exp w/ ground-truth pitch RNN modeling. 
+        try GRU. 
+        try one-hot pitch embedding. Compare top-1 accuracy w/ 1d z. 
+    multi-timbre scale dataset. 
+        1d z, decode anyways. 
+        vicReg
 }
 archive {
     有些结， 升一维就能解开。 暂时升一维， 等会儿降回来？

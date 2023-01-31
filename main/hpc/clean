@@ -16,7 +16,7 @@ def main():
             line = p.stdout.readline()
             if line == b'':
                 break
-            line = line.lstrip(' ')
+            line = line.decode().lstrip(' ')
             first_part = line.split(' ', 1)[0]
             try:
                 job_id = str(int(first_part))

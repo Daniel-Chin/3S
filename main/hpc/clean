@@ -29,9 +29,10 @@ def main():
             continue
         for job_id in running_jobs:
             if job_id in filename:
-                continue
-        print('rm', filename)
-        input('Confirm...')
-        os.remove(filename)
+                break
+        else:
+            print('rm', filename)
+            input('Confirm...')
+            os.remove(filename)
 
 main()

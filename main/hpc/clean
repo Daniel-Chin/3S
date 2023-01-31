@@ -12,8 +12,9 @@ def main():
     running_jobs = []
     with sp.Popen(['squeue', '-u', os.getenv('USER')], stdout=sp.PIPE) as p:
         p.wait()
+        assert p.stdout is not None
         while True:
-            line = p.stdout.readline()
+            line: bytes = p.stdout.readline()
             if line == b'':
                 break
             line = line.decode().lstrip(' ')

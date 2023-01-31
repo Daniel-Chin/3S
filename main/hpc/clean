@@ -7,7 +7,7 @@ def main():
     os.remove('./auto.sbatch')
 
     running_jobs = []
-    with sp.Popen(['./sq'], stdout=sp.PIPE) as p:
+    with sp.Popen(['squeue', '-u', '$USER'], stdout=sp.PIPE) as p:
         p.wait()
         while True:
             line = p.stdout.readline()

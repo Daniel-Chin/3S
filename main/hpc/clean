@@ -32,7 +32,7 @@ def main():
                 break
         else:
             print('rm', filename)
-            input('Confirm...')
+            # input('Confirm...')
             os.remove(filename)
 
 main()

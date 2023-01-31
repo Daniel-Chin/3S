@@ -9,3 +9,4 @@ losses.py
 workspace.py
 *.data
 midi2audio_fork/
+temp/

@@ -1,17 +1,18 @@
 from functools import lru_cache
-from symmetry_transforms import *
+
 from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
+from symmetry_transforms import *
 
-TRAIN_SET_PATH    = '../datasets/two_body/train'
-VALIDATE_SET_PATH = '../datasets/two_body/validate'
+TRAIN_SET_PATH    = '../datasets/bounce/train'
+VALIDATE_SET_PATH = '../datasets/bounce/validate'
 VALIDATE_SET_SIZE = 64
-SEQ_LEN = 25
-ACTUAL_DIM = 6
-SLOW_EVAL_EPOCH_INTERVAL = 100
+SEQ_LEN = 20
+ACTUAL_DIM = 3
+SLOW_EVAL_EPOCH_INTERVAL = 1000
 
-EXP_NAME = 'sps_2b'
+EXP_NAME = 'sps_change_set'
 N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
@@ -116,7 +117,7 @@ baseline.symm = SymmetryAssumption(
 )
 
 for s in (
-    ours, 
+    # ours, 
     baseline, 
 ):
     hP = template.copy()

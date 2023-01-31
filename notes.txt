@@ -1162,6 +1162,12 @@ next {
         RNN cannot predict the z well enough. 
         This is quite interesting to think about. For now, try random hParam changes. 
 }
+1/31 {
+    2023_m01_d29@02_13_27_sps_2b
+        even with batch_size=64 and no weight_decay, noSymm is still unrealistically strong. 
+        auto_plot_loss.pdf and eval_encoder.pdf show sig advantage for SPS. 
+        next exp: using the same hParam, is noSymm as strong on 1Ball? 
+}
 next {
     arxiv paper:
         ...

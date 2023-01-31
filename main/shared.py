@@ -205,7 +205,7 @@ class HyperParams(BaseHyperParams):
         saved_sched_sampling = self.sched_sampling
         self.sched_sampling = None
         saved_batch_size = self.batch_size
-        self.batch_size = self.experiment_globals['VALIDATE_SET_SIZE']
+        self.batch_size = self.experiment_globals['DATASET_INSTANCE'].VALIDATE_SET_SIZE
         saved_vicreg_emb_dim = self.vicreg_emb_dim
         saved_vicreg_invariance_on_Y = self.vicreg_invariance_on_Y
         if self.vicreg_emb_dim is None:

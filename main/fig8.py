@@ -56,10 +56,9 @@ def main(experiment_path, lock_epoch):
         assert title == COL_TITLE(groups[col_i + n_groups_per_symm])[0]
         ax.set_title(title)
 
-    dataset = VideoDataset(
-        experiment.VALIDATE_SET_PATH, 
-        experiment.VALIDATE_SET_SIZE, experiment.SEQ_LEN, 
-        experiment.ACTUAL_DIM, DEVICE, 
+    dataset = experiment.getDataset(
+        is_train_not_validate=False, size=None, 
+        device=DEVICE, 
     )
     _shape = dataset.video_set.shape
     image_set = dataset.video_set.view(

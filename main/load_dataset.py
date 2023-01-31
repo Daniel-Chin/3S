@@ -1,7 +1,11 @@
+from __future__ import annotations
+
 import os
+from os import path
 import json
-from typing import List
+from typing import *
 from functools import lru_cache
+from abc import ABCMeta, abstractmethod
 
 import numpy as np
 import torch
@@ -9,10 +13,34 @@ import torch.utils.data
 from PIL import Image
 import tqdm
 from physics_shared import Body
+from music_dataset_shared import Song, Note, SongBox, Config as MusicDatasetConfig
 
 from shared import *
 
-class VideoDataset(torch.utils.data.Dataset):
+class Dataset(torch.utils.data.Dataset, metaclass=ABCMeta):
+    def __init__(self) -> None:
+        super().__init__()
+
+        self.size: int = None
+        self.video_set: torch.Tensor = None
+        self.label_set: torch.Tensor = None
+    
+    def __len__(self):
+        return self.size
+
+    @abstractmethod
+    def __getitem__(self, index: int) -> Tuple[torch.Tensor, torch.Tensor]:
+        raise NotImplemented
+    
+    @abstractmethod
+    def copy(self) -> Dataset:
+        raise NotImplemented
+    
+    @abstractmethod
+    def truncate(self, new_size: int) -> Dataset:
+        raise NotImplemented
+
+class VideoDataset(Dataset):
     def __init__(
         self, dataset_path, size, SEQ_LEN, 
         ACTUAL_DIM: int, device=None, 
@@ -23,8 +51,8 @@ class VideoDataset(torch.utils.data.Dataset):
         self.SEQ_LEN = SEQ_LEN
         self.ACTUAL_DIM = ACTUAL_DIM
         self.device = device
-        self.video_set = None
-        self.label_set = None
+        from console import console
+        console({**globals(), **locals()})
 
         if dataset_path is not None:
             prev_cwd = os.getcwd()
@@ -73,9 +101,6 @@ class VideoDataset(torch.utils.data.Dataset):
 
             self.video_set = video_set
             self.label_set = label_set
-    
-    def __len__(self):
-        return self.size
     
     def __getitem__(self, index):
         return (
@@ -138,9 +163,8 @@ def dataLoader(dataset: VideoDataset, batch_size, set_size=None):
         yield batch
 
 @lru_cache()
-def getImageSet(*args, **kw):
+def getImageSet(dataset: Dataset):
     # flatten the videos to images. 
-    dataset = VideoDataset(*args, **kw)
     _shape = dataset.video_set.shape
     image_set = dataset.video_set.view(
         _shape[0] * _shape[1], _shape[2], _shape[3], _shape[4], 
@@ -155,6 +179,19 @@ def printStats(*args):
     _, traj_set = getImageSet(*args)
     print('mean:', traj_set.mean(dim=0))
     print('std: ', traj_set.std (dim=0))
+
+class MusicDataset(Dataset):
+    def __init__(
+        self, songBox: SongBox, config: MusicDatasetConfig, 
+        is_train_not_validate: bool, device=None, 
+    ) -> None:
+        super().__init__()
+
+        if is_train_not_validate:
+            which = 'train'
+        else:
+            which = 'validate'
+        dataset_path = path.join(config.DATASET_PATH, which)
 
 if __name__ == '__main__':
     # dataset = Dataset('../datasets/bounce/train', 128, 20, 3)

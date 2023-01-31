@@ -1,15 +1,28 @@
+from typing import *
 from functools import lru_cache
 
 from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 from symmetry_transforms import *
+from dataset_instances import BounceSingleColor as DATASET_INSTANCE
+from load_dataset import VideoDataset
 
-TRAIN_SET_PATH    = '../datasets/bounce/train'
-VALIDATE_SET_PATH = '../datasets/bounce/validate'
-VALIDATE_SET_SIZE = 64
-SEQ_LEN = 20
-ACTUAL_DIM = 3
+def getDataset(
+    is_train_not_validate: bool, size: Optional[int], device, 
+):
+    if is_train_not_validate:
+        set_path = DATASET_INSTANCE.TRAIN_SET_PATH
+    else:
+        set_path = DATASET_INSTANCE.VALIDATE_SET_PATH
+        assert size is None
+        size = DATASET_INSTANCE.VALIDATE_SET_SIZE
+    return VideoDataset(
+        set_path, size, DATASET_INSTANCE.SEQ_LEN, 
+        DATASET_INSTANCE.ACTUAL_DIM, 
+        device, 
+    )
+
 SLOW_EVAL_EPOCH_INTERVAL = 1000
 
 EXP_NAME = ...

@@ -5,25 +5,21 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 from symmetry_transforms import *
-from dataset_instances import BounceSingleColor as DATASET_INSTANCE
-from load_dataset import VideoDataset
+from dataset_instances import IonianScales_fr3gm as DATASET_INSTANCE
+from load_dataset import MusicDataset
 
 def getDataset(
     is_train_not_validate: bool, size: Optional[int], device, 
 ):
-    if is_train_not_validate:
-        set_path = DATASET_INSTANCE.TRAIN_SET_PATH
-    else:
-        set_path = DATASET_INSTANCE.VALIDATE_SET_PATH
-        assert size is None
-        size = DATASET_INSTANCE.VALIDATE_SET_SIZE
-    return VideoDataset(
-        set_path, size, DATASET_INSTANCE.SEQ_LEN, 
-        DATASET_INSTANCE.ACTUAL_DIM, 
-        device, 
+    assert size is None
+    return MusicDataset(
+        DATASET_INSTANCE.songBox, 
+        DATASET_INSTANCE.config, 
+        is_train_not_validate, device, 
     )
 
-SLOW_EVAL_EPOCH_INTERVAL = 2000
+ACTUAL_DIM = 1
+SLOW_EVAL_EPOCH_INTERVAL = 1000
 
 EXP_NAME = ...
 N_RAND_INITS = ...
@@ -111,40 +107,11 @@ template.vicreg_expander_widths = None
 template.vicreg_invariance_on_Y = None
 template.vicreg_cross_traj = None
 
-# vicreg is different from template
-vicreg = template.copy()
-vicreg.lossWeightTree['vicreg'].weight = 1
-vicreg.lossWeightTree['vicreg']['variance'].weight = 25
-vicreg.lossWeightTree['vicreg']['invariance'].weight = 25
-vicreg.lossWeightTree['vicreg']['covariance'].weight = 1
-vicreg.vicreg_expander_identity = False
-vicreg.vicreg_expander_widths = [64, 64, 64]
-vicreg.vicreg_invariance_on_Y = False
-vicreg.vicreg_cross_traj = False
-vicreg.weight_decay = 1e-9  # to tweak
-vicreg.batch_size = 32
-vicreg.lossWeightTree['self_recon'].weight = 0
-vicreg.lossWeightTree['kld'].weight = 0
-vicreg.lossWeightTree['predict'].weight = 0
-vicreg.lossWeightTree['predict']['image'].weight = 0
-vicreg.lossWeightTree['predict']['z'].weight = 0
-vicreg.vae_is_actually_ae = True
-vicreg.variational_rnn = False
+# modifying template
+# template.xxx = xxx
 
-# modify vicreg from vanilla
-vicreg.lossWeightTree['vicreg']['variance'].weight = 35
-vicreg.lossWeightTree['vicreg']['invariance'].weight = 25
-vicreg.vicreg_expander_identity = True
-vicreg.vicreg_expander_widths = None
-vicreg.train_set_size = 512
-vicreg.batch_size = 512
-vicreg.max_epoch = 32000
-vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
-
-for xxx in [
-    ..., 
-]:
-    hP = vicreg.copy()
+for xxx in []:
+    hP = template.copy()
     hP.xxx = xxx
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

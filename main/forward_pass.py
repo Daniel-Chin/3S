@@ -23,7 +23,7 @@ def forward(
     require_img_predictions_and_z_hat: bool = True, 
     validating: bool = False, 
 ):
-    SEQ_LEN = experiment.SEQ_LEN
+    SEQ_LEN = experiment.DATASET_INSTANCE.SEQ_LEN
     batch_size = video_batch.shape[0]
     imgCriterion = hParams.sched_image_loss.get(epoch)
     lossTree = Loss_root()
@@ -368,7 +368,7 @@ def rnnForward(
     batch_size, experiment, hParams: HyperParams, 
     epoch, batch_i, profiler, 
 ):
-    SEQ_LEN = experiment.SEQ_LEN
+    SEQ_LEN = experiment.DATASET_INSTANCE.SEQ_LEN
     min_context = hParams.rnn_min_context
     if hParams.sched_sampling is None:
         teacher_rate = 0

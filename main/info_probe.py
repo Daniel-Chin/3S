@@ -18,7 +18,7 @@ class InfoProbeNetwork(nn.Module):
             fcs.append(nn.Linear(c0, c1))
             fcs.append(nn.ReLU())
             c0 = c1
-        fcs.append(nn.Linear(c0, experiment.ACTUAL_DIM))
+        fcs.append(nn.Linear(c0, experiment.DATASET_INSTANCE.ACTUAL_DIM))
         self._forward = nn.Sequential(*fcs)
     
     def forward(self, /, x):
@@ -39,11 +39,11 @@ class InfoProbeDataset(torch.utils.data.Dataset):
             )
             for video_batch, traj_batch in loader:
                 flat_video_batch = video_batch.view(
-                    hParams.batch_size * experiment.SEQ_LEN, 
+                    hParams.batch_size * experiment.DATASET_INSTANCE.SEQ_LEN, 
                     IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
                 )
                 flat_traj_batch = traj_batch.view(
-                    hParams.batch_size * experiment.SEQ_LEN, -1, 
+                    hParams.batch_size * experiment.DATASET_INSTANCE.SEQ_LEN, -1, 
                 )
                 mu, _ = vae.encode(flat_video_batch)
                 z.append(mu)

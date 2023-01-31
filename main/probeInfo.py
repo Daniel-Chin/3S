@@ -5,10 +5,13 @@ from numbers import Number
 import torch
 from torch.nn import functional as F
 from torchWork import loadExperiment, DEVICE
-from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModels
+from torchWork.experiment_control import (
+    EXPERIMENT_PY_FILENAME, loadLatestModels, ExperimentGroup, 
+)
 from matplotlib import pyplot as plt
 import tqdm
 
+from shared import *
 from load_dataset import VideoDataset
 from vae import VAE
 from info_probe import probe, InfoProbeDataset
@@ -33,21 +36,23 @@ def main(experiment_path, lock_epoch):
     # Manual filtering
     # n_rand_inits = 1
 
-    max_dataset_size = 0
+    max_dataset_size = None
     for group in groups:
-        max_dataset_size = max(
-            max_dataset_size, 
-            group.hyperParams.train_set_size, 
-        )
-    trainSet    = VideoDataset(
-        experiment.TRAIN_SET_PATH,    max_dataset_size,  
-        experiment.SEQ_LEN, 
-        experiment.ACTUAL_DIM, DEVICE, 
+        group: ExperimentGroup
+        hParams: HyperParams = group.hyperParams
+        if hParams.train_set_size is not None:
+            max_dataset_size = max_dataset_size or 0
+            max_dataset_size = max(
+                max_dataset_size, 
+                hParams.train_set_size, 
+            )
+    trainSet    = experiment.getDataset(
+        is_train_not_validate=True,  size=max_dataset_size, 
+        device=DEVICE, 
     )
-    validateSet = VideoDataset(
-        experiment.VALIDATE_SET_PATH, experiment.VALIDATE_SET_SIZE, 
-        experiment.SEQ_LEN, 
-        experiment.ACTUAL_DIM, DEVICE, 
+    validateSet = experiment.getDataset(
+        is_train_not_validate=False, size=None, 
+        device=DEVICE, 
     )
 
     for i in range(99):

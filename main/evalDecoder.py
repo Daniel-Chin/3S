@@ -128,11 +128,11 @@ class UI:
         self.initSliders()
     
     def ComputeDist(self, experiment):
-        image_set, _ = getImageSet(
-            experiment.VALIDATE_SET_PATH, 
-            experiment.VALIDATE_SET_SIZE, experiment.SEQ_LEN, 
-            experiment.ACTUAL_DIM, DEVICE, 
+        validateSet = experiment.getDataset(
+            is_train_not_validate=False, size=None, 
+            device=DEVICE, 
         )
+        image_set, _ = getImageSet(validateSet)
         while True:
             vae: VAE = yield
             Z, _ = vae.encode(image_set)
@@ -184,11 +184,11 @@ class UI:
                 self.photoLabels[row_i][col_i].config(image=photo)
     
     def initCalibrate(self, experiment):
-        image_set, traj_set = getImageSet(
-            experiment.VALIDATE_SET_PATH, 
-            CALIBRATE_SET_SIZE, experiment.SEQ_LEN, 
-            experiment.ACTUAL_DIM, DEVICE, 
+        validateSet = experiment.getDataset(
+            is_train_not_validate=False, size=None, 
+            device=DEVICE, 
         )
+        image_set, traj_set = getImageSet(validateSet)
         _mean = traj_set.mean(dim=0)
         _std  = traj_set.std (dim=0)
         self.knob_lim[0] = _mean - 2 * _std

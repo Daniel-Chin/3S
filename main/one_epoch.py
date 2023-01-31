@@ -36,7 +36,7 @@ def oneEpoch(
         )
         with hParams.eval():
             validateLoader = dataLoader(
-                validateSet, hParams.batch_size, experiment.VALIDATE_SET_SIZE, 
+                validateSet, hParams.batch_size, validateSet.size, 
             )
 
         vae.train()

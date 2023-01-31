@@ -24,11 +24,11 @@ def main(experiment_path, lock_epoch):
     ))
     groups: List[MyExpGroup]
     print(f'{exp_name = }')
-    image_set, traj_set = getImageSet(
-        experiment.VALIDATE_SET_PATH, 
-        experiment.VALIDATE_SET_SIZE, experiment.SEQ_LEN, 
-        experiment.ACTUAL_DIM, DEVICE, 
+    validateSet = experiment.getDataset(
+        is_train_not_validate=False, size=None, 
+        device=DEVICE, 
     )
+    image_set, traj_set = getImageSet(validateSet)
     X = [g.variable_value for g in groups]
     if not all([isinstance(x, Number) for x in X]):
         X = range(len(groups))

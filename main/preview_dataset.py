@@ -1,9 +1,9 @@
 from matplotlib import pyplot as plt
 
-from load_dataset import Dataset
+from load_dataset import VideoDataset
 
 def main():
-    dataset = Dataset(
+    dataset = VideoDataset(
         '../datasets/xj_bounce/validate', 64, 20, 3, 
     )
     for video, traj in dataset:

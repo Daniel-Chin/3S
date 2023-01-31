@@ -9,7 +9,7 @@ from torchWork.experiment_control import (
 from torchWork.profiler import GPUUtilizationReporter
 
 from shared import *
-from load_dataset import Dataset
+from load_dataset import VideoDataset
 from one_epoch import oneEpoch
 from vae import VAE
 from rnn import PredRNN, EnergyRNN
@@ -41,12 +41,12 @@ def main(continue_exp_dir=None):
             max_dataset_size, 
             hParams.train_set_size, 
         )
-    trainSet    = Dataset(
+    trainSet    = VideoDataset(
         experiment.TRAIN_SET_PATH,    max_dataset_size,  
         experiment.SEQ_LEN, 
         experiment.ACTUAL_DIM, DEVICE, 
     )
-    validateSet = Dataset(
+    validateSet = VideoDataset(
         experiment.VALIDATE_SET_PATH, experiment.VALIDATE_SET_SIZE, 
         experiment.SEQ_LEN, 
         experiment.ACTUAL_DIM, DEVICE, 

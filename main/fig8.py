@@ -7,7 +7,7 @@ from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModel
 from matplotlib import pyplot as plt
 
 from vae import VAE
-from load_dataset import Dataset
+from load_dataset import VideoDataset
 from template_bounce import MyExpGroup
 from linearity_metric import projectionMSE, projectionMSELockHeight
 
@@ -56,7 +56,7 @@ def main(experiment_path, lock_epoch):
         assert title == COL_TITLE(groups[col_i + n_groups_per_symm])[0]
         ax.set_title(title)
 
-    dataset = Dataset(
+    dataset = VideoDataset(
         experiment.VALIDATE_SET_PATH, 
         experiment.VALIDATE_SET_SIZE, experiment.SEQ_LEN, 
         experiment.ACTUAL_DIM, DEVICE, 

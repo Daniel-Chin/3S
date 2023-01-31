@@ -19,7 +19,7 @@ except ImportError as e:
 
 from shared import *
 from physics_shared import *
-from render_dataset_shared import *
+from render_video_dataset_shared import *
 from physics_two_body import *
 from template_two_body import SEQ_LEN
 

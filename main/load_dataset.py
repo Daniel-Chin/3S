@@ -12,7 +12,7 @@ from physics_shared import Body
 
 from shared import *
 
-class Dataset(torch.utils.data.Dataset):
+class VideoDataset(torch.utils.data.Dataset):
     def __init__(
         self, dataset_path, size, SEQ_LEN, 
         ACTUAL_DIM: int, device=None, 
@@ -119,7 +119,7 @@ def PersistentLoader(dataset, batch_size):
                 break
             yield video_batch, traj_batch
 
-def dataLoader(dataset: Dataset, batch_size, set_size=None):
+def dataLoader(dataset: VideoDataset, batch_size, set_size=None):
     batch_size = min(batch_size, dataset.size)
     if set_size is not None:
         if set_size % batch_size:
@@ -140,7 +140,7 @@ def dataLoader(dataset: Dataset, batch_size, set_size=None):
 @lru_cache()
 def getImageSet(*args, **kw):
     # flatten the videos to images. 
-    dataset = Dataset(*args, **kw)
+    dataset = VideoDataset(*args, **kw)
     _shape = dataset.video_set.shape
     image_set = dataset.video_set.view(
         _shape[0] * _shape[1], _shape[2], _shape[3], _shape[4], 

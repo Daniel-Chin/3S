@@ -7,7 +7,7 @@ from OpenGL.GLUT import *
 
 from shared import *
 from physics_shared import *
-from render_dataset_shared import *
+from render_video_dataset_shared import *
 from physics_bounce import *
 from template_bounce import SEQ_LEN
 

@@ -5,7 +5,7 @@ from torch.optim import Adam
 
 from shared import *
 from vae import VAE
-from load_dataset import Dataset, dataLoader
+from load_dataset import VideoDataset, dataLoader
 
 class InfoProbeNetwork(nn.Module):
     def __init__(
@@ -28,7 +28,7 @@ class InfoProbeDataset(torch.utils.data.Dataset):
     def __init__(
         self, experiment, hParams: HyperParams, 
         vae: VAE, 
-        dataSet: Dataset, 
+        dataSet: VideoDataset, 
     ):
         vae.eval()
         z = []

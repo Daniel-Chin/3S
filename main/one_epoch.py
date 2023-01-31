@@ -11,7 +11,7 @@ from shared import *
 from forward_pass import forward
 from vae import VAE
 from rnn import PredRNN, EnergyRNN
-from load_dataset import Dataset, dataLoader
+from load_dataset import VideoDataset, dataLoader
 from video_eval import videoEval
 
 def oneEpoch(
@@ -19,7 +19,7 @@ def oneEpoch(
     experiment, hParams: HyperParams, 
     models: Dict[str, List[torch.nn.Module]], 
     optim: torch.optim.Optimizer, 
-    trainSet: Dataset, validateSet: Dataset, 
+    trainSet: VideoDataset, validateSet: VideoDataset, 
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, trainer_id: int, 
 ):

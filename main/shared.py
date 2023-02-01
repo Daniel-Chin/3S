@@ -201,8 +201,6 @@ class HyperParams(BaseHyperParams):
                 self.vicreg_emb_dim = self.vicreg_expander_widths[-1]
     
     def copyOneParam(self, k: str, v):
-        if v is None:
-            return True, None
         if k in ('sched_image_loss', 'sched_sampling'):
             return True, v
         if k == 'symm':

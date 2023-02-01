@@ -11,11 +11,10 @@ from load_dataset import MusicDataset
 def getDataset(
     is_train_not_validate: bool, size: Optional[int], device, 
 ):
-    assert size is None
     return MusicDataset(
         DATASET_INSTANCE.songBox, 
         DATASET_INSTANCE.config, 
-        is_train_not_validate, device, 
+        is_train_not_validate, size, device, 
     )
 
 SLOW_EVAL_EPOCH_INTERVAL = 30
@@ -85,10 +84,26 @@ template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
 template.rnn_ensemble = 1
-template.vae_channels = [64, 128, 256]
-template.deep_spread = True
+template.vae_signal_resolution = (
+    DATASET_INSTANCE.config.N_BINS, 
+    DATASET_INSTANCE.config.ENCODE_STEP, 
+)
+template.vae_channels = [64, 64, 128, 128]
+template.vae_kernel_sizes = [
+    (5, DATASET_INSTANCE.config.ENCODE_STEP), 
+    (8, 1), 
+    (4, 1), 
+    (4, 1), 
+]
+template.vae_strides = [2, 4, 2, 2]
+template.vae_paddings = [
+    (1, 0), 
+    (2, 0), 
+    (1, 0), 
+    (1, 0), 
+]
+template.vae_fc_before_decode = [16, 64, 256, 1024]
 template.relu_leak = False
-template.vae_kernel_size = 4
 template.vae_is_actually_ae = False
 template.encoder_batch_norm = True
 template.batch_size = 16
@@ -109,5 +124,6 @@ template.vicreg_cross_traj = None
 # template.xxx = xxx
 
 hP = template.copy()
+hP.train_set_size = 128
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))

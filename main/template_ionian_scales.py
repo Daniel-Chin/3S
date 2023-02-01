@@ -11,11 +11,10 @@ from load_dataset import MusicDataset
 def getDataset(
     is_train_not_validate: bool, size: Optional[int], device, 
 ):
-    assert size is None
     return MusicDataset(
         DATASET_INSTANCE.songBox, 
         DATASET_INSTANCE.config, 
-        is_train_not_validate, device, 
+        is_train_not_validate, size, device, 
     )
 
 SLOW_EVAL_EPOCH_INTERVAL = 30

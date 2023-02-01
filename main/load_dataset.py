@@ -187,7 +187,7 @@ class MusicDataset(Dataset):
     def __init__(
         self, songBox: SongBox, config: MusicDatasetConfig, 
         is_train_not_validate: bool, 
-        device=None, 
+        size: Optional[int] = None, device=None, 
     ) -> None:
         super().__init__()
 
@@ -201,6 +201,7 @@ class MusicDataset(Dataset):
             self.dataset_path, INDEX_FILENAME, 
         ), 'r') as f:
             index: List[Tuple[str, int, Any]] = json.load(f)
+        index = index[:size]
         video_set = []
         label_set = []
         self.map = {}

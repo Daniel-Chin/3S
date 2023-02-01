@@ -30,8 +30,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = '0'
-        self.variable_value = 0
+        self.variable_name = 'predict_w'
+        self.variable_value = hyperParams.lossWeightTree['predict'].weight
     
     @lru_cache(1)
     def name(self):
@@ -129,5 +129,12 @@ template.vicreg_cross_traj = None
 # template.xxx = xxx
 
 hP = deepcopy(template)
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = deepcopy(template)
+hP.lossWeightTree['predict'].weight = 0
+hP.lossWeightTree['predict']['z'].weight = 0
+hP.lossWeightTree['predict']['image'].weight = 0
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))

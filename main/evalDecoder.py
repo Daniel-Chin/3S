@@ -139,7 +139,7 @@ class UI:
             yield Z.mean(dim=0), Z.std(dim=0)
 
     def initSliders(self):
-        for i in range(self.max_latent_dim):
+        for i, knob in enumerate(self.knobs):
             slider = tk.Scale(
                 self.win,
                 # variable=tk.DoubleVar(value=self.knobs[i]),
@@ -154,7 +154,7 @@ class UI:
                 ) else 0, 
                 length=2000, width=100, sliderlength=100,
             )
-            slider.set(self.knobs[i].item())
+            slider.set(knob.item())
             slider.grid(
                 row=0, rowspan=self.n_row + 2, column=i, 
                 padx=10, 

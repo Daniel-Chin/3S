@@ -23,15 +23,16 @@ def forward(
     require_img_predictions_and_z_hat: bool = True, 
     validating: bool = False, 
 ):
-    SEQ_LEN    = experiment.DATASET_INSTANCE.SEQ_LEN
-    RESOLUTION = experiment.DATASET_INSTANCE.RESOLUTION
+    SEQ_LEN        = experiment.DATASET_INSTANCE.SEQ_LEN
+    IMG_N_CHANNELS = experiment.DATASET_INSTANCE.IMG_N_CHANNELS
     batch_size = video_batch.shape[0]
     imgCriterion = hParams.sched_image_loss.get(epoch)
     lossTree = Loss_root()
 
     # remove time axis
     flat_video_batch = video_batch.view(
-        batch_size * SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
+        batch_size * SEQ_LEN, IMG_N_CHANNELS, 
+        *hParams.signal_resolution, 
     )
     flat_traj_batch = traj_batch.view(
         batch_size * SEQ_LEN, -1, 
@@ -51,7 +52,7 @@ def forward(
             ).cpu()
             reconstructions = flat_reconstructions.detach().view(
                 batch_size, SEQ_LEN, 
-                IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
+                IMG_N_CHANNELS, *hParams.signal_resolution, 
             )
         else:
             reconstructions = None
@@ -150,7 +151,7 @@ def forward(
                     flat_predictions = vae.decode(r_flat_z_hat_aug)
                 img_predictions = flat_predictions.view(
                     small_batch_size, SEQ_LEN - min_context, 
-                    IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
+                    IMG_N_CHANNELS, *hParams.signal_resolution, 
                 )
                 with profiler('good'):
                     lossTree.predict.image.append(imgCriterion(

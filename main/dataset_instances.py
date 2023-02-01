@@ -9,6 +9,7 @@ class DatasetInstance:
     VALIDATE_SET_SIZE: int = None
     SEQ_LEN: int = None
     ACTUAL_DIM: int = None
+    IMG_N_CHANNELS: int = None
     EVAL_METHOD: Optional[str] = None
 
 class IonianScalesSongBox(SongBox):
@@ -42,8 +43,10 @@ class IonianScales_fr3gm(DatasetInstance):
     config.SOUND_FONT_PATH = path.abspath(
         '../sound_fonts/FluidR3_GM/FluidR3_GM.sf2', 
     )
+    VALIDATE_SET_SIZE = 476
     SEQ_LEN = songBox.n_notes_per_song
     ACTUAL_DIM = 1
+    IMG_N_CHANNELS = 1
 
 class BounceSingleColor(DatasetInstance):
     TRAIN_SET_PATH    = '../datasets/bounce/train'
@@ -51,6 +54,7 @@ class BounceSingleColor(DatasetInstance):
     VALIDATE_SET_SIZE = 64
     SEQ_LEN = 20
     ACTUAL_DIM = 3
+    IMG_N_CHANNELS = 3
     EVAL_METHOD = VIDEO_EVAL
     RESOLUTION = 32
 
@@ -60,6 +64,7 @@ class TwoBody(DatasetInstance):
     VALIDATE_SET_SIZE = 64
     SEQ_LEN = 25
     ACTUAL_DIM = 6
+    IMG_N_CHANNELS = 3
     EVAL_METHOD = VIDEO_EVAL
     RESOLUTION = 32
 

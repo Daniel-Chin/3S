@@ -6,6 +6,8 @@ from shared import *
 def projectionMSE(X: torch.Tensor, Y: torch.Tensor):
     Y = Y - Y.mean(dim=0)
     Y = Y / Y.std(dim=0)
+    if torch.isnan(Y[:, -1]).all():
+        Y = Y[:, :-1]
 
     X = F.pad(X, (1, 0), value=1)
 

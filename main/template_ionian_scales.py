@@ -12,11 +12,14 @@ from load_dataset import MusicDataset
 def getDataset(
     is_train_not_validate: bool, size: Optional[int], device, 
 ):
-    return MusicDataset(
+    dataset = MusicDataset(
         DATASET_INSTANCE.songBox, 
         DATASET_INSTANCE.config, 
         is_train_not_validate, size, device, 
     )
+    if not is_train_not_validate:
+        assert DATASET_INSTANCE.VALIDATE_SET_SIZE == dataset.size
+    return dataset
 
 SLOW_EVAL_EPOCH_INTERVAL = 30
 
@@ -85,10 +88,11 @@ template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
 template.rnn_ensemble = 1
-template.vae_signal_resolution = (
+template.signal_resolution = (
     DATASET_INSTANCE.config.N_BINS, 
     DATASET_INSTANCE.config.ENCODE_STEP, 
 )
+template.signal_n_channels = DATASET_INSTANCE.IMG_N_CHANNELS
 template.vae_channels = [64, 64, 128, 128]
 template.vae_kernel_sizes = [
     (5, DATASET_INSTANCE.config.ENCODE_STEP), 

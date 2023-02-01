@@ -1,6 +1,5 @@
 __all__ = [
     'TRAJ_FILENAME', 
-    'IMG_N_CHANNELS', 
     
     'HyperParams', 'torch2PIL', 'torch2np', 
     'reparameterize', 
@@ -22,7 +21,6 @@ from symmetry_transforms import SymmetryAssumption
 from torchWork import *
 
 TRAJ_FILENAME = 'trajectory.json'
-IMG_N_CHANNELS = 3
 
 IntPair = Tuple[int, int]
 IntOrPair = Union[int, IntPair]
@@ -57,7 +55,8 @@ class HyperParams(BaseHyperParams):
         self.dropout: float = None
         self.rnn_ensemble: int = None
 
-        self.vae_signal_resolution: IntPair = None
+        self.signal_resolution: IntPair = None
+        self.signal_n_channels: int = None
         self.vae_channels: List[int] = None
         self.vae_kernel_sizes: List[IntOrPair] = None
         self.vae_strides: List[int] = None
@@ -123,8 +122,10 @@ class HyperParams(BaseHyperParams):
             self.dropout = 0.0
         if self.relu_leak is None:
             self.relu_leak = True
-        if self.vae_signal_resolution is None:
-            self.vae_signal_resolution = 32
+        if self.signal_resolution is None:
+            self.signal_resolution = 32
+        if self.signal_n_channels is None:
+            self.signal_n_channels = 3
         if self.vae_kernel_sizes is None:
             self.vae_kernel_sizes = [3] * len(self.vae_channels)
         if self.vae_strides is None:

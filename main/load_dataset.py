@@ -49,7 +49,8 @@ class Dataset(torch.utils.data.Dataset, metaclass=ABCMeta):
 class VideoDataset(Dataset):
     def __init__(
         self, dataset_path, size, SEQ_LEN, 
-        ACTUAL_DIM: int, RESOLUTION: int, device=None, 
+        ACTUAL_DIM: int, RESOLUTION: int, IMG_N_CHANNELS, 
+        device=None, 
     ) -> None:
         super().__init__()
 
@@ -154,7 +155,7 @@ def dataLoader(dataset: Dataset, batch_size, set_size=None):
         if set_size % batch_size:
             assert set_size < batch_size
             batch_size = set_size
-    if set_size is None:
+    if set_size is None or set_size == dataset.size:
         truncatedDataset = dataset
     else:
         truncatedDataset = dataset.truncate(set_size)
@@ -259,7 +260,7 @@ class MusicDataset(Dataset):
                 :, 
                 note_i * config.ENCODE_STEP : (note_i + 1) * config.ENCODE_STEP, 
             ]
-        return datapoint
+        return datapoint.unsqueeze(1)   # channel dim
     
     def truncate(self, new_size: int) -> Dataset:
         raise NotImplemented

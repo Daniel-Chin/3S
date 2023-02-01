@@ -41,7 +41,7 @@ def evalZTraj(vae: VAE, dataset: Dataset, hParams: HyperParams, experiment):
     RESOLUTION = experiment.DATASET_INSTANCE.RESOLUTION
     batch_size = dataset.size
     flat_batch = dataset.video_set.view(
-        batch_size * SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
+        batch_size * SEQ_LEN, experiment.DATASET_INSTANCE.IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
     )
     flat_mu, _ = vae.encode(flat_batch)
     mu = flat_mu.detach().view(batch_size, SEQ_LEN, hParams.latent_dim)

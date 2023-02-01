@@ -4,7 +4,7 @@ from load_dataset import VideoDataset
 
 def main():
     dataset = VideoDataset(
-        '../datasets/xj_bounce/validate', 64, 20, 3, 32, 
+        '../datasets/xj_bounce/validate', 64, 20, 3, 32, 3, 
     )
     for video, traj in dataset:
         plt.plot(traj)

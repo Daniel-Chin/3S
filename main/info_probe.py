@@ -31,7 +31,6 @@ class InfoProbeDataset(torch.utils.data.Dataset):
         dataSet: Dataset, 
     ):
         SEQ_LEN    = experiment.DATASET_INSTANCE.SEQ_LEN
-        RESOLUTION = experiment.DATASET_INSTANCE.RESOLUTION
         vae.eval()
         z = []
         traj = []
@@ -42,7 +41,8 @@ class InfoProbeDataset(torch.utils.data.Dataset):
             for video_batch, traj_batch in loader:
                 flat_video_batch = video_batch.view(
                     hParams.batch_size * SEQ_LEN, 
-                    IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
+                    experiment.DATASET_INSTANCE.IMG_N_CHANNELS, 
+                    *hParams.signal_resolution, 
                 )
                 flat_traj_batch = traj_batch.view(
                     hParams.batch_size * SEQ_LEN, -1, 

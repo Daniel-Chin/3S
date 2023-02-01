@@ -14,26 +14,35 @@ class VAE(nn.Module):
     def __init__(self, hyperParams: HyperParams) -> None:
         super().__init__()
         self.hParams = hyperParams
-        channels = [IMG_N_CHANNELS, *hyperParams.vae_channels]
+        channels = [hyperParams.signal_n_channels, *hyperParams.vae_channels]
         if hyperParams.relu_leak:
             MyRelu = nn.LeakyReLU
         else:
             MyRelu = nn.ReLU
-        def computeConvNeck(signal_width):
-            layer_width = signal_width
+        def computeConvNeck():
+            layer_width = hyperParams.signal_resolution
+            if isinstance(layer_width, int):
+                layer_width = [layer_width, layer_width]
+            else:
+                layer_width = [*layer_width]
             for kernel_size, padding, stride in zip(
                 hyperParams.vae_kernel_sizes, 
                 hyperParams.vae_paddings, 
                 hyperParams.vae_strides, 
             ):
-                layer_width = (
-                    layer_width + padding * 2 - kernel_size
-                ) // stride + 1
+                if isinstance(kernel_size, int):
+                    kernel_size = (kernel_size, kernel_size)
+                if isinstance(padding, int):
+                    padding = (padding, padding)
+                if isinstance(stride, int):
+                    stride = (stride, stride)
+                for dim in range(2):
+                    layer_width[dim] = (
+                        layer_width[dim] 
+                        + padding[dim] * 2 - kernel_size[dim]
+                    ) // stride[dim] + 1
             return layer_width
-        self.conv_neck = [
-            computeConvNeck(x) 
-            for x in hyperParams.vae_signal_resolution
-        ]
+        self.conv_neck = computeConvNeck()
 
         def zipLayerParams():
             return zip(

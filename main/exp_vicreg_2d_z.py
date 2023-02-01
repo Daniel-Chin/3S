@@ -1,15 +1,30 @@
+from typing import *
 from functools import lru_cache
+from copy import deepcopy
 
 from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 from symmetry_transforms import *
+from dataset_instances import BounceSingleColor as DATASET_INSTANCE
+from load_dataset import VideoDataset
 
-TRAIN_SET_PATH    = '../datasets/bounce/train'
-VALIDATE_SET_PATH = '../datasets/bounce/validate'
-VALIDATE_SET_SIZE = 64
-SEQ_LEN = 20
-ACTUAL_DIM = 3
+def getDataset(
+    is_train_not_validate: bool, size: Optional[int], device, 
+):
+    if is_train_not_validate:
+        set_path = DATASET_INSTANCE.TRAIN_SET_PATH
+    else:
+        set_path = DATASET_INSTANCE.VALIDATE_SET_PATH
+        assert size is None
+        size = DATASET_INSTANCE.VALIDATE_SET_SIZE
+    return VideoDataset(
+        set_path, size, DATASET_INSTANCE.SEQ_LEN, 
+        DATASET_INSTANCE.ACTUAL_DIM, DATASET_INSTANCE.RESOLUTION, 
+        DATASET_INSTANCE.IMG_N_CHANNELS, 
+        device, 
+    )
+
 SLOW_EVAL_EPOCH_INTERVAL = 2000
 
 EXP_NAME = 'vicreg_2d_z'
@@ -78,10 +93,17 @@ template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
 template.rnn_ensemble = 1
+template.signal_resolution = (
+    DATASET_INSTANCE.RESOLUTION, 
+    DATASET_INSTANCE.RESOLUTION, 
+)
+template.signal_n_channels = DATASET_INSTANCE.IMG_N_CHANNELS
 template.vae_channels = [64, 128, 256]
-template.deep_spread = True
+template.vae_kernel_sizes = [4, 4, 4]
+template.vae_strides = [2, 2, 2]
+template.vae_paddings = [1, 1, 1]
+template.vae_fc_before_decode = [16, 32, 64]
 template.relu_leak = False
-template.vae_kernel_size = 4
 template.vae_is_actually_ae = False
 template.encoder_batch_norm = True
 template.batch_size = 16
@@ -99,7 +121,7 @@ template.vicreg_invariance_on_Y = None
 template.vicreg_cross_traj = None
 
 # vicreg is different from template
-vicreg = template.copy()
+vicreg = deepcopy(template)
 vicreg.lossWeightTree['vicreg'].weight = 1
 vicreg.lossWeightTree['vicreg']['variance'].weight = 25
 vicreg.lossWeightTree['vicreg']['invariance'].weight = 25
@@ -128,7 +150,7 @@ vicreg.batch_size = 512
 vicreg.max_epoch = 32000
 vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 
-hP = vicreg.copy()
+hP = deepcopy(vicreg)
 hP.symm = SymmetryAssumption(
     2, [
         (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 

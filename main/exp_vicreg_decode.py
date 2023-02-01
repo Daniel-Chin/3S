@@ -97,6 +97,7 @@ template.signal_resolution = (
     DATASET_INSTANCE.RESOLUTION, 
     DATASET_INSTANCE.RESOLUTION, 
 )
+template.signal_n_channels = DATASET_INSTANCE.IMG_N_CHANNELS
 template.vae_channels = [64, 128, 256]
 template.vae_kernel_sizes = [4, 4, 4]
 template.vae_strides = [2, 2, 2]

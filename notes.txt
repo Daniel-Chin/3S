@@ -1168,6 +1168,11 @@ next {
         auto_plot_loss.pdf and eval_encoder.pdf show sig advantage for SPS. 
         next exp: using the same hParam, is noSymm as strong on 1Ball? 
 }
+2/1 {
+    refactor: music and video now share SPS code. 
+    2023_m02_d01@01_30_04_verify_refactor
+        every thing is normal! refactor success. 
+}
 next {
     arxiv paper:
         ...
@@ -1190,6 +1195,8 @@ todo {
     vicreg+decode
         style uses current timestep, not RNN prediction. use high kld weight. 
         first exp: vicreg+decode. 
+    vae
+        remove linear before deconv
 }
 archive {
     有些结， 升一维就能解开。 暂时升一维， 等会儿降回来？

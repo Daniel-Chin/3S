@@ -230,6 +230,10 @@ class HyperParams(BaseHyperParams):
             self.batch_size = saved_batch_size
             self.vicreg_emb_dim = saved_vicreg_emb_dim
             self.vicreg_invariance_on_Y = saved_vicreg_invariance_on_Y
+    
+    def copy(self):
+        print('Warning: deprecated. use `from copy import deepcopy` instead.')
+        return deepcopy(self)
 
 def torch2np(torchImg: torch.Tensor) -> np.ndarray:
     return (

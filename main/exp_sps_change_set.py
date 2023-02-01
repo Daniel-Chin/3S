@@ -130,9 +130,9 @@ template.batch_size = 64
 template.weight_decay = 0
 SLOW_EVAL_EPOCH_INTERVAL = 800
 
-ours = template.copy()
+ours = deepcopy(template)
 
-baseline = template.copy()
+baseline = deepcopy(template)
 baseline.symm = SymmetryAssumption(
     3, [
         (SAMPLE_TRANS, [Trivial()], {Slice(0, 3)}), 
@@ -143,7 +143,7 @@ for s in (
     # ours, 
     baseline, 
 ):
-    hP = template.copy()
+    hP = deepcopy(template)
     hP.symm = s.symm
 
     hP.ready(globals())

@@ -127,7 +127,7 @@ class HyperParams(BaseHyperParams):
         if self.signal_n_channels is None:
             self.signal_n_channels = 3
         if self.vae_kernel_sizes is None:
-            self.vae_kernel_sizes = [3] * len(self.vae_channels)
+            self.vae_kernel_sizes = [4] * len(self.vae_channels)
         if self.vae_strides is None:
             self.vae_strides = [2] * len(self.vae_channels)
         if self.vae_paddings is None:

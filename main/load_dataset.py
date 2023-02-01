@@ -51,8 +51,6 @@ class VideoDataset(Dataset):
         self.SEQ_LEN = SEQ_LEN
         self.ACTUAL_DIM = ACTUAL_DIM
         self.device = device
-        from console import console
-        console({**globals(), **locals()})
 
         if dataset_path is not None:
             prev_cwd = os.getcwd()

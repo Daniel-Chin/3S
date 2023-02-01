@@ -7,7 +7,6 @@ from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModel
 from matplotlib import pyplot as plt
 
 from vae import VAE
-from load_dataset import VideoDataset
 from template_bounce import MyExpGroup
 from linearity_metric import projectionMSE, projectionMSELockHeight
 

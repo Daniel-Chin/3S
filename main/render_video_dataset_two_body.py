@@ -21,7 +21,7 @@ from shared import *
 from physics_shared import *
 from render_video_dataset_shared import *
 from physics_two_body import *
-from template_two_body import SEQ_LEN
+from dataset_instances import TwoBody as DATASET_INSTANCE
 
 PATH = path.join(
     '../datasets/two_body', 
@@ -50,7 +50,11 @@ class TwoBodyViewer(BallViewer):
         self.do_loop_one_traj = False
         self.trajs = []
         self.traj_i = -1
-        super().__init__(running_mode, SEQ_LEN, ball_radius, eye, look_at, SPF)
+        super().__init__(
+            running_mode, DATASET_INSTANCE.SEQ_LEN, 
+            DATASET_INSTANCE.RESOLUTION, ball_radius, eye, 
+            look_at, SPF, 
+        )
     
     def loop(self):
         with self.lock:
@@ -67,7 +71,7 @@ class TwoBodyViewer(BallViewer):
             except IndexError:
                 assert self.traj_i == len(self.trajs)
                 trajectory, _ = oneLegalRun(
-                    DT, SEQ_LEN, 
+                    DT, DATASET_INSTANCE.SEQ_LEN, 
                     CENTER_OF_MASS_STATIONARY, REJECTABLE_START, 
                     EYE, 
                 )

@@ -12,7 +12,6 @@ from matplotlib import pyplot as plt
 import tqdm
 
 from shared import *
-from load_dataset import VideoDataset
 from vae import VAE
 from info_probe import probe, InfoProbeDataset
 from template_bounce import MyExpGroup

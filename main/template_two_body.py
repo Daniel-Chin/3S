@@ -19,7 +19,7 @@ def getDataset(
         size = DATASET_INSTANCE.VALIDATE_SET_SIZE
     return VideoDataset(
         set_path, size, DATASET_INSTANCE.SEQ_LEN, 
-        DATASET_INSTANCE.ACTUAL_DIM, 
+        DATASET_INSTANCE.ACTUAL_DIM, DATASET_INSTANCE.RESOLUTION, 
         device, 
     )
 
@@ -90,10 +90,16 @@ template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
 template.rnn_ensemble = 1
+template.vae_signal_resolution = (
+    DATASET_INSTANCE.RESOLUTION, 
+    DATASET_INSTANCE.RESOLUTION, 
+)
 template.vae_channels = [64, 128, 256]
-template.deep_spread = True
+template.vae_kernel_sizes = [4, 4, 4]
+template.vae_strides = [2, 2, 2]
+template.vae_paddings = [1, 1, 1]
+template.vae_fc_before_decode = [16, 32, 64]
 template.relu_leak = False
-template.vae_kernel_size = 4
 template.vae_is_actually_ae = False
 template.encoder_batch_norm = True
 template.batch_size = 16

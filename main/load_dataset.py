@@ -12,10 +12,15 @@ import torch
 import torch.utils.data
 from PIL import Image
 import tqdm
-from physics_shared import Body
-from music_dataset_shared import Song, Note, SongBox, Config as MusicDatasetConfig
+import librosa
+from scipy.signal import stft
 
 from shared import *
+from physics_shared import Body
+from music_dataset_shared import (
+    INDEX_FILENAME, 
+    Song, Note, SongBox, Config as MusicDatasetConfig, 
+)
 
 class Dataset(torch.utils.data.Dataset, metaclass=ABCMeta):
     def __init__(self) -> None:
@@ -43,7 +48,7 @@ class Dataset(torch.utils.data.Dataset, metaclass=ABCMeta):
 class VideoDataset(Dataset):
     def __init__(
         self, dataset_path, size, SEQ_LEN, 
-        ACTUAL_DIM: int, device=None, 
+        ACTUAL_DIM: int, RESOLUTION: int, device=None, 
     ) -> None:
         super().__init__()
 
@@ -142,7 +147,7 @@ def PersistentLoader(dataset, batch_size):
                 break
             yield video_batch, traj_batch
 
-def dataLoader(dataset: VideoDataset, batch_size, set_size=None):
+def dataLoader(dataset: Dataset, batch_size, set_size=None):
     batch_size = min(batch_size, dataset.size)
     if set_size is not None:
         if set_size % batch_size:
@@ -181,7 +186,8 @@ def printStats(*args):
 class MusicDataset(Dataset):
     def __init__(
         self, songBox: SongBox, config: MusicDatasetConfig, 
-        is_train_not_validate: bool, device=None, 
+        is_train_not_validate: bool, 
+        device=None, 
     ) -> None:
         super().__init__()
 
@@ -189,8 +195,76 @@ class MusicDataset(Dataset):
             which = 'train'
         else:
             which = 'validate'
-        dataset_path = path.join(config.DATASET_PATH, which)
+        self.dataset_path = path.join(config.DATASET_PATH, which)
 
+        with open(path.join(
+            self.dataset_path, INDEX_FILENAME, 
+        ), 'r') as f:
+            index: List[Tuple[str, int, Any]] = json.load(f)
+        video_set = []
+        label_set = []
+        self.map = {}
+        for (
+            instrument_name, song_id, song_json, 
+        ) in tqdm.tqdm(index, desc=f'load {which}'):
+            wav_name = f'{instrument_name}-{song_id}.wav'
+            datapoint = self.loadOneFile(
+                config, songBox, wav_name, 
+            )
+            song = Song.fromJSON(song_json)
+            video_set.append(datapoint)
+            label_set.append(song.toTensor())
+            self.map[wav_name] = (datapoint, song)
+        self.size = len(index)
+        video_set = torch.stack(video_set, dim=0)
+        label_set = torch.stack(label_set, dim=0)
+        if device is not None:
+            print(f'Moving dataset to {device}...', flush=True)
+            video_set = video_set.to(device)
+            label_set = label_set.to(device)
+        video_set = video_set - video_set.mean()
+        video_set = video_set / video_set.std()
+        self.video_set = video_set
+        self.label_set = label_set
+    
+    def __getitem__(self, index):
+        return (
+            self.video_set[index, :, :, :], 
+            self.label_set[index, :, :], 
+        )
+
+    def loadOneFile(
+        self, config: MusicDatasetConfig, songBox: SongBox, 
+        wav_name, 
+    ):
+        filename = path.join(
+            self.dataset_path, wav_name, 
+        )
+        audio, _ = librosa.load(filename, sr=config.SR)
+        _, _, spectrogram = stft(
+            audio, nperseg=config.WIN_LEN, 
+            noverlap=config.WIN_LEN - config.HOP_LEN, 
+            nfft=config.WIN_LEN, 
+        )
+        log_mag = torch.Tensor(np.abs(spectrogram[:, 1:])).log()
+        # print('log_mag', log_mag.mean(), '+-', log_mag.std())
+        datapoint = torch.zeros((
+            songBox.n_notes_per_song, config.N_BINS, 
+            config.ENCODE_STEP, 
+        ))
+        for note_i in range(songBox.n_notes_per_song):
+            datapoint[note_i, :, :] = log_mag[
+                :, 
+                note_i * config.ENCODE_STEP : (note_i + 1) * config.ENCODE_STEP, 
+            ]
+        return datapoint
+    
+    def truncate(self, new_size: int) -> Dataset:
+        raise NotImplemented
+    
+    def copy(self) -> Dataset:
+        raise NotImplemented
+    
 if __name__ == '__main__':
     # dataset = Dataset('../datasets/bounce/train', 128, 20, 3)
     # loader = PersistentLoader(dataset, 32)

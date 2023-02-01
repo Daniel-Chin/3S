@@ -12,6 +12,7 @@ from functools import lru_cache
 from itertools import combinations_with_replacement
 from time import time
 
+import torch
 import pretty_midi as pm
 from music21.instrument import Instrument, Piano
 try:
@@ -34,6 +35,8 @@ from intruments_and_ranges import intruments_ranges
 BEND_RATIO = .5  # When MIDI specification is incomplete...
 BEND_MAX = 8191
 GRACE_END = .1
+
+INDEX_FILENAME = 'index.json'
 TEMP_MIDI_FILE = path.abspath('./temp/temp.mid')
 TEMP_WAV_FILE  = path.abspath('./temp/temp.wav')
 os.makedirs('temp', exist_ok=True)
@@ -68,6 +71,16 @@ class Song:
     @staticmethod
     def fromJSON(obj):
         return __class__([Note.fromJSON(x) for x in obj])
+    
+    @lru_cache()
+    def toTensor(self):
+        x = torch.zeros((len(self.notes), 2))
+        for i, note in enumerate(self.notes):
+            if note.is_rest:
+                x[i, 1] = 1
+            else:
+                x[i, 0] = note.pitch
+        return x
 
 class SongBox(metaclass=ABCMeta):
     # Used as an input to MusicDataset. 
@@ -101,6 +114,9 @@ class Config:
 
     FADE_OUT_N_SAMPLES = 512
     FADE_OUT_FILTER = np.linspace(1, 0, FADE_OUT_N_SAMPLES)
+
+    assert WIN_LEN == 2 * HOP_LEN
+    N_BINS = WIN_LEN // 2 + 1
 
 def synthOneNote(
     fs: FluidSynth, config: Config, 
@@ -190,7 +206,7 @@ def synthDataset(config: Config, songBox: SongBox):
     for train_or_validate, _intruments_ranges in intruments_ranges.items():
         os.mkdir(train_or_validate)
         os.chdir(train_or_validate)
-        index = []
+        index: List[Tuple[str, int, Any]] = []
         for instrument, pitch_range in tqdm(_intruments_ranges, desc=train_or_validate):
             @lru_cache(88)
             def synthOne(pitch: float):
@@ -203,14 +219,15 @@ def synthDataset(config: Config, songBox: SongBox):
                     config, song, synthOne, n_samples_per_song, dtype, 
                 )
                 index.append((
-                    instrument.instrumentName, song_id, 
+                    instrument.instrumentName, 
+                    song_id, 
                     song.toJSON(), 
                 ))
                 soundfile.write(
                     f'{instrument.instrumentName}-{song_id}.wav', 
                     audio, config.SR, 
                 )
-        with open('index.json', 'w') as f:
+        with open(INDEX_FILENAME, 'w') as f:
             json.dump(index, f)
         os.chdir('..')
 

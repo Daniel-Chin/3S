@@ -34,11 +34,13 @@ MODE_MAKE_IMG = 'make_img'
 
 class BallViewer(metaclass=ABCMeta):
     def __init__(
-        self, running_mode, SEQ_LEN, ball_radius, 
+        self, running_mode, SEQ_LEN, RESOLUTION, 
+        ball_radius, 
         eye, look_at, SPF, 
     ) -> None:
         self.running_mode = running_mode
         self.SEQ_LEN = SEQ_LEN
+        self.RESOLUTION = RESOLUTION
         self.ball_radius = ball_radius
         self.eye = eye
         self.look_at = look_at
@@ -96,7 +98,7 @@ class BallViewer(metaclass=ABCMeta):
             bodies = self.trajectory[self.stage - 1]
             self.makeBodies(*bodies)
             if self.running_mode is MODE_MAKE_IMG:
-                self.frames.append(screenShot())
+                self.frames.append(screenShot(self.RESOLUTION))
         
         self.render_or_screenshot = 1 - self.render_or_screenshot
     
@@ -232,7 +234,7 @@ class BallViewer(metaclass=ABCMeta):
         # 设置视口
         glViewport(0, 0, WIN_W, WIN_H)
 
-def screenShot():
+def screenShot(RESOLUTION):
     glReadBuffer(GL_FRONT)
     # 从缓冲区中的读出的数据是字节数组
     data = glReadPixels(0, 0, WIN_W, WIN_H, GL_RGB, GL_UNSIGNED_BYTE)

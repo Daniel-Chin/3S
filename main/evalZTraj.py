@@ -33,10 +33,12 @@ def main():
             vae=(VAE, 1), 
         ), LOCK_EPOCH)['vae'][0]
         vae.eval()
-        evalZTraj(vae, dataset, group.hyperParams, experiment.DATASET_INSTANCE.SEQ_LEN)
+        evalZTraj(vae, dataset, group.hyperParams, experiment)
 
-def evalZTraj(vae: VAE, dataset: Dataset, hParams: HyperParams, SEQ_LEN):
+def evalZTraj(vae: VAE, dataset: Dataset, hParams: HyperParams, experiment):
     # Entire dataset as one batch. Not optimized for GPU! 
+    SEQ_LEN = experiment.DATASET_INSTANCE.SEQ_LEN
+    RESOLUTION = experiment.DATASET_INSTANCE.RESOLUTION
     batch_size = dataset.size
     flat_batch = dataset.video_set.view(
         batch_size * SEQ_LEN, IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 

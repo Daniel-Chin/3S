@@ -5,7 +5,7 @@ from torch.optim import Adam
 
 from shared import *
 from vae import VAE
-from load_dataset import VideoDataset, dataLoader
+from load_dataset import Dataset, dataLoader
 
 class InfoProbeNetwork(nn.Module):
     def __init__(
@@ -28,8 +28,10 @@ class InfoProbeDataset(torch.utils.data.Dataset):
     def __init__(
         self, experiment, hParams: HyperParams, 
         vae: VAE, 
-        dataSet: VideoDataset, 
+        dataSet: Dataset, 
     ):
+        SEQ_LEN    = experiment.DATASET_INSTANCE.SEQ_LEN
+        RESOLUTION = experiment.DATASET_INSTANCE.RESOLUTION
         vae.eval()
         z = []
         traj = []
@@ -39,11 +41,11 @@ class InfoProbeDataset(torch.utils.data.Dataset):
             )
             for video_batch, traj_batch in loader:
                 flat_video_batch = video_batch.view(
-                    hParams.batch_size * experiment.DATASET_INSTANCE.SEQ_LEN, 
+                    hParams.batch_size * SEQ_LEN, 
                     IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
                 )
                 flat_traj_batch = traj_batch.view(
-                    hParams.batch_size * experiment.DATASET_INSTANCE.SEQ_LEN, -1, 
+                    hParams.batch_size * SEQ_LEN, -1, 
                 )
                 mu, _ = vae.encode(flat_video_batch)
                 z.append(mu)

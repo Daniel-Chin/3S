@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_test.py
+exp_ionian.py
 '''.strip()
 # op = input('Which exp? ')
 

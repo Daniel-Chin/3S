@@ -1,8 +1,6 @@
 __all__ = [
     'TRAJ_FILENAME', 
-    'RESOLUTION', 
     'IMG_N_CHANNELS', 
-    'ENTIRE_DATASET_IN_DEVICE', 
     
     'HyperParams', 'torch2PIL', 'torch2np', 
     'reparameterize', 
@@ -11,7 +9,7 @@ __all__ = [
     'SigmoidScheduledSampling', 'ScheduledImageLoss', 
 ]
 
-from typing import Callable, List, Optional, Dict, Tuple
+from typing import *
 from contextlib import contextmanager
 from abc import ABCMeta, abstractmethod
 
@@ -23,9 +21,10 @@ from symmetry_transforms import SymmetryAssumption
 from torchWork import *
 
 TRAJ_FILENAME = 'trajectory.json'
-RESOLUTION = 32
 IMG_N_CHANNELS = 3
-ENTIRE_DATASET_IN_DEVICE = True
+
+IntPair = Tuple[int, int]
+IntOrPair = Union[int, IntPair]
 
 class HyperParams(BaseHyperParams):
     def __init__(self) -> None:
@@ -57,10 +56,13 @@ class HyperParams(BaseHyperParams):
         self.dropout: float = None
         self.rnn_ensemble: int = None
 
+        self.vae_signal_resolution: IntPair = None
         self.vae_channels: List[int] = None
-        self.deep_spread: bool = None
+        self.vae_kernel_sizes: List[IntOrPair] = None
+        self.vae_strides: List[int] = None
+        self.vae_paddings: List[IntOrPair] = None
+        self.vae_fc_before_decode: List[int] = None
         self.relu_leak: bool = None
-        self.vae_kernel_size: int = None
         self.vae_is_actually_ae: bool = None
         self.encoder_batch_norm: bool = None
 
@@ -90,7 +92,7 @@ class HyperParams(BaseHyperParams):
         self.imgCriterion: Callable[
             [torch.Tensor, torch.Tensor], torch.Tensor, 
         ] = None    # Deprecated
-        self.n_batches_per_epoch: int = None
+        self.n_batches_per_epoch: Optional[int] = None
         self.vicreg_emb_dim: int = None
 
         self.experiment_globals: Dict = None
@@ -120,8 +122,16 @@ class HyperParams(BaseHyperParams):
             self.dropout = 0.0
         if self.relu_leak is None:
             self.relu_leak = True
-        if self.vae_kernel_size is None:
-            self.vae_kernel_size = 3
+        if self.vae_signal_resolution is None:
+            self.vae_signal_resolution = 32
+        if self.vae_kernel_sizes is None:
+            self.vae_kernel_sizes = [3] * len(self.vae_channels)
+        if self.vae_strides is None:
+            self.vae_strides = [2] * len(self.vae_channels)
+        if self.vae_paddings is None:
+            self.vae_paddings = [1] * len(self.vae_channels)
+        if self.vae_fc_before_decode is None:
+            self.vae_fc_before_decode = [16, 32, 64]
         if self.lr_diminish is None:
             self.lr_diminish = None
         if isinstance(self.teacher_forcing_duration, int):
@@ -182,7 +192,8 @@ class HyperParams(BaseHyperParams):
         self.OptimClass = {
             'adam': torch.optim.Adam, 
         }[self.optim_name]
-        self.n_batches_per_epoch = self.train_set_size // self.batch_size
+        if self.train_set_size is not None:
+            self.n_batches_per_epoch = self.train_set_size // self.batch_size
         if self.lossWeightTree['vicreg'].weight != 0:
             if self.vicreg_expander_identity:
                 self.vicreg_emb_dim = self.symm.latent_dim

@@ -23,7 +23,8 @@ def forward(
     require_img_predictions_and_z_hat: bool = True, 
     validating: bool = False, 
 ):
-    SEQ_LEN = experiment.DATASET_INSTANCE.SEQ_LEN
+    SEQ_LEN    = experiment.DATASET_INSTANCE.SEQ_LEN
+    RESOLUTION = experiment.DATASET_INSTANCE.RESOLUTION
     batch_size = video_batch.shape[0]
     imgCriterion = hParams.sched_image_loss.get(epoch)
     lossTree = Loss_root()

@@ -79,6 +79,7 @@ def videoEval(
     video_batch: torch.Tensor, traj_batch, 
     vae, predRnns, energyRnns, profiler, 
 ):
+    RESOLUTION = experiment.DATASET_INSTANCE.RESOLUTION
     n_datapoints = video_batch.shape[0]
     (
         lossTree, reconstructions, img_predictions, 

@@ -9,7 +9,7 @@ from shared import *
 from physics_shared import *
 from render_video_dataset_shared import *
 from physics_bounce import *
-from template_bounce import SEQ_LEN
+from dataset_instances import BounceSingleColor as DATASET_INSTANCE
 
 PATH = path.join(
     '../datasets/bounce_flash_color', 
@@ -34,8 +34,8 @@ EYE = np.array([0.0, -2.0, 4.0])  # 眼睛的位置（默认z轴的正方向）
 LOOK_AT = np.array([0.0, 10.0, 0.0])  # 瞄准方向的参考点（默认在坐标原点）
 
 class BounceViewer(BallViewer):
-    def __init__(self, running_mode, SEQ_LEN, ball_radius, eye, look_at, SPF) -> None:
-        super().__init__(running_mode, SEQ_LEN, ball_radius, eye, look_at, SPF)
+    def __init__(self, running_mode, SEQ_LEN, RESOLUTION, ball_radius, eye, look_at, SPF) -> None:
+        super().__init__(running_mode, SEQ_LEN, RESOLUTION, ball_radius, eye, look_at, SPF)
         self.random_color = RANDOM_COLOR
 
     def getTrajectory(self):
@@ -69,7 +69,9 @@ def main():
     os.makedirs(PATH, exist_ok=True)
     os.chdir(PATH)
     viewer = BounceViewer(
-        RUNNING_MODE, SEQ_LEN, BALL_RADIUS, EYE, LOOK_AT, SPF, 
+        RUNNING_MODE, DATASET_INSTANCE.SEQ_LEN, 
+        DATASET_INSTANCE.RESOLUTION, BALL_RADIUS, EYE, LOOK_AT, 
+        SPF, 
     )
     glutMainLoop()  # 进入glut主循环
 

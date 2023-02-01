@@ -6,9 +6,6 @@ from torch import nn
 from shared import *
 from symmetry_transforms import identity
 
-STRIDE = 2
-PADDING = 1
-
 class VAE(nn.Module):
     '''
     Huge thanks to AntixK. 
@@ -22,27 +19,38 @@ class VAE(nn.Module):
             MyRelu = nn.LeakyReLU
         else:
             MyRelu = nn.ReLU
-        def computeConvNeck():
-            layer_width = RESOLUTION
-            for _ in hyperParams.vae_channels:
+        def computeConvNeck(signal_width):
+            layer_width = signal_width
+            for kernel_size, padding, stride in zip(
+                hyperParams.vae_kernel_sizes, 
+                hyperParams.vae_paddings, 
+                hyperParams.vae_strides, 
+            ):
                 layer_width = (
-                    layer_width + PADDING * 2 
-                    - hyperParams.vae_kernel_size
-                ) // STRIDE + 1
+                    layer_width + padding * 2 - kernel_size
+                ) // stride + 1
             return layer_width
-        self.conv_neck_width = computeConvNeck()
+        self.conv_neck = [
+            computeConvNeck(x) 
+            for x in hyperParams.vae_signal_resolution
+        ]
 
+        def zipLayerParams():
+            return zip(
+                channels[0:], 
+                channels[1:], 
+                hyperParams.vae_kernel_sizes, 
+                hyperParams.vae_paddings, 
+                hyperParams.vae_strides, 
+            )
         modules = []
-        for c0, c1 in zip(
-            channels[0:], 
-            channels[1:], 
-        ):
+        for c0, c1, kernel_size, padding, stride in zipLayerParams():
             sequential = []
             sequential.append(
                 nn.Conv2d(
                     c0, c1, 
-                    kernel_size=hyperParams.vae_kernel_size, 
-                    stride=STRIDE, padding=PADDING, 
+                    kernel_size=kernel_size, 
+                    stride=stride, padding=padding, 
                 ),
             )
             if hyperParams.encoder_batch_norm:
@@ -55,7 +63,7 @@ class VAE(nn.Module):
             modules.append(nn.Sequential(*sequential))
         
         self.conv_neck_dim = (
-            channels[-1] * self.conv_neck_width ** 2
+            channels[-1] * self.conv_neck[0] * self.conv_neck[1]
         )
 
         self.encoder = nn.Sequential(*modules)
@@ -67,48 +75,43 @@ class VAE(nn.Module):
                 self.conv_neck_dim, hyperParams.symm.latent_dim, 
             )
 
-        if hyperParams.deep_spread:
-            self.fcBeforeDecode = nn.Sequential(
-                nn.Linear(
-                    hyperParams.symm.latent_dim, 
-                    16, 
-                ), 
-                MyRelu(), 
-                nn.Linear(16, 32), 
-                MyRelu(), 
-                nn.Linear(32, 64), 
-                MyRelu(), 
-                nn.Linear(
-                    64, 
-                    self.conv_neck_dim, 
-                ), 
-            )
-        else:
-            self.fcBeforeDecode = nn.Linear(
-                hyperParams.symm.latent_dim, 
-                self.conv_neck_dim, 
-            )
         modules = []
-        for c0, c1 in zip(
-            channels[  :0:-1], 
-            channels[-2: :-1], 
-        ):
+        prev_layer_width = hyperParams.symm.latent_dim
+        for layer_width in hyperParams.vae_fc_before_decode:
+            modules.append(nn.Linear(
+                prev_layer_width, layer_width, 
+            ))
+            prev_layer_width = layer_width
+            modules.append(MyRelu())
+        modules.append(nn.Linear(
+            prev_layer_width, self.conv_neck_dim, 
+        ))  
+        # Yes, linear + conv (without activation layer) 
+        # is reducible to linear, but it's fine. 
+        del prev_layer_width
+        self.fcBeforeDecode = nn.Sequential(*modules)
+
+        modules = []
+        for c0, c1, kernel_size, padding, stride in reversed([
+            *zipLayerParams(), 
+        ]):
             modules.extend([
                 nn.ConvTranspose2d(
-                    c0, c1, 
-                    kernel_size=hyperParams.vae_kernel_size, 
-                    stride=STRIDE, padding=PADDING, 
+                    c1, c0, 
+                    kernel_size=kernel_size, 
+                    stride=stride, padding=padding, 
                 ),
                 # nn.BatchNorm2d(c1), 
                 MyRelu(), 
             ])
+        assert isinstance(modules[-1], MyRelu)
         modules[-1] = nn.Sigmoid()
         self.decoder = nn.Sequential(*modules)
 
-        # print('VAE # of params:', sum(
-        #     p.numel() for p in self.parameters() 
-        #     if p.requires_grad
-        # ), flush=True)
+        print('VAE # of params:', sum(
+            p.numel() for p in self.parameters() 
+            if p.requires_grad
+        ), flush=True)
 
         if hyperParams.lossWeightTree['vicreg'].weight:
             if hyperParams.vicreg_expander_identity:
@@ -144,7 +147,7 @@ class VAE(nn.Module):
         t: torch.Tensor = self.fcBeforeDecode(z)
         t = t.view(
             -1, self.hParams.vae_channels[-1], 
-            self.conv_neck_width, self.conv_neck_width, 
+            *self.conv_neck, 
         )
         t = self.decoder(t)
         return t

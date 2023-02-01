@@ -3,10 +3,13 @@ from typing import *
 
 from music_dataset_shared import *
 
+VIDEO_EVAL = 'VIDEO_EVAL'
+
 class DatasetInstance:
     VALIDATE_SET_SIZE: int = None
     SEQ_LEN: int = None
     ACTUAL_DIM: int = None
+    EVAL_METHOD: Optional[str] = None
 
 class IonianScalesSongBox(SongBox):
     IONIAN_SCALE = [0, 2, 4, 5, 7, 9, 11, 12, 11, 9, 7, 5, 4, 2, 0]
@@ -48,6 +51,8 @@ class BounceSingleColor(DatasetInstance):
     VALIDATE_SET_SIZE = 64
     SEQ_LEN = 20
     ACTUAL_DIM = 3
+    EVAL_METHOD = VIDEO_EVAL
+    RESOLUTION = 32
 
 class TwoBody(DatasetInstance):
     TRAIN_SET_PATH    = '../datasets/two_body/train'
@@ -55,6 +60,8 @@ class TwoBody(DatasetInstance):
     VALIDATE_SET_SIZE = 64
     SEQ_LEN = 25
     ACTUAL_DIM = 6
+    EVAL_METHOD = VIDEO_EVAL
+    RESOLUTION = 32
 
 if __name__ == '__main__':
     x = IonianScales_fr3gm

@@ -11,15 +11,16 @@ from shared import *
 from forward_pass import forward
 from vae import VAE
 from rnn import PredRNN, EnergyRNN
-from load_dataset import VideoDataset, dataLoader
+from load_dataset import Dataset, dataLoader
 from video_eval import videoEval
+from dataset_instances import VIDEO_EVAL
 
 def oneEpoch(
     group_name: str, epoch: int, 
     experiment, hParams: HyperParams, 
     models: Dict[str, List[torch.nn.Module]], 
     optim: torch.optim.Optimizer, 
-    trainSet: VideoDataset, validateSet: VideoDataset, 
+    trainSet: Dataset, validateSet: Dataset, 
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, trainer_id: int, 
 ):
@@ -120,17 +121,18 @@ def oneEpoch(
             with profiler('save checkpoints'):
                 saveModels(models, epoch, save_path)
             if hParams.lossWeightTree['self_recon'].weight:
-                with profiler('video eval'):
-                    for name, dataset in [
-                        ('train', trainSet), 
-                        ('validate', validateSet), 
-                    ]:
-                        loader = dataLoader(dataset, 12)
-                        videoEval(
-                            epoch, save_path, name, 
-                            experiment, hParams, *next(loader), 
-                            vae, predRnns, energyRnns, profiler, 
-                        )
+                if experiment.DATASET_INSTANCE.EVAL_METHOD is VIDEO_EVAL:
+                    with profiler('video eval'):
+                        for name, dataset in [
+                            ('train', trainSet), 
+                            ('validate', validateSet), 
+                        ]:
+                            loader = dataLoader(dataset, 12)
+                            videoEval(
+                                epoch, save_path, name, 
+                                experiment, hParams, *next(loader), 
+                                vae, predRnns, energyRnns, profiler, 
+                            )
     
     if epoch % 32 == 0:
         print(group_name, 'epoch', epoch, 'finished.')

@@ -6,24 +6,28 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 from symmetry_transforms import *
-from dataset_instances import IonianScales_fr3gm as DATASET_INSTANCE
-from load_dataset import MusicDataset
+from dataset_instances import BounceSingleColor as DATASET_INSTANCE
+from load_dataset import VideoDataset
 
 def getDataset(
     is_train_not_validate: bool, size: Optional[int], device, 
 ):
-    dataset = MusicDataset(
-        DATASET_INSTANCE.songBox, 
-        DATASET_INSTANCE.config, 
-        is_train_not_validate, size, device, 
+    if is_train_not_validate:
+        set_path = DATASET_INSTANCE.TRAIN_SET_PATH
+    else:
+        set_path = DATASET_INSTANCE.VALIDATE_SET_PATH
+        assert size is None
+        size = DATASET_INSTANCE.VALIDATE_SET_SIZE
+    return VideoDataset(
+        set_path, size, DATASET_INSTANCE.SEQ_LEN, 
+        DATASET_INSTANCE.ACTUAL_DIM, DATASET_INSTANCE.RESOLUTION, 
+        DATASET_INSTANCE.IMG_N_CHANNELS, 
+        device, 
     )
-    if not is_train_not_validate:
-        assert DATASET_INSTANCE.VALIDATE_SET_SIZE == dataset.size
-    return dataset
 
-SLOW_EVAL_EPOCH_INTERVAL = 30
+SLOW_EVAL_EPOCH_INTERVAL = 1000
 
-EXP_NAME = 'ionian'
+EXP_NAME = 'verify_refactor'
 N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
@@ -68,8 +72,9 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 ])
 template.lr = 0.001
 template.symm = SymmetryAssumption(
-    1, [
-        (SAMPLE_TRANS, [Translate(1, 1)], {Slice(0, 1)}), 
+    3, [
+        (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+        (SAMPLE_TRANS, [Trivial()], {Slice(2, 3)}), 
     ], 
     .1, 
 )
@@ -89,25 +94,15 @@ template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
 template.rnn_ensemble = 1
 template.signal_resolution = (
-    DATASET_INSTANCE.config.N_BINS, 
-    DATASET_INSTANCE.config.ENCODE_STEP, 
+    DATASET_INSTANCE.RESOLUTION, 
+    DATASET_INSTANCE.RESOLUTION, 
 )
 template.signal_n_channels = DATASET_INSTANCE.IMG_N_CHANNELS
-template.vae_channels = [64, 64, 128, 128]
-template.vae_kernel_sizes = [
-    (5, DATASET_INSTANCE.config.ENCODE_STEP), 
-    (8, 1), 
-    (4, 1), 
-    (4, 1), 
-]
-template.vae_strides = [2, 4, 2, 2]
-template.vae_paddings = [
-    (1, 0), 
-    (2, 0), 
-    (1, 0), 
-    (1, 0), 
-]
-template.vae_fc_before_decode = [16, 64, 256, 1024]
+template.vae_channels = [64, 128, 256]
+template.vae_kernel_sizes = [4, 4, 4]
+template.vae_strides = [2, 2, 2]
+template.vae_paddings = [1, 1, 1]
+template.vae_fc_before_decode = [16, 32, 64]
 template.relu_leak = False
 template.vae_is_actually_ae = False
 template.encoder_batch_norm = True
@@ -116,9 +111,9 @@ template.grad_clip = None
 template.optim_name = 'adam'
 template.weight_decay = 0
 template.lr_diminish = None
-template.train_set_size = None
+template.train_set_size = 64
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
-template.sched_sampling = LinearScheduledSampling(600)
+template.sched_sampling = LinearScheduledSampling(18000)
 template.max_epoch = template.sched_sampling.duration
 template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None

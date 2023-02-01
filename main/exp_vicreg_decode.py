@@ -1,5 +1,6 @@
 from typing import *
 from functools import lru_cache
+from copy import deepcopy
 
 from torchWork import LossWeightTree, ExperimentGroup
 
@@ -118,7 +119,7 @@ template.vicreg_invariance_on_Y = None
 template.vicreg_cross_traj = None
 
 # vicreg is different from template
-vicreg = template.copy()
+vicreg = deepcopy(template)
 vicreg.lossWeightTree['vicreg'].weight = 1
 vicreg.lossWeightTree['vicreg']['variance'].weight = 25
 vicreg.lossWeightTree['vicreg']['invariance'].weight = 25
@@ -147,7 +148,7 @@ vicreg.vicreg_expander_widths = None
 # vicreg.max_epoch = 32000
 # vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 
-hP = vicreg.copy()
+hP = deepcopy(vicreg)
 hP.lossWeightTree['vicreg'].weight = .04
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))

@@ -1,5 +1,6 @@
 from typing import *
 from functools import lru_cache
+from copy import deepcopy
 
 from torchWork import LossWeightTree, ExperimentGroup
 
@@ -121,7 +122,7 @@ template.vicreg_cross_traj = None
 # template.xxx = xxx
 
 for xxx in []:
-    hP = template.copy()
+    hP = deepcopy(template)
     hP.xxx = xxx
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

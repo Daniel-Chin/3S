@@ -6,6 +6,7 @@ import json
 from typing import *
 from functools import lru_cache
 from abc import ABCMeta, abstractmethod
+from copy import copy
 
 import numpy as np
 import torch
@@ -38,7 +39,7 @@ class Dataset(torch.utils.data.Dataset, metaclass=ABCMeta):
         raise NotImplemented
     
     @abstractmethod
-    def copy(self) -> Dataset:
+    def __copy__(self) -> Dataset:
         raise NotImplemented
     
     @abstractmethod
@@ -111,7 +112,7 @@ class VideoDataset(Dataset):
             self.label_set[index, :, :], 
         )
     
-    def copy(self):
+    def __copy__(self):
         other = __class__(
             None, self.size, self.SEQ_LEN, self.ACTUAL_DIM, 
             self.device, 
@@ -124,7 +125,7 @@ class VideoDataset(Dataset):
         if new_size == self.size:
             return self
         assert new_size < self.size
-        other = self.copy()
+        other = copy(self)
         other.size = new_size
         other.video_set = other.video_set[:new_size, ...]
         other.label_set = other.label_set[:new_size, ...]
@@ -263,7 +264,7 @@ class MusicDataset(Dataset):
     def truncate(self, new_size: int) -> Dataset:
         raise NotImplemented
     
-    def copy(self) -> Dataset:
+    def __copy__(self) -> Dataset:
         raise NotImplemented
     
 if __name__ == '__main__':

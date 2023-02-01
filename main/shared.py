@@ -12,6 +12,7 @@ __all__ = [
 from typing import *
 from contextlib import contextmanager
 from abc import ABCMeta, abstractmethod
+from copy import deepcopy
 
 import numpy as np
 import torch
@@ -200,13 +201,13 @@ class HyperParams(BaseHyperParams):
             else:
                 self.vicreg_emb_dim = self.vicreg_expander_widths[-1]
     
-    def copyOneParam(self, k: str, v):
+    def copyOneParam(self, k: str, v, memo):
         if k in ('sched_image_loss', 'sched_sampling'):
             return True, v
         if k == 'symm':
             assert isinstance(v, SymmetryAssumption)
-            return True, v.copy()
-        return super().copyOneParam(k, v)
+            return True, deepcopy(v, memo)
+        return super().copyOneParam(k, v, memo)
     
     @contextmanager
     def eval(self):

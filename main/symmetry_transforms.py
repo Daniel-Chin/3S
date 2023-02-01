@@ -194,10 +194,10 @@ class SymmetryAssumption:
         
         return trans, untrans
     
-    def copy(self):
+    def __deepcopy__(self, memo):
         return __class__(
             self.latent_dim, 
-            deepcopy(self.rule), 
+            deepcopy(self.rule, memo), 
             self.identity_prob, 
         )
     
@@ -235,7 +235,7 @@ class GusMethod(SymmetryAssumption):
     def __repr__(self) -> str:
         return '<symm GusMethod>'
     
-    def copy(self):
+    def __deepcopy__(self):
         return __class__()
 
 def test(size=100):

@@ -1,16 +1,29 @@
+from typing import *
 from functools import lru_cache
+from copy import deepcopy
 
 from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 from symmetry_transforms import *
+from dataset_instances import BounceSingleColor as DATASET_INSTANCE
+from load_dataset import VideoDataset
 
-TRAIN_SET_PATH    = '../datasets/bounce/train'
-VALIDATE_SET_PATH = '../datasets/bounce/validate'
-VALIDATE_SET_SIZE = 64
-SEQ_LEN = 20
-ACTUAL_DIM = 3
-SLOW_EVAL_EPOCH_INTERVAL = 1000
+def getDataset(
+    is_train_not_validate: bool, size: Optional[int], device, 
+):
+    if is_train_not_validate:
+        set_path = DATASET_INSTANCE.TRAIN_SET_PATH
+    else:
+        set_path = DATASET_INSTANCE.VALIDATE_SET_PATH
+        assert size is None
+        size = DATASET_INSTANCE.VALIDATE_SET_SIZE
+    return VideoDataset(
+        set_path, size, DATASET_INSTANCE.SEQ_LEN, 
+        DATASET_INSTANCE.ACTUAL_DIM, DATASET_INSTANCE.RESOLUTION, 
+        DATASET_INSTANCE.IMG_N_CHANNELS, 
+        device, 
+    )
 
 EXP_NAME = 'sps_change_set'
 N_RAND_INITS = 8
@@ -111,8 +124,8 @@ ours = template.copy()
 
 baseline = template.copy()
 baseline.symm = SymmetryAssumption(
-    6, [
-        (SAMPLE_TRANS, [Trivial()], {Slice(0, 6)}), 
+    3, [
+        (SAMPLE_TRANS, [Trivial()], {Slice(0, 3)}), 
     ], 
 )
 

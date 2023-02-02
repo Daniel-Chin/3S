@@ -52,6 +52,8 @@ class InfoProbeDataset(torch.utils.data.Dataset):
                 traj.append(flat_traj_batch)
             self.z = torch.concat(z).detach()
             self.traj = torch.concat(traj).detach()
+            self.traj = self.traj - self.traj.mean(dim=0)
+            self.traj = self.traj / self.traj.std (dim=0)
         self.size = self.z.shape[0]
     
     def __len__(self):

@@ -61,21 +61,26 @@ class UI:
         self.z_dists = [
             [None] * self.n_col for _ in range(self.n_row)
         ]
-        self.max_latent_dim = 0
-        variable_names = set()
+        max_latent_dim = 0
         for col_i, group in enumerate(groups):
             group.hyperParams.fillDefaults()
-            self.max_latent_dim = max(
-                self.max_latent_dim, 
+            max_latent_dim = max(
+                max_latent_dim, 
                 group.hyperParams.symm.latent_dim, 
             )
+        if SUPERVISE_CALIBRATE:
+            self.n_sliders = experiment.DATASET_INSTANCE.ACTUAL_DIM
+        else:
+            self.n_sliders = max_latent_dim
+        variable_names = set()
+        for col_i, group in enumerate(groups):
             variable_names.add(group.variable_name)
             groupLabel = tk.Label(
                 self.win, text=group.variable_value, 
             )
             groupLabel.grid(
                 row = 1, 
-                column = self.max_latent_dim + col_i, 
+                column = self.n_sliders + col_i, 
                 # padx=5, pady=5, 
             )
             for row_i in range(self.n_row):
@@ -91,7 +96,7 @@ class UI:
                 label = tk.Label(self.win)
                 label.grid(
                     row = row_i + 2, 
-                    column = self.max_latent_dim + col_i, 
+                    column = self.n_sliders + col_i, 
                     padx=5, pady=5, 
                 )
                 self.photoLabels[row_i][col_i] = label
@@ -106,17 +111,17 @@ class UI:
                     print()
 
         self.knobs = torch.zeros((
-            self.max_latent_dim, 
+            self.n_sliders, 
         ), dtype=torch.float, device=DEVICE)
         self.knob_lim = [
-            -RADIUS * torch.ones((self.max_latent_dim, )), 
-            +RADIUS * torch.ones((self.max_latent_dim, )), 
+            -RADIUS * torch.ones((self.n_sliders, )), 
+            +RADIUS * torch.ones((self.n_sliders, )), 
         ]
         topLabel = tk.Label(self.win, text=variable_names.pop())
         assert not variable_names
         topLabel.grid(
             row=0, 
-            column=self.max_latent_dim, 
+            column=self.n_sliders, 
             columnspan=self.n_col, 
             # padx=5, pady=5, 
         )

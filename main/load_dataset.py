@@ -57,6 +57,7 @@ class VideoDataset(Dataset):
         self.size = size
         self.SEQ_LEN = SEQ_LEN
         self.ACTUAL_DIM = ACTUAL_DIM
+        self.IMG_N_CHANNELS = IMG_N_CHANNELS
         self.device = device
 
         if dataset_path is not None:
@@ -115,7 +116,8 @@ class VideoDataset(Dataset):
     
     def __copy__(self):
         other = __class__(
-            None, self.size, self.SEQ_LEN, self.ACTUAL_DIM, 
+            None, self.size, self.SEQ_LEN, 
+            self.ACTUAL_DIM, self.IMG_N_CHANNELS, 
             self.device, 
         )
         other.video_set = self.video_set

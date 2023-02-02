@@ -18,8 +18,8 @@ from template_bounce import MyExpGroup
 
 try:
     from workspace import (
-        EXP_PATH, LOCK_EPOCH, SUP_CALIBRATE_N_EPOCHS, 
-        SUP_CALIBRATE_MODE, CHECK_OVERFIT, COMPARE_GROUPS, 
+        EXP_PATH, LOCK_EPOCH, INFO_PROBE_N_EPOCHS, 
+        INFO_PROBE_MODE, CHECK_OVERFIT, COMPARE_GROUPS, 
     )
 except ImportError:
     EXP_PATH = input('EXP_PATH=')
@@ -55,7 +55,7 @@ def main(experiment_path, lock_epoch):
     )
 
     for i in range(99):
-        kw = dict(n_epochs=SUP_CALIBRATE_N_EPOCHS)
+        kw = dict(n_epochs=INFO_PROBE_N_EPOCHS)
         if i == 0:
             pass
         else:
@@ -84,7 +84,7 @@ def main(experiment_path, lock_epoch):
                 Y_valid[rand_init_i].append(validate_losses)
         legend_handles = []
         legend_labels = []
-        if SUP_CALIBRATE_MODE is CHECK_OVERFIT:
+        if INFO_PROBE_MODE is CHECK_OVERFIT:
             for rand_init_i in range(n_rand_inits):
                 for group_i, group in enumerate(groups):
                     lineTrain, = plt.plot(
@@ -100,7 +100,7 @@ def main(experiment_path, lock_epoch):
             legend_labels.append('train')
             legend_handles.append(lineValid)
             legend_labels.append('validate')
-        elif SUP_CALIBRATE_MODE is COMPARE_GROUPS:
+        elif INFO_PROBE_MODE is COMPARE_GROUPS:
             X = [g.variable_value for g in groups]
             if not all([isinstance(x, Number) for x in X]):
                 X = range(len(groups))
@@ -129,7 +129,7 @@ def main(experiment_path, lock_epoch):
         )
         # plt.ylim(0, 4)
         plt.savefig(path.join(
-            experiment_path, f'auto_info_probe_{SUP_CALIBRATE_MODE}.pdf', 
+            experiment_path, f'auto_info_probe_{INFO_PROBE_MODE}.pdf', 
         ))
         plt.show()
 

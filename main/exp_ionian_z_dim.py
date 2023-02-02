@@ -21,17 +21,17 @@ def getDataset(
         assert DATASET_INSTANCE.VALIDATE_SET_SIZE == dataset.size
     return dataset
 
-SLOW_EVAL_EPOCH_INTERVAL = 30
+SLOW_EVAL_EPOCH_INTERVAL = 5
 
-EXP_NAME = 'ionian'
-N_RAND_INITS = 8
+EXP_NAME = 'ionian_z_dim'
+N_RAND_INITS = 6
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'predict_w'
-        self.variable_value = hyperParams.lossWeightTree['predict'].weight
+        self.variable_name = 'latent_dim'
+        self.variable_value = hyperParams.symm.latent_dim
     
     @lru_cache(1)
     def name(self):
@@ -118,7 +118,7 @@ template.weight_decay = 0
 template.lr_diminish = None
 template.train_set_size = None
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
-template.sched_sampling = LinearScheduledSampling(600)
+template.sched_sampling = LinearScheduledSampling(40)   # should be 600, if to match 1Body. 
 template.max_epoch = template.sched_sampling.duration
 template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None
@@ -128,13 +128,13 @@ template.vicreg_cross_traj = None
 # modifying template
 # template.xxx = xxx
 
-hP = deepcopy(template)
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
-
-hP = deepcopy(template)
-hP.lossWeightTree['predict'].weight = 0
-hP.lossWeightTree['predict']['z'].weight = 0
-hP.lossWeightTree['predict']['image'].weight = 0
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
+for d in [1, 2, 3, 4, 5]:
+    hP = deepcopy(template)
+    hP.symm = SymmetryAssumption(
+        d, [
+            (SAMPLE_TRANS, [Translate(d, 1)], {Slice(0, d)}), 
+        ], 
+        .1, 
+    )
+    hP.ready(globals())
+    GROUPS.append(MyExpGroup(hP))

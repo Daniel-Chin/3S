@@ -1222,6 +1222,11 @@ todo {
     try GRU with 2body
     vicreg on 2Body. motivation: 2023_m02_d01@07_53_02_vicreg_2d_z
     also try VICReg with music. 
+        alert: timbre is also translation-equivariant. 
+        make forward skip C loss if dim(z)=1. 
+    music 3D z, T(3)
+        linear w/ pitch? 
+        check: how many dim in z until we can recon? 
     natural melody:
         first exp w/ ground-truth pitch RNN modeling. 
         try GRU. 

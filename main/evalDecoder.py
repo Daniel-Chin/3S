@@ -21,13 +21,13 @@ from supervise_calibrate import superviseCalibrate
 from template_bounce import MyExpGroup
 
 try:
-    from workspace import EXP_PATH, LOCK_EPOCH, filterGroups, CAP_N_RAND_INITS
+    from workspace import (
+        EXP_PATH, LOCK_EPOCH, filterGroups, CAP_N_RAND_INITS, 
+        SUPERVISE_CALIBRATE, CALIBRATE_SET_SIZE, 
+    )
 except ImportError:
     EXP_PATH = input('EXP_PATH=')
     LOCK_EPOCH = None
-
-SUPERVISE_CALIBRATE = True
-CALIBRATE_SET_SIZE = 4  # number of videos
 
 RADIUS = 2
 TICK_INTERVAL = .5

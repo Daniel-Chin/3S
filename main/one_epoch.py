@@ -13,7 +13,8 @@ from vae import VAE
 from rnn import PredRNN, EnergyRNN
 from load_dataset import Dataset, dataLoader
 from video_eval import videoEval
-from dataset_instances import VIDEO_EVAL
+from music_eval import musicEval
+from dataset_instances import VIDEO_EVAL, MUSIC_EVAL
 
 def oneEpoch(
     group_name: str, epoch: int, 
@@ -121,14 +122,21 @@ def oneEpoch(
             with profiler('save checkpoints'):
                 saveModels(models, epoch, save_path)
             if hParams.lossWeightTree['self_recon'].weight:
-                if experiment.DATASET_INSTANCE.EVAL_METHOD is VIDEO_EVAL:
-                    with profiler('video eval'):
-                        for name, dataset in [
-                            ('train', trainSet), 
-                            ('validate', validateSet), 
-                        ]:
+                with profiler('video/music eval'):
+                    for name, dataset in [
+                        ('train', trainSet), 
+                        ('validate', validateSet), 
+                    ]:
+                        if   experiment.DATASET_INSTANCE.EVAL_METHOD is VIDEO_EVAL:
                             loader = dataLoader(dataset, 12)
                             videoEval(
+                                epoch, save_path, name, 
+                                experiment, hParams, *next(loader), 
+                                vae, predRnns, energyRnns, profiler, 
+                            )
+                        elif experiment.DATASET_INSTANCE.EVAL_METHOD is MUSIC_EVAL:
+                            loader = dataLoader(dataset, 4)
+                            musicEval(
                                 epoch, save_path, name, 
                                 experiment, hParams, *next(loader), 
                                 vae, predRnns, energyRnns, profiler, 

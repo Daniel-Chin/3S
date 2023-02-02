@@ -4,6 +4,7 @@ from typing import *
 from music_dataset_shared import *
 
 VIDEO_EVAL = 'VIDEO_EVAL'
+MUSIC_EVAL = 'MUSIC_EVAL'
 
 class DatasetInstance:
     VALIDATE_SET_SIZE: int = None
@@ -47,6 +48,7 @@ class IonianScales_fr3gm(DatasetInstance):
     SEQ_LEN = songBox.n_notes_per_song
     ACTUAL_DIM = 2
     IMG_N_CHANNELS = 1
+    EVAL_METHOD = MUSIC_EVAL
 
 class BounceSingleColor(DatasetInstance):
     TRAIN_SET_PATH    = '../datasets/bounce/train'

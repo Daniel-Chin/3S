@@ -15,7 +15,7 @@ from PIL.Image import Resampling
 from tqdm import tqdm
 
 from shared import torch2PIL
-from load_dataset import getImageSet
+from load_dataset import getImageSet, Dataset
 from vae import VAE
 from supervise_calibrate import superviseCalibrate
 from template_bounce import MyExpGroup
@@ -189,11 +189,13 @@ class UI:
                 self.photoLabels[row_i][col_i].config(image=photo)
     
     def initCalibrate(self, experiment):
-        validateSet = experiment.getDataset(
+        validateSet: Dataset = experiment.getDataset(
             is_train_not_validate=False, size=None, 
             device=DEVICE, 
         )
-        image_set, traj_set = getImageSet(validateSet)
+        image_set, traj_set = getImageSet(validateSet.truncate(
+            CALIBRATE_SET_SIZE, 
+        ))
         _mean = traj_set.mean(dim=0)
         _std  = traj_set.std (dim=0)
         self.knob_lim[0] = _mean - 2 * _std

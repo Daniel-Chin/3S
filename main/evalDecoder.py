@@ -101,8 +101,8 @@ class UI:
                     mean, std = computeDist.send(vae)
                     self.z_dists[row_i][col_i] = mean, std
                     print('z space: ', end='')
-                    for i, sym in enumerate('xyz'):
-                        print(f'{sym}: mean {mean[i]:+.1f}, std {std[i]:.1f}', end='; ')
+                    for sym, _mean, _std in zip('xyz', mean, std):
+                        print(f'{sym}: mean {_mean:+.1f}, std {_std:.1f}', end='; ')
                     print()
 
         self.knobs = torch.zeros((
@@ -205,8 +205,12 @@ class UI:
                 )
 
 def decode(vae: VAE, z: torch.Tensor):
-    recon = vae.decode(z.unsqueeze(0))
-    return torch2PIL(recon[0, :, :, :])
+    recon = vae.decode(z.unsqueeze(0))[0, :, :, :]
+    if recon.shape[0] == 1:
+        return torch2PIL(recon, 'L')
+    elif recon.shape[0] == 3:
+        return torch2PIL(recon, 'RGB')
+    assert False
 
 def main(experiment_path, lock_epoch):
     with torch.no_grad():

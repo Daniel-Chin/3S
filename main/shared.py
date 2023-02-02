@@ -241,8 +241,11 @@ def torch2np(torchImg: torch.Tensor) -> np.ndarray:
         .permute(1, 2, 0) * 255
     ).round().numpy().astype(np.uint8)
 
-def torch2PIL(torchImg: torch.Tensor):
-    return Image.fromarray(torch2np(torchImg), 'RGB')
+def torch2PIL(torchImg: torch.Tensor, mode):
+    npImg = torch2np(torchImg)
+    if mode == 'L':
+        npImg = npImg[:, :, 0]
+    return Image.fromarray(npImg, mode)
 
 def reparameterize(mu, log_var):
     std = torch.exp(0.5 * log_var)

@@ -71,6 +71,10 @@ def forward(
         else:
             my_slice = slice(0, 3)
             to_decode = flat_traj_batch
+        if hParams.vae_is_actually_ae:
+            pass
+        else:
+            to_decode = reparameterize(to_decode, -3)
         my_z_hat = flat_z.clone()[:, my_slice]
         my_z = flat_traj_batch.clone()[:, my_slice]
         lossTree.supervise.vae.encode = F.mse_loss(

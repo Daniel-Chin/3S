@@ -80,13 +80,13 @@ class HyperParams(BaseHyperParams):
         self.train_set_size: int = None
         self.max_epoch: int = None
 
-        self.vicreg_expander_identity: bool = None
-        self.vicreg_expander_widths: List[int] = None
-        self.vicreg_invariance_on_Y: bool = None
+        self.vicreg_expander_identity: Optional[bool] = None
+        self.vicreg_expander_widths: Optional[List[int]] = None
+        self.vicreg_invariance_on_Y: Optional[bool] = None
         # That "Y" follows the symbols defined in the vicreg paper. 
         # In this source code, vicreg's Y is `z`, 
         # and vicreg's Z is `emb_l` and `emb_r`. 
-        self.vicreg_cross_traj: bool = None
+        self.vicreg_cross_traj: Optional[bool] = None
 
         
         self.imgCriterion: Callable[

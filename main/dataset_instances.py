@@ -45,7 +45,7 @@ class IonianScales_fr3gm(DatasetInstance):
     )
     VALIDATE_SET_SIZE = 476
     SEQ_LEN = songBox.n_notes_per_song
-    ACTUAL_DIM = 1
+    ACTUAL_DIM = 2
     IMG_N_CHANNELS = 1
 
 class BounceSingleColor(DatasetInstance):

@@ -21,7 +21,7 @@ def getDataset(
         assert DATASET_INSTANCE.VALIDATE_SET_SIZE == dataset.size
     return dataset
 
-SLOW_EVAL_EPOCH_INTERVAL = 30
+SLOW_EVAL_EPOCH_INTERVAL = 5
 
 EXP_NAME = ...
 N_RAND_INITS = ...
@@ -118,7 +118,7 @@ template.weight_decay = 0
 template.lr_diminish = None
 template.train_set_size = None
 template.sched_image_loss = ScheduledImageLoss((0, 'mse'))
-template.sched_sampling = LinearScheduledSampling(600)
+template.sched_sampling = LinearScheduledSampling(40)   # should be 600, if to match 1Body. 
 template.max_epoch = template.sched_sampling.duration
 template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None

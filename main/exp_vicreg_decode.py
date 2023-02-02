@@ -34,8 +34,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = '0'
-        self.variable_value = 0
+        self.variable_name = 'nickname'
+        self.variable_value = hyperParams.nickname
     
     @lru_cache(1)
     def name(self):
@@ -151,6 +151,19 @@ vicreg.vicreg_expander_widths = None
 # vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 
 hP = deepcopy(vicreg)
+hP.nickname = 'high'
 hP.lossWeightTree['vicreg'].weight = .04
+hP.lossWeightTree['vicreg']['variance'].weight = 0
+hP.lossWeightTree['vicreg']['invariance'].weight = 25
+hP.lossWeightTree['vicreg']['covariance'].weight = 0
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = deepcopy(vicreg)
+hP.nickname = 'low'
+hP.lossWeightTree['vicreg'].weight = 3.84e-3 / 25
+hP.lossWeightTree['vicreg']['variance'].weight = 0
+hP.lossWeightTree['vicreg']['invariance'].weight = 25
+hP.lossWeightTree['vicreg']['covariance'].weight = 0
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))

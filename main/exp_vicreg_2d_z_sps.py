@@ -27,15 +27,15 @@ def getDataset(
 
 SLOW_EVAL_EPOCH_INTERVAL = 2000
 
-EXP_NAME = 'vicreg_2d_z'
+EXP_NAME = 'vicreg_2d_z_sps'
 N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = '0'
-        self.variable_value = 0
+        self.variable_name = 'nickname'
+        self.variable_value = hyperParams.nickname
     
     @lru_cache(1)
     def name(self):
@@ -151,9 +151,21 @@ vicreg.max_epoch = 32000
 vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 
 hP = deepcopy(vicreg)
+hP.nickname = 'sps'
 hP.symm = SymmetryAssumption(
     2, [
         (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
+    ], 
+    .1, 
+)
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = deepcopy(vicreg)
+hP.nickname = 'ablat'
+hP.symm = SymmetryAssumption(
+    2, [
+        (SAMPLE_TRANS, [Trivial()], {Slice(0, 2)}), 
     ], 
     .1, 
 )

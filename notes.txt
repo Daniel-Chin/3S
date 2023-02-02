@@ -1173,6 +1173,45 @@ next {
     2023_m02_d01@01_30_04_verify_refactor
         every thing is normal! refactor success. 
 }
+2/2 {
+    2023_m02_d01@07_50_34_vicreg_decode
+        with vicreg weight = .04, self-recon is hurt. 
+        next exp: z_loss
+            weight_decay = 1e-9
+            increase z pred loss weight
+            See if self-recon is hurt. 
+            Implement this z loss with vicreg I loss. 
+    2023_m02_d01@07_53_02_vicreg_2d_z
+        motivation: 
+        Maybe VICReg fails because in SPS-decode the vertical height is regularized by the decoder losses. 
+        Result: 
+        info_probe_*.pdf
+            The learned z can predict the 3d truth with a loss equal to height-collapsed perfect guess. 
+            Doesn't contain info about ball Z. 
+            Contains all info about ball XY. 
+        The mapping is perfectly linear. 
+        This obs is strongly in favor of the hypothesis. 
+        So, decoding has two effects:
+        - prevent collapse, 
+        - helps with continuity, because our dataset is toy and z locality is correlated with signal-space locality. 
+        This means, if we don't count on the dataset being toy, the central reason behind the failure of SPS+VICReg on 1Ball is the lack of symmetry on ball height. If the dataset wasn't toy, SPS+decode wouldn't yield linear ball height either. 
+        Next, two directions:
+            - apply symm to ball height. 
+            - Use vicreg on 2Body. 
+        although considered a failure case, this experiment in and of itself is a successful instance of VICReg+SPS that
+        - no decoding. 
+        - completely ignores certain aspects about the signal. 
+        - fully encodes certain aspects about the signal. 
+        - encoded z is perfectly interpretable. 
+        - therefore, fulfills "future work" mentioned by IJCAI23. 
+    2023_m02_d01@07_54_29_sps_change_set
+        OK! So it's getting easier to find hyper-strong baselines. 
+        next: is it train_set_size=512 that made it strong?
+    2023_m02_d01@08_01_01_ionian
+        unreal. Yesterday I jokingly said, "maybe it's just the 2^-6 chance that all runs resulted in a z space with the same direction." It actually was. 
+        Also, self-recon starts overfitting around epoch 0. Which reminds me, we should start with faster sched samp. 
+        next: music_eval. 
+}
 next {
     arxiv paper:
         ...
@@ -1181,9 +1220,7 @@ todo {
     refactor K
         see 2023_m01_d24@19_40_53_K notes. 
     try GRU with 2body
-    Maybe 
-        VICReg should have 2D z for the ground plane. vertical height doesn't have symm, and is not encoded. 
-        maybe VICReg fails because the vertical height is regularized by the decoder losses. 
+    vicreg on 2Body. motivation: 2023_m02_d01@07_53_02_vicreg_2d_z
     also try VICReg with music. 
     natural melody:
         first exp w/ ground-truth pitch RNN modeling. 

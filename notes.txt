@@ -1212,6 +1212,12 @@ next {
         Also, self-recon starts overfitting around epoch 0. Which reminds me, we should start with faster sched samp. 
         next: music_eval. 
 }
+2/3 {
+    2023_m02_d02@02_52_44_vicreg_decode
+        this exp uses VICReg code to replicate z pred loss effect. 
+        z_pred_loss weight = 1 doesn't work. 
+        result: looks close enough. next, bring in V and C losses. 
+}
 next {
     arxiv paper:
         ...

@@ -157,8 +157,8 @@ GROUPS.append(MyExpGroup(hP))
 
 hP = deepcopy(vicreg)
 hP.nickname = 'invar'
-w = hP.lossWeightTree['preict']['z'].weight
-hP.lossWeightTree['preict']['z'].weight = 0
+w = hP.lossWeightTree['predict']['z'].weight
+hP.lossWeightTree['predict']['z'].weight = 0
 hP.lossWeightTree['vicreg'].weight = 1
 hP.lossWeightTree['vicreg']['variance'].weight = 0
 hP.lossWeightTree['vicreg']['invariance'].weight = w

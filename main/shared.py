@@ -29,6 +29,8 @@ class HyperParams(BaseHyperParams):
     def __init__(self) -> None:
         super().__init__()
 
+        self.nickname: Optional[str] = None
+        
         self.symm: SymmetryAssumption = None
         self.K: int = 1
         

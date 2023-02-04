@@ -6,6 +6,7 @@ import json
 from typing import *
 from functools import lru_cache
 from copy import copy
+import random
 
 import numpy as np
 import torch
@@ -28,7 +29,7 @@ class Dataset(torch.utils.data.Dataset):
         self, datasetDefinition: DatasetDefinition, 
         is_train_not_validate: bool, 
         size: Optional[int], device=None, 
-        dont_load: bool = False, 
+        dont_load: bool = False, do_shuffle: bool = False, 
     ) -> None:
         super().__init__()
 
@@ -41,9 +42,9 @@ class Dataset(torch.utils.data.Dataset):
         self.label_set: Optional[torch.Tensor] = None
 
         if not dont_load:
-            self.load()
+            self.load(do_shuffle)
 
-    def load(self):
+    def load(self, do_shuffle):
         dDef = self.datasetDefinition
         if self.is_train_not_validate:
             which_set = 'train'
@@ -71,9 +72,14 @@ class Dataset(torch.utils.data.Dataset):
             dDef.actual_dim,
         ))
         if dDef.data_modality is VIDEO:
+            assert not do_shuffle
             index = range(self.size)
         else:
-            index = self.getMusicIndex(dataset_path)[:self.size]
+            index = self.getMusicIndex(dataset_path)
+            if do_shuffle:
+                index = random.sample(index, self.size)
+            else:
+                index = index[:self.size]
             self.map = {}
         for data_i in tqdm.trange(
             len(index), desc=f'load {which_set} set', 

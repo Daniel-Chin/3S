@@ -193,8 +193,7 @@ class UI:
         validateSet: Dataset = Dataset(
             experiment.datasetDef, 
             is_train_not_validate=False, size=CALIBRATE_SET_SIZE, 
-            shuffle=True, 
-            device=DEVICE, 
+            device=DEVICE, do_shuffle=True, 
         )
         image_set, traj_set = getImageSet(validateSet)
         _mean = traj_set.mean(dim=0)

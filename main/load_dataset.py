@@ -195,11 +195,8 @@ def img2Tensor(img):
     )
 
 def dataLoader(dataset: Dataset, batch_size, set_size=None):
+    # this drops the last non-full batch even for validation set. 
     batch_size = min(batch_size, dataset.size)
-    if set_size is not None:
-        if set_size % batch_size:
-            assert set_size < batch_size
-            batch_size = set_size
     if set_size is None or set_size == dataset.size:
         truncatedDataset = dataset
     else:

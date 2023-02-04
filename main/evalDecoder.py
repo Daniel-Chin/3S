@@ -14,7 +14,8 @@ from PIL import ImageTk
 from PIL.Image import Resampling
 from tqdm import tqdm
 
-from shared import torch2PIL
+from shared import *
+from dataset_definitions import DatasetDefinition, MUSIC
 from load_dataset import getImageSet, Dataset
 from vae import VAE
 from supervise_calibrate import superviseCalibrate
@@ -190,10 +191,11 @@ class UI:
                 self.photoLabels[row_i][col_i].config(image=photo)
     
     def initCalibrate(self, experiment):
+        datasetDef: DatasetDefinition = experiment.datasetDef
         validateSet: Dataset = Dataset(
-            experiment.datasetDef, 
+            datasetDef, 
             is_train_not_validate=False, size=CALIBRATE_SET_SIZE, 
-            device=DEVICE, do_shuffle=True, 
+            device=DEVICE, do_shuffle=datasetDef.data_modality is MUSIC, 
         )
         image_set, traj_set = getImageSet(validateSet)
         _mean = traj_set.mean(dim=0)

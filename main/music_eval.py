@@ -26,8 +26,16 @@ def musicEval(
         epoch, 0, experiment, hParams, video_batch, traj_batch, 
         vae, predRnns, energyRnns, profiler, True, True, 
     )
-    vmin = min(video_batch.min(), reconstructions.min(), img_predictions.min())
-    vmax = max(video_batch.max(), reconstructions.max(), img_predictions.max())
+    vmin = min(
+        video_batch    .min().cpu(), 
+        reconstructions.min().cpu(), 
+        img_predictions.min().cpu(), 
+    )
+    vmax = max(
+        video_batch    .max().cpu(), 
+        reconstructions.max().cpu(), 
+        img_predictions.max().cpu(), 
+    )
 
     fig, axeses = plt.subplots(
         4, n_datapoints, sharex=True, 

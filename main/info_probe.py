@@ -54,7 +54,9 @@ class InfoProbeDataset(torch.utils.data.Dataset):
             self.z = torch.concat(z).detach()
             self.traj = torch.concat(traj).detach()
             self.traj = self.traj - self.traj.mean(dim=0)
-            self.traj = self.traj / self.traj.std (dim=0)
+            std = self.traj.std(dim=0)
+            std[std == 0] = 1   # collapsed label dim is perserved
+            self.traj = self.traj / std
         self.size = self.z.shape[0]
     
     def __len__(self):

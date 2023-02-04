@@ -88,4 +88,4 @@ def viewAsSpectrogram(batch: torch.Tensor):
     n_notes_per_song, IMG_N_CHANNELS, N_BINS, ENCODE_STEP = batch.shape
     return batch.squeeze(1).permute(0, 2, 1).reshape(
         n_notes_per_song * ENCODE_STEP, N_BINS, 
-    ).T
+    ).T.cpu().numpy()

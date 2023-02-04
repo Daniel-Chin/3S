@@ -34,8 +34,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'variance_w'
-        self.variable_value = hyperParams.lossWeightTree['vicreg'].weight
+        self.variable_name = 'nickname'
+        self.variable_value = hyperParams.nickname
     
     @lru_cache(1)
     def name(self):
@@ -150,11 +150,30 @@ vicreg.vicreg_expander_widths = None
 # vicreg.max_epoch = 32000
 # vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 
-for vw in (3.84e-3 / 25, .0003, .001, .003):
-    hP = deepcopy(vicreg)
-    hP.lossWeightTree['vicreg'].weight = vw
-    hP.lossWeightTree['vicreg']['variance'].weight = 25
-    hP.lossWeightTree['vicreg']['invariance'].weight = 25
-    hP.lossWeightTree['vicreg']['covariance'].weight = 1
-    hP.ready(globals())
-    GROUPS.append(MyExpGroup(hP))
+# for vw in (
+#     3.84e-3 / 25, 
+#     .0003, .001, .003
+# ):
+
+hP = deepcopy(vicreg)
+hP.nickname = 'expander'
+hP.lossWeightTree['vicreg'].weight = .0003
+hP.lossWeightTree['vicreg']['variance'].weight = 25
+hP.lossWeightTree['vicreg']['invariance'].weight = 25
+hP.lossWeightTree['vicreg']['covariance'].weight = 1
+vicreg.vicreg_expander_identity = False
+vicreg.vicreg_expander_widths = [64, 64, 64]
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = deepcopy(vicreg)
+hP.nickname = 'batch_size'
+hP.lossWeightTree['vicreg'].weight = .0003
+hP.lossWeightTree['vicreg']['variance'].weight = 25
+hP.lossWeightTree['vicreg']['invariance'].weight = 25
+hP.lossWeightTree['vicreg']['covariance'].weight = 1
+hP.batch_size = 64
+hP.sched_sampling = LinearScheduledSampling(18000 * 4)
+hP.max_epoch = template.sched_sampling.duration
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))

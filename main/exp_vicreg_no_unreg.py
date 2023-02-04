@@ -162,11 +162,10 @@ hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 
 hP = deepcopy(vicreg)
-hP.nickname = 'T3R2'
+hP.nickname = 'T2R2'
 hP.symm = SymmetryAssumption(
-    3, [
+    2, [
         (SAMPLE_TRANS, [Translate(2, 1), Rotate(2)], {Slice(0, 2)}), 
-        (SAMPLE_TRANS, [Translate(1, 1)], {Slice(2, 3)}), 
     ], 
     .1, 
 )

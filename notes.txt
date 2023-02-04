@@ -1217,6 +1217,21 @@ next {
         this exp uses VICReg code to replicate z pred loss effect. 
         z_pred_loss weight = 1 doesn't work. 
         result: looks close enough. next, bring in V and C losses. 
+    2023_m02_d02@02_53_43_vicreg_2d_z_sps
+        VICReg alone cannot get linear XY! With SPS it reaches perfect linearity! 
+        Even info content is so significantly improved by SPS! 
+        Without decoding, SPS shows a much stronger advantage over ablat! Decoding helped regularise the latent. 
+    2023_m01_d30@01_03_57_vicreg_misc
+        base is the best lol. 
+}
+2/4 {
+    2023_m02_d02@02_53_43_vicreg_no_unreg
+        has no visible effect. 
+        next: repeat exp, w/ dim(z)=2. look at:
+            RNN pred loss. Is T3R3 higher? 
+            Info content. Linearity. 
+    2023_m02_d02@20_46_18_vicreg_decode
+        note there is a typo. "variance weight" should be "VICReg weight"
 }
 next {
     arxiv paper:

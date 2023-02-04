@@ -142,12 +142,12 @@ vicreg.vicreg_expander_widths = [64, 64, 64]
 hP = deepcopy(vicreg)
 hP.nickname = 'no_vicreg'
 hP.lossWeightTree['vicreg'].weight = 0
-vicreg.lossWeightTree['vicreg']['variance'].weight = 0
-vicreg.lossWeightTree['vicreg']['invariance'].weight = 0
-vicreg.lossWeightTree['vicreg']['covariance'].weight = 0
-vicreg.vicreg_expander_identity = None
-vicreg.vicreg_expander_widths = None
-vicreg.vicreg_invariance_on_Y = None
+hP.lossWeightTree['vicreg']['variance'].weight = 0
+hP.lossWeightTree['vicreg']['invariance'].weight = 0
+hP.lossWeightTree['vicreg']['covariance'].weight = 0
+hP.vicreg_expander_identity = None
+hP.vicreg_expander_widths = None
+hP.vicreg_invariance_on_Y = None
 hP.batch_size = 64
 hP.sched_sampling = LinearScheduledSampling(18000 * 4)
 hP.max_epoch = template.sched_sampling.duration
@@ -157,12 +157,12 @@ GROUPS.append(MyExpGroup(hP))
 hP = deepcopy(vicreg)
 hP.nickname = 'no_vicreg_bsize=16'
 hP.lossWeightTree['vicreg'].weight = 0
-vicreg.lossWeightTree['vicreg']['variance'].weight = 0
-vicreg.lossWeightTree['vicreg']['invariance'].weight = 0
-vicreg.lossWeightTree['vicreg']['covariance'].weight = 0
-vicreg.vicreg_expander_identity = None
-vicreg.vicreg_expander_widths = None
-vicreg.vicreg_invariance_on_Y = None
+hP.lossWeightTree['vicreg']['variance'].weight = 0
+hP.lossWeightTree['vicreg']['invariance'].weight = 0
+hP.lossWeightTree['vicreg']['covariance'].weight = 0
+hP.vicreg_expander_identity = None
+hP.vicreg_expander_widths = None
+hP.vicreg_invariance_on_Y = None
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 

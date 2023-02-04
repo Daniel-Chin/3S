@@ -6,20 +6,8 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 from symmetry_transforms import *
-from dataset_instances import IonianScales_fr3gm as DATASET_INSTANCE
-from load_dataset import MusicDataset
-
-def getDataset(
-    is_train_not_validate: bool, size: Optional[int], device, 
-):
-    dataset = MusicDataset(
-        DATASET_INSTANCE.songBox, 
-        DATASET_INSTANCE.config, 
-        is_train_not_validate, size, device, 
-    )
-    if not is_train_not_validate:
-        assert DATASET_INSTANCE.VALIDATE_SET_SIZE == dataset.size
-    return dataset
+from hyper_params import *
+from dataset_definitions import ionianScales_fr3gm as datasetDef
 
 SLOW_EVAL_EPOCH_INTERVAL = 5
 
@@ -40,6 +28,7 @@ class MyExpGroup(ExperimentGroup):
 GROUPS = []
 
 template = HyperParams()
+template.datasetDef = datasetDef
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1.31072, None), 
     LossWeightTree('kld', 3.2e-7, None), 
@@ -88,14 +77,9 @@ template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
 template.rnn_ensemble = 1
-template.signal_resolution = (
-    DATASET_INSTANCE.config.N_BINS, 
-    DATASET_INSTANCE.config.ENCODE_STEP, 
-)
-template.signal_n_channels = DATASET_INSTANCE.IMG_N_CHANNELS
 template.vae_channels = [64, 64, 128, 128]
 template.vae_kernel_sizes = [
-    (5, DATASET_INSTANCE.config.ENCODE_STEP), 
+    (5, datasetDef.musicDatasetConfig.encode_step), 
     (8, 1), 
     (4, 1), 
     (4, 1), 

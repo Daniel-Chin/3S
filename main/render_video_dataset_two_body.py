@@ -21,7 +21,7 @@ from shared import *
 from physics_shared import *
 from render_video_dataset_shared import *
 from physics_two_body import *
-from dataset_instances import TwoBody as DATASET_INSTANCE
+from dataset_definitions import twoBody as datasetDef
 
 PATH = path.join(
     '../datasets/two_body', 
@@ -51,8 +51,8 @@ class TwoBodyViewer(BallViewer):
         self.trajs = []
         self.traj_i = -1
         super().__init__(
-            running_mode, DATASET_INSTANCE.SEQ_LEN, 
-            DATASET_INSTANCE.RESOLUTION, ball_radius, eye, 
+            running_mode, datasetDef.seq_len, 
+            datasetDef.resolution, ball_radius, eye, 
             look_at, SPF, 
         )
     
@@ -71,7 +71,7 @@ class TwoBodyViewer(BallViewer):
             except IndexError:
                 assert self.traj_i == len(self.trajs)
                 trajectory, _ = oneLegalRun(
-                    DT, DATASET_INSTANCE.SEQ_LEN, 
+                    DT, datasetDef.seq_len, 
                     CENTER_OF_MASS_STATIONARY, REJECTABLE_START, 
                     EYE, 
                 )

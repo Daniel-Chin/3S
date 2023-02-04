@@ -69,7 +69,7 @@ class UI:
                 group.hyperParams.symm.latent_dim, 
             )
         if SUPERVISE_CALIBRATE:
-            self.n_sliders = experiment.DATASET_INSTANCE.ACTUAL_DIM
+            self.n_sliders = group.hyperParams.datasetDef.actual_dim
         else:
             self.n_sliders = max_latent_dim
         variable_names = set()
@@ -133,7 +133,8 @@ class UI:
         self.initSliders()
     
     def ComputeDist(self, experiment):
-        validateSet = experiment.getDataset(
+        validateSet = Dataset(
+            experiment.datasetDef, 
             is_train_not_validate=False, size=None, 
             device=DEVICE, 
         )
@@ -189,13 +190,13 @@ class UI:
                 self.photoLabels[row_i][col_i].config(image=photo)
     
     def initCalibrate(self, experiment):
-        validateSet: Dataset = experiment.getDataset(
-            is_train_not_validate=False, size=None, 
+        validateSet: Dataset = Dataset(
+            experiment.datasetDef, 
+            is_train_not_validate=False, size=CALIBRATE_SET_SIZE, 
+            shuffle=True, 
             device=DEVICE, 
         )
-        image_set, traj_set = getImageSet(validateSet.truncate(
-            CALIBRATE_SET_SIZE, 
-        ))
+        image_set, traj_set = getImageSet(validateSet)
         _mean = traj_set.mean(dim=0)
         _std  = traj_set.std (dim=0)
         self.knob_lim[0] = _mean - 2 * _std

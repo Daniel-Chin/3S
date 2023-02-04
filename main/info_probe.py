@@ -4,6 +4,7 @@ from torch.nn import functional as F
 from torch.optim import Adam
 
 from shared import *
+from hyper_params import *
 from vae import VAE
 from load_dataset import Dataset, dataLoader
 
@@ -18,7 +19,7 @@ class InfoProbeNetwork(nn.Module):
             fcs.append(nn.Linear(c0, c1))
             fcs.append(nn.ReLU())
             c0 = c1
-        fcs.append(nn.Linear(c0, experiment.DATASET_INSTANCE.ACTUAL_DIM))
+        fcs.append(nn.Linear(c0, hyperParams.datasetDef.actual_dim))
         self._forward = nn.Sequential(*fcs)
     
     def forward(self, /, x):
@@ -30,7 +31,7 @@ class InfoProbeDataset(torch.utils.data.Dataset):
         vae: VAE, 
         dataSet: Dataset, 
     ):
-        SEQ_LEN    = experiment.DATASET_INSTANCE.SEQ_LEN
+        SEQ_LEN    = hParams.datasetDef.seq_len
         vae.eval()
         z = []
         traj = []
@@ -41,8 +42,8 @@ class InfoProbeDataset(torch.utils.data.Dataset):
             for video_batch, traj_batch in loader:
                 flat_video_batch = video_batch.view(
                     hParams.batch_size * SEQ_LEN, 
-                    experiment.DATASET_INSTANCE.IMG_N_CHANNELS, 
-                    *hParams.signal_resolution, 
+                    hParams.datasetDef.img_n_channels, 
+                    *hParams.datasetDef.img_resolution, 
                 )
                 flat_traj_batch = traj_batch.view(
                     hParams.batch_size * SEQ_LEN, -1, 

@@ -4,6 +4,7 @@ import torch
 from torch import nn
 
 from shared import *
+from hyper_params import *
 from symmetry_transforms import identity
 
 class VAE(nn.Module):
@@ -14,13 +15,13 @@ class VAE(nn.Module):
     def __init__(self, hyperParams: HyperParams) -> None:
         super().__init__()
         self.hParams = hyperParams
-        channels = [hyperParams.signal_n_channels, *hyperParams.vae_channels]
+        channels = [hyperParams.datasetDef.img_n_channels, *hyperParams.vae_channels]
         if hyperParams.relu_leak:
             MyRelu = nn.LeakyReLU
         else:
             MyRelu = nn.ReLU
         def computeConvNeck():
-            layer_width = hyperParams.signal_resolution
+            layer_width = hyperParams.datasetDef.img_resolution
             if isinstance(layer_width, int):
                 layer_width = [layer_width, layer_width]
             else:

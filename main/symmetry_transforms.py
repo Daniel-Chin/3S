@@ -1,3 +1,10 @@
+__all__ = [
+    'Transform', 'TUT', 'Slice', 
+    'Trivial', 'Translate', 'Rotate', 
+    'SymmetryAssumption', 'GusMethod', 
+    'SAMPLE_TRANS', 'COMPOSE_TRANS', 
+]
+
 from typing import Callable, List, Set, Tuple
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
@@ -7,26 +14,12 @@ import numpy as np
 import torch
 from torchWork import DEVICE
 
-__all__ = [
-    'Transform', 'TUT', 'Slice', 
-    'Trivial', 'Translate', 'Rotate', 
-    'SymmetryAssumption', 'GusMethod', 
-    'SAMPLE_TRANS', 'COMPOSE_TRANS', 
-]
+from shared import *
 
 Transform = Callable[[torch.Tensor], torch.Tensor]
 TUT = Tuple[Transform, Transform]
 
-class HowTransCombine: 
-    def __init__(self, name):
-        self.name = name
-    def __repr__(self):
-        return self.name
-    # behave like primitives
-    def __copy__(self):
-        return self
-    def __deepcopy__(self, _):
-        return self
+class HowTransCombine(EnumStr): pass
 SAMPLE_TRANS  = HowTransCombine('SAMPLE_TRANS')
 COMPOSE_TRANS = HowTransCombine('COMPOSE_TRANS')
 

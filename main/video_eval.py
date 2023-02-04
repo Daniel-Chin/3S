@@ -19,6 +19,7 @@ except ImportError as e:
     raise e
 
 from shared import *
+from hyper_params import *
 from forward_pass import forward
 
 COL_MARGIN = 1
@@ -79,7 +80,8 @@ def videoEval(
     video_batch: torch.Tensor, traj_batch, 
     vae, predRnns, energyRnns, profiler, 
 ):
-    RESOLUTION = experiment.DATASET_INSTANCE.RESOLUTION
+    assert hParams.datasetDef.img_resolution[0] == hParams.datasetDef.img_resolution[1]
+    RESOLUTION = hParams.datasetDef.img_resolution[0]
     n_datapoints = video_batch.shape[0]
     (
         lossTree, reconstructions, img_predictions, 
@@ -101,7 +103,7 @@ def videoEval(
     height = sum(row_heights)
     vid = VideoWriter(width, height)
     with vid.context(filename):
-        for t in range(experiment.DATASET_INSTANCE.SEQ_LEN):
+        for t in range(hParams.datasetDef.seq_len):
             frame = np.zeros((width, height, 3), dtype=np.uint8)
             for col_i in range(n_datapoints):
                 x = col_i * col_width

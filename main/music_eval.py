@@ -5,6 +5,7 @@ import torch
 from matplotlib import pyplot as plt
 
 from shared import *
+from hyper_params import *
 from forward_pass import forward
 
 def musicEval(

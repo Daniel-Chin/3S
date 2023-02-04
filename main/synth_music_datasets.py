@@ -1,18 +1,12 @@
-__all__ = [
-    'Note', 'Song', 'SongBox', 'Config', 'synthDataset', 
-]
-
 import os
 from os import path
 import shutil
 import json
 from typing import *
-from abc import ABCMeta, abstractmethod
 from functools import lru_cache
 from itertools import combinations_with_replacement
 from time import time
 
-import torch
 import pretty_midi as pm
 from music21.instrument import Instrument, Piano
 try:
@@ -30,7 +24,12 @@ import soundfile
 import numpy as np
 from tqdm import tqdm
 
+from shared import *
 from intruments_and_ranges import intruments_ranges
+from dataset_definitions import (
+    MUSIC, 
+    MusicDatasetConfig as Config, DatasetDefinition, 
+)
 
 BEND_RATIO = .5  # When MIDI specification is incomplete...
 BEND_MAX = 8191
@@ -40,83 +39,6 @@ INDEX_FILENAME = 'index.json'
 TEMP_MIDI_FILE = path.abspath('./temp/temp.mid')
 TEMP_WAV_FILE  = path.abspath('./temp/temp.wav')
 os.makedirs('temp', exist_ok=True)
-
-class Note:
-    def __init__(self, is_rest: bool, pitch: Optional[int] = None):
-        assert is_rest == (pitch is None)
-        self.is_rest = is_rest
-        if not is_rest:
-            self.pitch = pitch
-    
-    def toJSON(self):
-        if self.is_rest:
-            return -1
-        else:
-            return self.pitch
-    
-    @staticmethod
-    def fromJSON(obj):
-        if obj == -1:
-            return Note(True, None)
-        else:
-            return Note(False, obj)
-
-class Song:
-    def __init__(self, notes: List[Note]) -> None:
-        self.notes = notes
-    
-    def toJSON(self):
-        return [x.toJSON() for x in self.notes]
-    
-    @staticmethod
-    def fromJSON(obj):
-        return __class__([Note.fromJSON(x) for x in obj])
-    
-    @lru_cache()
-    def toTensor(self):
-        x = torch.zeros((len(self.notes), 2))
-        for i, note in enumerate(self.notes):
-            if note.is_rest:
-                x[i, 1] = 1
-            else:
-                x[i, 0] = note.pitch
-        return x
-
-class SongBox(metaclass=ABCMeta):
-    # Used as an input to MusicDataset. 
-    # Defines how the songs are generated. 
-    @abstractmethod
-    def __init__(self) -> None:
-        self.name: str = None
-        self.n_notes_per_song: int = None
-
-    @abstractmethod
-    def GenSongs(self, pitch_range: range) -> Generator[
-        Tuple[int, Song], None, None, 
-    ]:
-        raise NotImplemented
-
-class Config:
-    SOUND_FONT_PATH: str = None
-    DATASET_PATH: str = None
-
-    SR = 16000
-    HOP_LEN = 512
-    WIN_LEN = 1024
-    N_HOPS_PER_NOTE = 4
-    N_HOPS_BETWEEN_NOTES = 1
-
-    ENCODE_STEP = N_HOPS_PER_NOTE + N_HOPS_BETWEEN_NOTES
-    N_SAMPLES_PER_NOTE = HOP_LEN * N_HOPS_PER_NOTE
-    N_SAMPLES_BETWEEN_NOTES = HOP_LEN * N_HOPS_BETWEEN_NOTES
-    NOTE_DURATION = N_SAMPLES_PER_NOTE / SR
-    NOTE_INTERVAL = (N_SAMPLES_PER_NOTE + N_SAMPLES_BETWEEN_NOTES) / SR
-
-    FADE_OUT_N_SAMPLES = 512
-    FADE_OUT_FILTER = np.linspace(1, 0, FADE_OUT_N_SAMPLES)
-
-    assert WIN_LEN == 2 * HOP_LEN
-    N_BINS = WIN_LEN // 2 + 1
 
 def synthOneNote(
     fs: FluidSynth, config: Config, 
@@ -129,7 +51,7 @@ def synthOneNote(
     rounded_pitch = int(round(pitch))
     note = pm.Note(
         velocity=100, pitch=rounded_pitch, 
-        start=0, end=config.NOTE_DURATION + GRACE_END, 
+        start=0, end=config.note_duration + GRACE_END, 
     )
     pitchBend = pm.PitchBend(
         round((pitch - rounded_pitch) * BEND_MAX * BEND_RATIO), 
@@ -146,12 +68,12 @@ def synthOneNote(
     fs.midi_to_audio(TEMP_MIDI_FILE, TEMP_WAV_FILE, verbose=False)
 
     # read wav
-    audio, sr = librosa.load(TEMP_WAV_FILE, sr=config.SR)
-    assert sr == config.SR
-    audio = audio[:config.N_SAMPLES_PER_NOTE]
-    audio[-config.FADE_OUT_N_SAMPLES:] = audio[
-        -config.FADE_OUT_N_SAMPLES:
-    ] * config.FADE_OUT_FILTER
+    audio, sr = librosa.load(TEMP_WAV_FILE, sr=config.sr)
+    assert sr == config.sr
+    audio = audio[:config.n_samples_per_note]
+    audio[-config.fade_out_n_samples:] = audio[
+        -config.fade_out_n_samples:
+    ] * config.fade_out_filter
     return audio
 
 def vibrato(fs: FluidSynth):
@@ -187,21 +109,24 @@ def testPitchBend(fs: FluidSynth):
             format(p, ".2f")
         }.wav''', True)
 
-def synthDataset(config: Config, songBox: SongBox):
+def synthDataset(datasetDefinition: DatasetDefinition):
+    assert datasetDefinition.data_modality is MUSIC
+    config = datasetDefinition.musicDatasetConfig
+    songBox = datasetDefinition.songBox
     n_samples_per_song = (
-        config.N_SAMPLES_PER_NOTE + config.N_SAMPLES_BETWEEN_NOTES
+        config.n_samples_per_note + config.n_samples_between_notes
     ) * songBox.n_notes_per_song
-    fs = FluidSynth(config.SOUND_FONT_PATH, sample_rate=config.SR)
+    fs = FluidSynth(config.sound_font_path, sample_rate=config.sr)
     if time() >= 1675156752 + 60 * 60:
         verifySoundFont(fs, config)
     try:
-        shutil.rmtree(config.DATASET_PATH)
+        shutil.rmtree(datasetDefinition.dataset_path)
     except FileNotFoundError:
         pass
     else:
         print('Overwriting previous dataset.')
-    os.mkdir(config.DATASET_PATH)
-    os.chdir(config.DATASET_PATH)
+    os.mkdir(datasetDefinition.dataset_path)
+    os.chdir(datasetDefinition.dataset_path)
 
     for train_or_validate, _intruments_ranges in intruments_ranges.items():
         os.mkdir(train_or_validate)
@@ -225,7 +150,7 @@ def synthDataset(config: Config, songBox: SongBox):
                 ))
                 soundfile.write(
                     f'{instrument.instrumentName}-{song_id}.wav', 
-                    audio, config.SR, 
+                    audio, config.sr, 
                 )
         with open(INDEX_FILENAME, 'w') as f:
             json.dump(index, f)
@@ -238,12 +163,12 @@ def renderSong(
     audio = np.zeros((n_samples_per_song, ), dtype=dtype)
     cursor = 0
     for note in song.notes:
-        cursor += config.N_SAMPLES_BETWEEN_NOTES
+        cursor += config.n_samples_between_notes
         if not note.is_rest:
             audio[
-                cursor : cursor + config.N_SAMPLES_PER_NOTE
+                cursor : cursor + config.n_samples_per_note
             ] = synthOne(note.pitch)
-        cursor += config.N_SAMPLES_PER_NOTE
+        cursor += config.n_samples_per_note
     assert cursor == n_samples_per_song
     return audio
 
@@ -270,5 +195,7 @@ def verifySoundFont(fs: FluidSynth, config: Config, pitch=60):
     assert is_ok
 
 if __name__ == '__main__':
+    from dataset_definitions import ionianScales_fr3gm
     # vibrato()
-    testPitchBend()
+    # testPitchBend()
+    synthDataset(ionianScales_fr3gm)

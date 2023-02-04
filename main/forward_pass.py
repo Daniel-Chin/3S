@@ -8,6 +8,7 @@ import torchWork
 from torchWork import DEVICE, HAS_CUDA, CPU
 
 from shared import *
+from hyper_params import *
 from losses import Loss_root
 from vae import VAE
 from rnn import PredRNN, EnergyRNN
@@ -23,8 +24,8 @@ def forward(
     require_img_predictions_and_z_hat: bool = True, 
     validating: bool = False, 
 ):
-    SEQ_LEN        = experiment.DATASET_INSTANCE.SEQ_LEN
-    IMG_N_CHANNELS = experiment.DATASET_INSTANCE.IMG_N_CHANNELS
+    SEQ_LEN        = hParams.datasetDef.seq_len
+    IMG_N_CHANNELS = hParams.datasetDef.img_n_channels
     batch_size = video_batch.shape[0]
     imgCriterion = hParams.sched_image_loss.get(epoch)
     lossTree = Loss_root()
@@ -32,7 +33,7 @@ def forward(
     # remove time axis
     flat_video_batch = video_batch.view(
         batch_size * SEQ_LEN, IMG_N_CHANNELS, 
-        *hParams.signal_resolution, 
+        *hParams.datasetDef.img_resolution, 
     )
     flat_traj_batch = traj_batch.view(
         batch_size * SEQ_LEN, -1, 
@@ -52,7 +53,7 @@ def forward(
             ).cpu()
             reconstructions = flat_reconstructions.detach().view(
                 batch_size, SEQ_LEN, 
-                IMG_N_CHANNELS, *hParams.signal_resolution, 
+                IMG_N_CHANNELS, *hParams.datasetDef.img_resolution, 
             )
         else:
             reconstructions = None
@@ -155,7 +156,7 @@ def forward(
                     flat_predictions = vae.decode(r_flat_z_hat_aug)
                 img_predictions = flat_predictions.view(
                     small_batch_size, SEQ_LEN - min_context, 
-                    IMG_N_CHANNELS, *hParams.signal_resolution, 
+                    IMG_N_CHANNELS, *hParams.datasetDef.img_resolution, 
                 )
                 with profiler('good'):
                     lossTree.predict.image.append(imgCriterion(
@@ -374,7 +375,7 @@ def rnnForward(
     batch_size, experiment, hParams: HyperParams, 
     epoch, batch_i, profiler, 
 ):
-    SEQ_LEN = experiment.DATASET_INSTANCE.SEQ_LEN
+    SEQ_LEN = hParams.datasetDef.seq_len
     min_context = hParams.rnn_min_context
     if hParams.sched_sampling is None:
         teacher_rate = 0

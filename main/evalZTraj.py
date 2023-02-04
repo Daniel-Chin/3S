@@ -5,6 +5,7 @@ from torchWork.experiment_control import EXPERIMENT_PY_FILENAME
 from matplotlib import pyplot as plt
 
 from shared import *
+from hyper_params import *
 from load_dataset import Dataset
 from vae import VAE
 
@@ -21,7 +22,8 @@ def main():
         EXPERIMENT_PATH, EXPERIMENT_PY_FILENAME, 
     ))
     print(f'{exp_name = }')
-    dataset: Dataset = experiment.getDataset(
+    dataset = Dataset(
+        experiment.datasetDef,
         is_train_not_validate=False, size=None, device=DEVICE, 
     )
 
@@ -37,14 +39,13 @@ def main():
 
 def evalZTraj(vae: VAE, dataset: Dataset, hParams: HyperParams, experiment):
     # Entire dataset as one batch. Not optimized for GPU! 
-    SEQ_LEN = experiment.DATASET_INSTANCE.SEQ_LEN
-    RESOLUTION = experiment.DATASET_INSTANCE.RESOLUTION
     batch_size = dataset.size
     flat_batch = dataset.video_set.view(
-        batch_size * SEQ_LEN, experiment.DATASET_INSTANCE.IMG_N_CHANNELS, RESOLUTION, RESOLUTION, 
+        batch_size * hParams.datasetDef.seq_len, 
+        hParams.datasetDef.img_n_channels, 
     )
     flat_mu, _ = vae.encode(flat_batch)
-    mu = flat_mu.detach().view(batch_size, SEQ_LEN, hParams.latent_dim)
+    mu = flat_mu.detach().view(batch_size, hParams.datasetDef.seq_len, hParams.symm.latent_dim)
     for i in range(batch_size):
         print(f'{i=}')
         plt.plot(mu[i, :, 0], mu[i, :, 1])

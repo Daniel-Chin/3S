@@ -9,7 +9,7 @@ from shared import *
 from physics_shared import *
 from render_video_dataset_shared import *
 from physics_bounce import *
-from dataset_instances import BounceSingleColor as DATASET_INSTANCE
+from dataset_definitions import bounceSingleColor as datasetDef
 
 PATH = path.join(
     '../datasets/bounce_flash_color', 
@@ -68,9 +68,10 @@ class BounceViewer(BallViewer):
 def main():
     os.makedirs(PATH, exist_ok=True)
     os.chdir(PATH)
+    assert datasetDef.img_resolution[0] == datasetDef.img_resolution[1]
     viewer = BounceViewer(
-        RUNNING_MODE, DATASET_INSTANCE.SEQ_LEN, 
-        DATASET_INSTANCE.RESOLUTION, BALL_RADIUS, EYE, LOOK_AT, 
+        RUNNING_MODE, datasetDef.seq_len, 
+        datasetDef.img_resolution[0], BALL_RADIUS, EYE, LOOK_AT, 
         SPF, 
     )
     glutMainLoop()  # 进入glut主循环

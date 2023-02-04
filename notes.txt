@@ -1238,12 +1238,12 @@ next {
         ...
 }
 todo {
+    refactor: dataset
+        ctrl shift F dataLoader (arg changed)
+    revert "make bass low", because maybe spec too dense. 
     refactor K
         see 2023_m01_d24@19_40_53_K notes. 
     vicreg on 2Body. motivation: 2023_m02_d01@07_53_02_vicreg_2d_z
-    also try VICReg with music. 
-        alert: timbre is also translation-equivariant. 
-        make forward skip C loss if dim(z)=1. 
     music 3D z, T(3)
         linear w/ pitch? 
         check: how many dim in z until we can recon? 
@@ -1254,11 +1254,14 @@ todo {
     multi-timbre scale dataset. 
         1d z, decode anyways. 
         vicReg
+        alert: timbre is also translation-equivariant. 
+        make forward skip C loss if dim(z)=1. 
     vicreg+decode
         style uses current timestep, not RNN prediction. use high kld weight. 
-        first exp: vicreg+decode. 
+        first exp: vicreg+decode, to see how VICReg may least interfere with known-to-succeed decode methods. 
     vae
         remove linear before deconv
+        only after ionian results from xuanjie can be replicated. 
     try GRU with 2body
 }
 archive {

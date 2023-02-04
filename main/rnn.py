@@ -1,6 +1,8 @@
 import torch
 from torch import nn
+
 from shared import *
+from hyper_params import *
 
 class PredRNN(nn.Module):
     def __init__(self, hyperParams: HyperParams) -> None:

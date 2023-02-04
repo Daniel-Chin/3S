@@ -12,6 +12,8 @@ from matplotlib import pyplot as plt
 import tqdm
 
 from shared import *
+from hyper_params import *
+from load_dataset import Dataset
 from vae import VAE
 from info_probe import probe, InfoProbeDataset
 from template_bounce import MyExpGroup
@@ -45,11 +47,13 @@ def main(experiment_path, lock_epoch):
                 max_dataset_size, 
                 hParams.train_set_size, 
             )
-    trainSet    = experiment.getDataset(
+    trainSet    = Dataset(
+        experiment.datasetDef, 
         is_train_not_validate=True,  size=max_dataset_size, 
         device=DEVICE, 
     )
-    validateSet = experiment.getDataset(
+    validateSet = Dataset(
+        experiment.datasetDef, 
         is_train_not_validate=False, size=None, 
         device=DEVICE, 
     )

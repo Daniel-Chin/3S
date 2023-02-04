@@ -8,7 +8,7 @@ from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModel
 from matplotlib import pyplot as plt
 
 from vae import VAE
-from load_dataset import getImageSet
+from load_dataset import Dataset, getImageSet
 from template_bounce import MyExpGroup
 from linearity_metric import projectionMSE
 
@@ -24,7 +24,8 @@ def main(experiment_path, lock_epoch):
     ))
     groups: List[MyExpGroup]
     print(f'{exp_name = }')
-    validateSet = experiment.getDataset(
+    validateSet = Dataset(
+        experiment.datasetDef, 
         is_train_not_validate=False, size=None, 
         device=DEVICE, 
     )

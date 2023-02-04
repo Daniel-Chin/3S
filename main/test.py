@@ -1,7 +1,7 @@
 import os
 
 op = '''
-exp_vicreg_decode.py
+exp_test.py
 '''.strip()
 # op = input('Which exp? ')
 

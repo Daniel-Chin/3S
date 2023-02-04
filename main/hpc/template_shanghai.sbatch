@@ -10,7 +10,11 @@
 #SBATCH --job-name={JOB_NAME}
 #SBATCH --output={OUT_FILENAME}.out
 #SBATCH --error={OUT_FILENAME}.err
+#SBATCH --partition=aquila,gpu
 
 module purge
-source /scratch/$USER/py_env/symmEnv/select_images
-singularity exec --nv --overlay /scratch/$USER/py_env/$ENV_NAME/$OVERLAY:ro /scratch/work/public/singularity/$SINGULARITY /bin/bash -c 'source /ext3/env.sh; cd ..; python loss_meta.py; python main.py {ARGS}'
+module load miniconda
+source activate danielTorch
+cd ..
+python loss_meta.py
+python main.py {ARGS}

@@ -1237,6 +1237,8 @@ next {
             So our previous decision two use 2-dim timbre is grounded. 
             however, the recon is still poor. Maybe when other params are better, the optimal z dim will change. 
             next, remove predict loss and do self-recon only. 
+        probeInfo with CHECK_OVERFIT reveals that the info probes' results overfit to train set. 
+        Prolly not the info probes. Prolly the latents are overfitting to the train set. 
     2023_m02_d03@22_00_23_vicreg_decode
         both (bigger batch_size, yes expander) seem to improve linearity. 
         next: sanity check. is VICReg loss really the one thing that's screwing w/ SPS+decode? 

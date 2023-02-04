@@ -1240,7 +1240,6 @@ next {
 todo {
     refactor K
         see 2023_m01_d24@19_40_53_K notes. 
-    try GRU with 2body
     vicreg on 2Body. motivation: 2023_m02_d01@07_53_02_vicreg_2d_z
     also try VICReg with music. 
         alert: timbre is also translation-equivariant. 
@@ -1260,6 +1259,7 @@ todo {
         first exp: vicreg+decode. 
     vae
         remove linear before deconv
+    try GRU with 2body
 }
 archive {
     有些结， 升一维就能解开。 暂时升一维， 等会儿降回来？

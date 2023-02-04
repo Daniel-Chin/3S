@@ -161,8 +161,8 @@ hP.lossWeightTree['vicreg'].weight = .0003
 hP.lossWeightTree['vicreg']['variance'].weight = 25
 hP.lossWeightTree['vicreg']['invariance'].weight = 25
 hP.lossWeightTree['vicreg']['covariance'].weight = 1
-vicreg.vicreg_expander_identity = False
-vicreg.vicreg_expander_widths = [64, 64, 64]
+hP.vicreg_expander_identity = False
+hP.vicreg_expander_widths = [64, 64, 64]
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 

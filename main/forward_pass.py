@@ -414,7 +414,7 @@ def rnnForward(
         reparamed = flat_z_hat_tut
     return flat_z_hat_tut, reparamed, log_var
 
-@lru_cache(1)
+@lru_cache(2)
 def offDiagonalMask2d(size: int):
     x = torch.ones((size, size), device=DEVICE)
     x.fill_diagonal_(0)

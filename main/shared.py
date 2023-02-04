@@ -225,6 +225,10 @@ class HyperParams(BaseHyperParams):
             self.vicreg_emb_dim = self.symm.latent_dim
         if self.vicreg_invariance_on_Y is None:
             self.vicreg_invariance_on_Y = True
+        saved_vicreg_emb_dim = self.vicreg_emb_dim
+        if self.lossWeightTree['vicreg'].weight != 0:
+            if not self.vicreg_expander_identity:
+                self.vicreg_emb_dim = self.symm.latent_dim
         try:
             yield
         finally:
@@ -232,6 +236,7 @@ class HyperParams(BaseHyperParams):
             self.batch_size = saved_batch_size
             self.vicreg_emb_dim = saved_vicreg_emb_dim
             self.vicreg_invariance_on_Y = saved_vicreg_invariance_on_Y
+            self.vicreg_emb_dim = saved_vicreg_emb_dim
     
     def copy(self):
         print('Warning: deprecated. use `from copy import deepcopy` instead.')

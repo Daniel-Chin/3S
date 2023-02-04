@@ -6,24 +6,8 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 from symmetry_transforms import *
-from dataset_instances import BounceSingleColor as DATASET_INSTANCE
-from load_dataset import VideoDataset
-
-def getDataset(
-    is_train_not_validate: bool, size: Optional[int], device, 
-):
-    if is_train_not_validate:
-        set_path = DATASET_INSTANCE.TRAIN_SET_PATH
-    else:
-        set_path = DATASET_INSTANCE.VALIDATE_SET_PATH
-        assert size is None
-        size = DATASET_INSTANCE.VALIDATE_SET_SIZE
-    return VideoDataset(
-        set_path, size, DATASET_INSTANCE.SEQ_LEN, 
-        DATASET_INSTANCE.ACTUAL_DIM, DATASET_INSTANCE.RESOLUTION, 
-        DATASET_INSTANCE.IMG_N_CHANNELS, 
-        device, 
-    )
+from hyper_params import *
+from dataset_definitions import bounceSingleColor as datasetDef
 
 SLOW_EVAL_EPOCH_INTERVAL = 2000
 
@@ -44,6 +28,7 @@ class MyExpGroup(ExperimentGroup):
 GROUPS = []
 
 template = HyperParams()
+template.datasetDef = datasetDef
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1.31072, None), 
     LossWeightTree('kld', 3.2e-7, None), 
@@ -93,11 +78,6 @@ template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
 template.rnn_ensemble = 1
-template.signal_resolution = (
-    DATASET_INSTANCE.RESOLUTION, 
-    DATASET_INSTANCE.RESOLUTION, 
-)
-template.signal_n_channels = DATASET_INSTANCE.IMG_N_CHANNELS
 template.vae_channels = [64, 128, 256]
 template.vae_kernel_sizes = [4, 4, 4]
 template.vae_strides = [2, 2, 2]
@@ -150,30 +130,31 @@ vicreg.vicreg_expander_widths = None
 # vicreg.max_epoch = 32000
 # vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 
+# modify vicreg to combine w/ decode
+vicreg.vicreg_expander_identity = False
+vicreg.vicreg_expander_widths = [64, 64, 64]
+
 # for vw in (
 #     3.84e-3 / 25, 
 #     .0003, .001, .003
 # ):
 
 hP = deepcopy(vicreg)
-hP.nickname = 'expander'
-hP.lossWeightTree['vicreg'].weight = .0003
-hP.lossWeightTree['vicreg']['variance'].weight = 25
-hP.lossWeightTree['vicreg']['invariance'].weight = 25
-hP.lossWeightTree['vicreg']['covariance'].weight = 1
-hP.vicreg_expander_identity = False
-hP.vicreg_expander_widths = [64, 64, 64]
+hP.nickname = 'no_vicreg'
+hP.lossWeightTree['vicreg'].weight = 0
+hP.batch_size = 64
+hP.sched_sampling = LinearScheduledSampling(18000 * 4)
+hP.max_epoch = template.sched_sampling.duration
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 
 hP = deepcopy(vicreg)
-hP.nickname = 'batch_size'
-hP.lossWeightTree['vicreg'].weight = .0003
-hP.lossWeightTree['vicreg']['variance'].weight = 25
-hP.lossWeightTree['vicreg']['invariance'].weight = 25
-hP.lossWeightTree['vicreg']['covariance'].weight = 1
-hP.batch_size = 64
-hP.sched_sampling = LinearScheduledSampling(18000 * 4)
-hP.max_epoch = template.sched_sampling.duration
+hP.nickname = 'no_vicreg_bsize=16'
+hP.lossWeightTree['vicreg'].weight = 0
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
+
+hP = deepcopy(template)
+hP.nickname = 'vanilla'
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))

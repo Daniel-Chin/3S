@@ -1232,14 +1232,20 @@ next {
             Info content. Linearity. 
     2023_m02_d02@20_46_18_vicreg_decode
         note there is a typo. "variance weight" should be "VICReg weight"
+    2023_m02_d03@21_49_18_ionian_z_dim
+        3-dim z seems best. 
+            So our previous decision two use 2-dim timbre is grounded. 
+            however, the recon is still poor. Maybe when other params are better, the optimal z dim will change. 
+            next, remove predict loss and do self-recon only. 
+    2023_m02_d03@22_00_23_vicreg_decode
+        both (bigger batch_size, yes expander) seem to improve linearity. 
+        next: sanity check. is VICReg loss really the one thing that's screwing w/ SPS+decode? 
 }
 next {
     arxiv paper:
         ...
 }
 todo {
-    refactor: dataset
-        ctrl shift F dataLoader (arg changed)
     revert "make bass low", because maybe spec too dense. 
     refactor K
         see 2023_m01_d24@19_40_53_K notes. 

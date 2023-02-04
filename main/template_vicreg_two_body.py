@@ -136,7 +136,7 @@ vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 for xxx in [
     ..., 
 ]:
-    hP = deepcopy(template)
+    hP = deepcopy(vicreg)
     hP.xxx = xxx
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

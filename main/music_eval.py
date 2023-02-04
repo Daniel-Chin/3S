@@ -66,12 +66,12 @@ def musicEval(
         )
         col_axes[3].plot(
             X, 
-            z    [col_i, :, 0], label='encoded', 
+            z    [col_i, :, 0].cpu(), label='encoded', 
             linewidth=1, 
         )
         col_axes[3].plot(
             X[hParams.rnn_min_context:], 
-            z_hat[col_i, :, 0], label='predicted', 
+            z_hat[col_i, :, 0].cpu(), label='predicted', 
             linewidth=1, 
         )
         for ax in col_axes[:3]:

@@ -109,14 +109,20 @@ def main(experiment_path, lock_epoch):
             if not all([isinstance(x, Number) for x in X]):
                 X = range(len(groups))
             for rand_init_i in range(n_rand_inits):
-                y = []
-                for losses in Y_valid[rand_init_i]:
-                    y.append(losses[-1])
-                plt.plot(
-                    X, y, linestyle='none', 
-                    markerfacecolor='none', markeredgecolor='k', 
-                    marker='o', markersize=10, 
-                )
+                for which, Y, c in (
+                    ('train',    Y_train, 'y'), 
+                    ('validate', Y_valid, 'k'), 
+                ): 
+                    y = []
+                    for losses in Y[rand_init_i]:
+                        y.append(losses[-1])
+                    line = plt.plot(
+                        X, y, linestyle='none', 
+                        markerfacecolor='none', markeredgecolor=c, 
+                        marker='o', markersize=10, 
+                    )
+                    legend_handles.append(line)
+                    legend_labels.append(which)
             plt.xticks(X, [g.variable_value for g in groups])
             plt.xlabel(group.variable_name)
         plt.ylabel('Info Probe Losses')

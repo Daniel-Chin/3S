@@ -12,7 +12,7 @@ from dataset_definitions import bounceSingleColor as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 2000
 
 EXP_NAME = 'vicreg_decode'
-N_RAND_INITS = 6
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -83,6 +83,7 @@ template.vae_kernel_sizes = [4, 4, 4]
 template.vae_strides = [2, 2, 2]
 template.vae_paddings = [1, 1, 1]
 template.vae_fc_before_decode = [16, 32, 64]
+template.vae_sigmoid_after_decode = True
 template.relu_leak = False
 template.vae_is_actually_ae = False
 template.encoder_batch_norm = True
@@ -145,6 +146,7 @@ hP.lossWeightTree['vicreg'].weight = 0
 hP.lossWeightTree['vicreg']['variance'].weight = 0
 hP.lossWeightTree['vicreg']['invariance'].weight = 0
 hP.lossWeightTree['vicreg']['covariance'].weight = 0
+vicreg.lossWeightTree['predict']['z'].weight = 3.84e-3
 hP.vicreg_expander_identity = None
 hP.vicreg_expander_widths = None
 hP.vicreg_invariance_on_Y = None
@@ -160,6 +162,7 @@ hP.lossWeightTree['vicreg'].weight = 0
 hP.lossWeightTree['vicreg']['variance'].weight = 0
 hP.lossWeightTree['vicreg']['invariance'].weight = 0
 hP.lossWeightTree['vicreg']['covariance'].weight = 0
+vicreg.lossWeightTree['predict']['z'].weight = 3.84e-3
 hP.vicreg_expander_identity = None
 hP.vicreg_expander_widths = None
 hP.vicreg_invariance_on_Y = None

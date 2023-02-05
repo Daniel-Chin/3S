@@ -57,6 +57,7 @@ class HyperParams(BaseHyperParams):
         self.vae_strides: List[int] = None
         self.vae_paddings: List[IntOrPair] = None
         self.vae_fc_before_decode: List[int] = None
+        self.vae_sigmoid_after_decode: bool = None
         self.relu_leak: bool = None
         self.vae_is_actually_ae: bool = None
         self.encoder_batch_norm: bool = None
@@ -125,6 +126,8 @@ class HyperParams(BaseHyperParams):
             self.vae_paddings = [1] * len(self.vae_channels)
         if self.vae_fc_before_decode is None:
             self.vae_fc_before_decode = [16, 32, 64]
+        if self.vae_sigmoid_after_decode is None:
+            self.vae_sigmoid_after_decode = True
         if self.lr_diminish is None:
             self.lr_diminish = None
         if isinstance(self.teacher_forcing_duration, int):

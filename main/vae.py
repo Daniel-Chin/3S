@@ -115,7 +115,9 @@ class VAE(nn.Module):
                 MyRelu(), 
             ])
         assert isinstance(modules[-1], MyRelu)
-        modules[-1] = nn.Sigmoid()
+        modules.pop(-1)
+        if hyperParams.vae_sigmoid_after_decode:
+            modules.append(nn.Sigmoid())
         self.decoder = nn.Sequential(*modules)
 
         print('VAE # of params:', sum(

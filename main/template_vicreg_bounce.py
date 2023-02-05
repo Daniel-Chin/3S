@@ -83,6 +83,7 @@ template.vae_kernel_sizes = [4, 4, 4]
 template.vae_strides = [2, 2, 2]
 template.vae_paddings = [1, 1, 1]
 template.vae_fc_before_decode = [16, 32, 64]
+template.vae_sigmoid_after_decode = True
 template.relu_leak = False
 template.vae_is_actually_ae = False
 template.encoder_batch_norm = True

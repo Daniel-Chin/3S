@@ -92,6 +92,7 @@ template.vae_paddings = [
     (1, 0), 
 ]
 template.vae_fc_before_decode = [16, 64, 256, 1024]
+template.vae_sigmoid_after_decode = False
 template.relu_leak = False
 template.vae_is_actually_ae = False
 template.encoder_batch_norm = True

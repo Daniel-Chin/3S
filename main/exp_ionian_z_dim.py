@@ -118,8 +118,5 @@ for d in [1, 2, 3, 4, 5]:
         ], 
         .1, 
     )
-    hP.lossWeightTree['predict'].weight = 0
-    hP.lossWeightTree['predict']['z'].weight = 0
-    hP.lossWeightTree['predict']['image'].weight = 0
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

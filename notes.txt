@@ -1260,6 +1260,13 @@ next {
         Damn! I've been asking a sigmoid-terminated decoder for standard gaussian output. 
     2023_m02_d04@09_48_33_vicreg_decode
         forgot to turn on z_loss for no_vicreg groups. 
+    2023_m02_d04@21_07_57_ionian_z_dim
+        self-recon only makes VAE overfit. 
+        z_dim = 3 is able to recon f0 and timbre for some rand inits. 
+        z_dim = 5 has advantage over z_dim = 3 on validate set. 
+            maybe, timbre is 4D. Maybe, unregularized VAE just doesn't know what it's doing. 
+            So, it's valid to try 2D-4D timbre z for future exps. 
+        also, by now we see that z_dim = 1 cannot recon. Previously, I thought because pitch aligns all partials the VAE would at least learn the pitch. Wrong. 
 }
 next {
     arxiv paper:

@@ -148,6 +148,7 @@ class HyperParams(BaseHyperParams):
             self.vicreg_expander_identity = None
             self.vicreg_expander_widths = None
             self.vicreg_invariance_on_Y = None
+            self.vicreg_cross_traj = None
         if self.rnn_depth is None:
             self.rnn_depth = 1
 

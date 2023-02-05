@@ -6,24 +6,8 @@ from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 from symmetry_transforms import *
-from dataset_instances import BounceSingleColor as DATASET_INSTANCE
-from load_dataset import VideoDataset
-
-def getDataset(
-    is_train_not_validate: bool, size: Optional[int], device, 
-):
-    if is_train_not_validate:
-        set_path = DATASET_INSTANCE.TRAIN_SET_PATH
-    else:
-        set_path = DATASET_INSTANCE.VALIDATE_SET_PATH
-        assert size is None
-        size = DATASET_INSTANCE.VALIDATE_SET_SIZE
-    return VideoDataset(
-        set_path, size, DATASET_INSTANCE.SEQ_LEN, 
-        DATASET_INSTANCE.ACTUAL_DIM, DATASET_INSTANCE.RESOLUTION, 
-        DATASET_INSTANCE.IMG_N_CHANNELS, 
-        device, 
-    )
+from hyper_params import *
+from dataset_definitions import bounceSingleColor as datasetDef
 
 SLOW_EVAL_EPOCH_INTERVAL = 100
 
@@ -47,6 +31,7 @@ class MyExpGroup(ExperimentGroup):
 GROUPS = []
 
 template = HyperParams()
+template.datasetDef = datasetDef
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1.31072, None), 
     LossWeightTree('kld', 3.2e-7, None), 
@@ -95,11 +80,6 @@ template.jepa_stop_grad_l_encoder = False
 template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
 template.rnn_ensemble = 1
-template.signal_resolution = (
-    DATASET_INSTANCE.RESOLUTION, 
-    DATASET_INSTANCE.RESOLUTION, 
-)
-template.signal_n_channels = DATASET_INSTANCE.IMG_N_CHANNELS
 template.vae_channels = [64, 128, 256]
 template.vae_kernel_sizes = [4, 4, 4]
 template.vae_strides = [2, 2, 2]

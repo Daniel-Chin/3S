@@ -1220,7 +1220,7 @@ next {
     2023_m02_d02@02_53_43_vicreg_2d_z_sps
         VICReg alone cannot get linear XY! With SPS it reaches perfect linearity! 
         Even info content is so significantly improved by SPS! 
-        Without decoding, SPS shows a much stronger advantage over ablat! Decoding helped regularise the latent. 
+        Without decoding, SPS shows a much stronger advantage over ablat! Decoding helped regularize the latent. 
     2023_m01_d30@01_03_57_vicreg_misc
         base is the best lol. 
 }
@@ -1242,6 +1242,22 @@ next {
     2023_m02_d03@22_00_23_vicreg_decode
         both (bigger batch_size, yes expander) seem to improve linearity. 
         next: sanity check. is VICReg loss really the one thing that's screwing w/ SPS+decode? 
+}
+2/5 {
+    2023_m02_d02@02_53_36_sps_change_set
+        results from 2body also applies to 1Ball: 
+            if the training size is large (>=512), noSymm can also disen. 
+        train_set_size=256 is small enough to throw off noSymm. 
+        This feels related to the "decoding regularization" I've been observing lately. 
+    2023_m02_d03@21_47_18_erdoz
+        this exp aims to test Junyan's proof https://www.overleaf.com/project/637b541d88ce4410598b747e 
+            as long as the prior model can remember n+1, translation aug should be useless. 
+        However, exp results show T+R => linear z, R =? nonlinear z. 
+        So, keep T for now. 
+    2023_m02_d03@22_05_27_equivalence_test
+        insig diff. I call equivalent. 
+    2023_m02_d04@09_44_14_ionian_z_dim
+        Damn! I've been asking a sigmoid-terminated decoder for standard gaussian output. 
 }
 next {
     arxiv paper:

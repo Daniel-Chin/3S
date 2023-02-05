@@ -5,7 +5,7 @@ from music21.instrument import Instrument
 
 intruments_ranges: Dict[str, List[Tuple[Instrument, range]]] = dict(
     train=[
-        (instrument.AcousticBass(), range(36, 97)), 
+        (instrument.AcousticBass(), range(48, 97)), 
         (instrument.Banjo(), range(36, 97)), 
         (instrument.BaritoneSaxophone(), range(36, 73)), 
         (instrument.Celesta(), range(36, 97)), 
@@ -56,7 +56,7 @@ intruments_ranges: Dict[str, List[Tuple[Instrument, range]]] = dict(
         (instrument.Clarinet(), range(41, 85)), 
         (instrument.ChurchBells(), range(36, 97)), 
         (instrument.Sampler(), range(36, 97)), 
-        (instrument.ElectricBass(), range(36, 85)), 
+        (instrument.ElectricBass(), range(40, 85)), 
         (instrument.Harp(), range(36, 97)), 
         (instrument.Koto(), range(36, 97)), 
         (instrument.Bassoon(), range(36, 85)), 

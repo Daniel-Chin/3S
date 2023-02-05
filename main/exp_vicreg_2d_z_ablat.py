@@ -150,6 +150,10 @@ hP.lossWeightTree['vicreg']['variance'].weight = 0
 hP.lossWeightTree['vicreg']['covariance'].weight = 0
 hP.lossWeightTree['vicreg'].weight = 0
 hP.lossWeightTree['vicreg']['invariance'].weight = 0
+hP.vicreg_expander_identity = None
+hP.vicreg_expander_widths = None
+hP.vicreg_invariance_on_Y = None
+hP.vicreg_cross_traj = None
 hP.sched_sampling = LinearScheduledSampling(1)
 hP.max_epoch = template.sched_sampling.duration
 hP.ready(globals())

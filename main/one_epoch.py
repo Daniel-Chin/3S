@@ -68,9 +68,10 @@ def oneEpoch(
                 scaled_loss = total_loss * hParams.lr_diminish(
                     epoch, hParams, 
                 )
-        with profiler('good', 'backward'):
-            optim.zero_grad()
-            scaled_loss.backward()
+        if scaled_loss != 0:
+            with profiler('good', 'backward'):
+                optim.zero_grad()
+                scaled_loss.backward()
         with profiler('grad norm'):
             params = getParams(optim)
             grad_norm = getGradNorm(params)

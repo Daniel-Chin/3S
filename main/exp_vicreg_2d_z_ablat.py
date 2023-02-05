@@ -155,6 +155,6 @@ hP.vicreg_expander_widths = None
 hP.vicreg_invariance_on_Y = None
 hP.vicreg_cross_traj = None
 hP.sched_sampling = LinearScheduledSampling(1)
-hP.max_epoch = template.sched_sampling.duration
+hP.max_epoch = hP.sched_sampling.duration
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))

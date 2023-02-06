@@ -121,8 +121,9 @@ def main(experiment_path, lock_epoch):
                         markerfacecolor='none', markeredgecolor=c, 
                         marker='o', markersize=10, 
                     )
-                    legend_handles.append(line)
-                    legend_labels.append(which)
+                    if rand_init_i == 0:
+                        legend_handles.append(line[0])
+                        legend_labels.append(which)
             plt.xticks(X, [g.variable_value for g in groups])
             plt.xlabel(group.variable_name)
         plt.ylabel('Info Probe Losses')

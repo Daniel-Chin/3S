@@ -1294,6 +1294,15 @@ next {
         It's still higher than expected, considering lr=.001. Maybe batch norm fighted against a full collapse. 
     2023_m02_d05@21_25_09_ionian_z_dim
         applying T+R doesn't help at all. 
+    2023_m02_d05@22_48_30_vicreg_ionian
+        disen & info content are very poor. 
+        as expected, C loss = 0. 
+        interestingly, V loss = 0 and z std ~= 3. 
+        I loss is large. RNN cannot predict. 
+        It doesn't even encode the timbre! 
+            the V loss is happy since it's batch-wise. 
+            rnn prediction can be identity. 
+        xuanjie replied. fix self-recon first. 
 }
 next {
     arxiv paper:

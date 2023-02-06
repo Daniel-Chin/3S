@@ -195,7 +195,8 @@ class SymmetryAssumption:
         )
     
     def __eq__(self, other):
-        assert isinstance(other, __class__)
+        if not isinstance(other, __class__):
+            return False
         return (
             self.latent_dim == other.latent_dim 
             and self.rule == other.rule

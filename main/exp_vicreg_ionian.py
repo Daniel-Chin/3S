@@ -11,15 +11,15 @@ from dataset_definitions import ionianScales_fr3gm as datasetDef
 
 SLOW_EVAL_EPOCH_INTERVAL = 5
 
-EXP_NAME = ...
-N_RAND_INITS = ...
+EXP_NAME = 'vicreg_ionian'
+N_RAND_INITS = 8
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.WHAT
+        self.variable_name = '0'
+        self.variable_value = 0
     
     @lru_cache(1)
     def name(self):
@@ -139,8 +139,6 @@ vicreg.batch_size = 512
 vicreg.max_epoch = 16000
 vicreg.sched_sampling = LinearScheduledSampling(vicreg.max_epoch)
 
-for xxx in []:
-    hP = deepcopy(template)
-    hP.xxx = xxx
-    hP.ready(globals())
-    GROUPS.append(MyExpGroup(hP))
+hP = deepcopy(template)
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))

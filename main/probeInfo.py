@@ -21,11 +21,13 @@ from template_bounce import MyExpGroup
 try:
     from workspace import (
         EXP_PATH, LOCK_EPOCH, INFO_PROBE_N_EPOCHS, 
-        INFO_PROBE_MODE, CHECK_OVERFIT, COMPARE_GROUPS, 
     )
 except ImportError:
     EXP_PATH = input('EXP_PATH=')
     LOCK_EPOCH = None
+
+CHECK_OVERFIT = 'CHECK_OVERFIT'
+COMPARE_GROUPS = 'COMPARE_GROUPS'
 
 def main(experiment_path, lock_epoch):
     exp_name, n_rand_inits, groups, experiment = loadExperiment(path.join(
@@ -86,63 +88,65 @@ def main(experiment_path, lock_epoch):
                 )
                 Y_train[rand_init_i].append(   train_losses)
                 Y_valid[rand_init_i].append(validate_losses)
-        legend_handles = []
-        legend_labels = []
-        if INFO_PROBE_MODE is CHECK_OVERFIT:
-            for rand_init_i in range(n_rand_inits):
-                for group_i, group in enumerate(groups):
-                    lineTrain, = plt.plot(
-                        Y_train[rand_init_i][group_i],
-                        c='r', linewidth=1, 
-                    )
-                    lineValid, = plt.plot(
-                        Y_valid[rand_init_i][group_i],
-                        c='b', linewidth=1, 
-                    )
-            plt.xlabel('Epoch')
-            legend_handles.append(lineTrain)
-            legend_labels.append('train')
-            legend_handles.append(lineValid)
-            legend_labels.append('validate')
-        elif INFO_PROBE_MODE is COMPARE_GROUPS:
-            X = [g.variable_value for g in groups]
-            if not all([isinstance(x, Number) for x in X]):
-                X = range(len(groups))
-            for rand_init_i in range(n_rand_inits):
-                for which, Y, c in (
-                    ('train',    Y_train, 'y'), 
-                    ('validate', Y_valid, 'k'), 
-                ): 
-                    y = []
-                    for losses in Y[rand_init_i]:
-                        y.append(losses[-1])
-                    line = plt.plot(
-                        X, y, linestyle='none', 
-                        markerfacecolor='none', markeredgecolor=c, 
-                        marker='o', markersize=10, 
-                    )
-                    if rand_init_i == 0:
-                        legend_handles.append(line[0])
-                        legend_labels.append(which)
-            plt.xticks(X, [g.variable_value for g in groups])
-            plt.xlabel(group.variable_name)
-        plt.ylabel('Info Probe Losses')
-        plt.suptitle(exp_name)
-        lineCollapse = plt.axhline(
-            collapse_mse, c='k', linewidth=1, 
-        )
-        plt.axhline(
-            0, c='g', linewidth=1, 
-        )
-        plt.legend(
-            [*legend_handles, lineCollapse], 
-            [*legend_labels, 'full collapse'], 
-        )
-        # plt.ylim(0, 4)
-        plt.savefig(path.join(
-            experiment_path, f'auto_info_probe_{INFO_PROBE_MODE}.pdf', 
-        ))
-        plt.show()
+        for info_probe_mode in (CHECK_OVERFIT, COMPARE_GROUPS):
+            legend_handles = []
+            legend_labels = []
+            if info_probe_mode is CHECK_OVERFIT:
+                for rand_init_i in range(n_rand_inits):
+                    for group_i, group in enumerate(groups):
+                        lineTrain, = plt.plot(
+                            Y_train[rand_init_i][group_i],
+                            c='r', linewidth=1, 
+                        )
+                        lineValid, = plt.plot(
+                            Y_valid[rand_init_i][group_i],
+                            c='b', linewidth=1, 
+                        )
+                plt.xlabel('Epoch')
+                legend_handles.append(lineTrain)
+                legend_labels.append('train')
+                legend_handles.append(lineValid)
+                legend_labels.append('validate')
+            elif info_probe_mode is COMPARE_GROUPS:
+                X = [g.variable_value for g in groups]
+                if not all([isinstance(x, Number) for x in X]):
+                    X = range(len(groups))
+                for rand_init_i in range(n_rand_inits):
+                    for which, Y, c in (
+                        ('train',    Y_train, 'y'), 
+                        ('validate', Y_valid, 'k'), 
+                    ): 
+                        y = []
+                        for losses in Y[rand_init_i]:
+                            y.append(losses[-1])
+                        line = plt.plot(
+                            X, y, linestyle='none', 
+                            markerfacecolor='none', markeredgecolor=c, 
+                            marker='o', markersize=10, 
+                        )
+                        if rand_init_i == 0:
+                            legend_handles.append(line[0])
+                            legend_labels.append(which)
+                plt.xticks(X, [g.variable_value for g in groups])
+                plt.xlabel(group.variable_name)
+            plt.ylabel('Info Probe Losses')
+            plt.suptitle(exp_name)
+            lineCollapse = plt.axhline(
+                collapse_mse, c='k', linewidth=1, 
+            )
+            plt.axhline(
+                0, c='g', linewidth=1, 
+            )
+            plt.legend(
+                [*legend_handles, lineCollapse], 
+                [*legend_labels, 'full collapse'], 
+            )
+            # plt.ylim(0, 4)
+            if info_probe_mode is COMPARE_GROUPS:
+                plt.savefig(path.join(
+                    experiment_path, f'auto_info_probe.pdf', 
+                ))
+            plt.show()
 
 cached_collapse_baseline_mse = None
 def collapseBaselineMSE(dataset: InfoProbeDataset):

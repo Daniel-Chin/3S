@@ -1,15 +1,14 @@
+from typing import *
 from functools import lru_cache
+from copy import deepcopy
 
 from torchWork import LossWeightTree, ExperimentGroup
 
 from shared import *
 from symmetry_transforms import *
+from hyper_params import *
+from dataset_definitions import bounceSingleColor as datasetDef
 
-TRAIN_SET_PATH    = '../datasets/bounce/train'
-VALIDATE_SET_PATH = '../datasets/bounce/validate'
-VALIDATE_SET_SIZE = 64
-SEQ_LEN = 20
-ACTUAL_DIM = 3
 SLOW_EVAL_EPOCH_INTERVAL = 2000
 
 EXP_NAME = 'vicreg_cycle'
@@ -29,6 +28,7 @@ class MyExpGroup(ExperimentGroup):
 GROUPS = []
 
 template = HyperParams()
+template.datasetDef = datasetDef
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('self_recon', 1.31072, None), 
     LossWeightTree('kld', 3.2e-7, None), 
@@ -79,9 +79,12 @@ template.jepa_stop_grad_r_encoder = False
 template.dropout = 0.0
 template.rnn_ensemble = 1
 template.vae_channels = [64, 128, 256]
-template.deep_spread = True
+template.vae_kernel_sizes = [4, 4, 4]
+template.vae_strides = [2, 2, 2]
+template.vae_paddings = [1, 1, 1]
+template.vae_fc_before_decode = [16, 32, 64]
+template.vae_sigmoid_after_decode = True
 template.relu_leak = False
-template.vae_kernel_size = 4
 template.vae_is_actually_ae = False
 template.encoder_batch_norm = True
 template.batch_size = 16
@@ -96,6 +99,7 @@ template.max_epoch = template.sched_sampling.duration
 template.vicreg_expander_identity = None
 template.vicreg_expander_widths = None
 template.vicreg_invariance_on_Y = None
+template.vicreg_cross_traj = None
 
 # vicreg is different from template
 vicreg = template.copy()
@@ -106,6 +110,7 @@ vicreg.lossWeightTree['vicreg']['covariance'].weight = 1
 vicreg.vicreg_expander_identity = False
 vicreg.vicreg_expander_widths = [64, 64, 64]
 vicreg.vicreg_invariance_on_Y = False
+vicreg.vicreg_cross_traj = False
 vicreg.weight_decay = 1e-9  # to tweak
 vicreg.batch_size = 32
 vicreg.lossWeightTree['self_recon'].weight = 0

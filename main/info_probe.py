@@ -91,7 +91,14 @@ def probe(
         in_epoch_train_losses = []
         for z, traj in trainLoader:
             traj_hat = probeNetwork.forward(z)
-            train_loss = F.mse_loss(traj_hat, traj)
+            train_loss = F.mse_loss(
+                traj_hat
+                # [:, 2:]
+                , 
+                traj
+                # [:, 2:]
+                , 
+            )
             adam.zero_grad()
             train_loss.backward()
             adam.step()
@@ -104,7 +111,14 @@ def probe(
         with torch.no_grad():
             for z, traj in validateLoader:
                 traj_hat = probeNetwork.forward(z)
-                validate_loss = F.mse_loss(traj_hat, traj).cpu()
+                validate_loss = F.mse_loss(
+                    traj_hat
+                    # [:, 2:]
+                    , 
+                    traj
+                    # [:, 2:]
+                    , 
+                ).cpu()
         
         train_losses.append(epoch_train_loss)
         validate_losses.append(validate_loss)

@@ -1288,6 +1288,10 @@ next {
         with translate aug, linearity is low and info content is very limited. 
         1. ask xuanjie about the VAE-only model's performance
         2. try T+R. who knows. 
+    2023_m02_d04@23_41_07_vicreg_2d_z_ablat
+        as expected, both have no info content. 
+        the no VC group collapsed z to std=0.1~0.01. 
+        It's still higher than expected, considering lr=.001. Maybe batch norm fighted against a full collapse. 
 }
 next {
     arxiv paper:

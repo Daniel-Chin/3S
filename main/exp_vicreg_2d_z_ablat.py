@@ -12,7 +12,7 @@ from dataset_definitions import bounceSingleColor as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 2000
 
 EXP_NAME = 'vicreg_2d_z_ablat'
-N_RAND_INITS = 8
+N_RAND_INITS = 6
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -138,23 +138,24 @@ vicreg.symm = SymmetryAssumption(
 )
 
 hP = deepcopy(vicreg)
-hP.nickname = 'no_VC'
+hP.nickname = 'no_VCbn'
 hP.lossWeightTree['vicreg']['variance'].weight = 0
 hP.lossWeightTree['vicreg']['covariance'].weight = 0
+hP.encoder_batch_norm = False
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 
-hP = deepcopy(vicreg)
-hP.nickname = 'no_VIC'
-hP.lossWeightTree['vicreg']['variance'].weight = 0
-hP.lossWeightTree['vicreg']['covariance'].weight = 0
-hP.lossWeightTree['vicreg'].weight = 0
-hP.lossWeightTree['vicreg']['invariance'].weight = 0
-hP.vicreg_expander_identity = None
-hP.vicreg_expander_widths = None
-hP.vicreg_invariance_on_Y = None
-hP.vicreg_cross_traj = None
-hP.sched_sampling = LinearScheduledSampling(1)
-hP.max_epoch = hP.sched_sampling.duration
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
+# hP = deepcopy(vicreg)
+# hP.nickname = 'no_VIC'
+# hP.lossWeightTree['vicreg']['variance'].weight = 0
+# hP.lossWeightTree['vicreg']['covariance'].weight = 0
+# hP.lossWeightTree['vicreg'].weight = 0
+# hP.lossWeightTree['vicreg']['invariance'].weight = 0
+# hP.vicreg_expander_identity = None
+# hP.vicreg_expander_widths = None
+# hP.vicreg_invariance_on_Y = None
+# hP.vicreg_cross_traj = None
+# hP.sched_sampling = LinearScheduledSampling(1)
+# hP.max_epoch = hP.sched_sampling.duration
+# hP.ready(globals())
+# GROUPS.append(MyExpGroup(hP))

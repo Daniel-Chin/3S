@@ -110,11 +110,12 @@ template.vicreg_expander_widths = None
 template.vicreg_invariance_on_Y = None
 template.vicreg_cross_traj = None
 
-for d in [1, 2, 3, 4, 5]:
+for d in [3, 4, 5]:
     hP = deepcopy(template)
     hP.symm = SymmetryAssumption(
         d, [
-            (SAMPLE_TRANS, [Translate(d, 1)], {Slice(0, d)}), 
+            (SAMPLE_TRANS, [Translate(1, 1)], {Slice(0, 1)}), 
+            (SAMPLE_TRANS, [Translate(d - 1, 1), Rotate(d - 1)], {Slice(1, d)}), 
         ], 
         .1, 
     )

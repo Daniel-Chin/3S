@@ -1268,6 +1268,27 @@ next {
             So, it's valid to try 2D-4D timbre z for future exps. 
         also, by now we see that z_dim = 1 cannot recon. Previously, I thought because pitch aligns all partials the VAE would at least learn the pitch. Wrong. 
 }
+2/6 {
+    2023_m02_d03@21_47_23_vicreg_no_unreg
+        3D z with T3R3 yields NO EXTRA INFO than 2D z with T2R2. 
+        Safely, we can say the third axis is diff from the other two, which can be learned by vicreg under sps. 
+        Quite safely, we know it's the RNN that's having trouble finding the ground. 
+        therefore, eyes fixed on 2023_m02_d04@09_44_34_vicreg_2b ! 
+    2023_m02_d04@09_44_34_vicreg_2b
+        failed. 
+        maybe we need the expander back? 
+        Note, the two "safly" above is immediately challenged. Maybe 2D z worked like magic only because the covariance loss fully specifies mutual info up to zigzag. 
+    I was wrong about how info content is reflected on the probes' MSE loss. It's not like sqrt(3, 2, 1)... It's just linear w/ info dim. 
+    2023_m02_d04@21_22_44_vicreg_decode
+        managed to make no_vicreg equivalent w/ `template`. 
+        batch_size=64 killed disen. Is it because train_set_size=64 and we have no stochasticity? 
+        2023_m01_d17@21_56_11_vicreg_batch_size confirms this thought. changing template. 
+    2023_m02_d04@23_17_44_ionian_z_dim
+        inspecting images, we see that recon quality is bad. 
+        with translate aug, linearity is low and info content is very limited. 
+        1. ask xuanjie about the VAE-only model's performance
+        2. try T+R. who knows. 
+}
 next {
     arxiv paper:
         ...

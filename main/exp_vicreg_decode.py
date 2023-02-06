@@ -134,6 +134,8 @@ vicreg.vicreg_expander_widths = None
 # modify vicreg to combine w/ decode
 vicreg.vicreg_expander_identity = False
 vicreg.vicreg_expander_widths = [64, 64, 64]
+template.train_set_size = 64
+vicreg.train_set_size = 64
 
 # for vw in (
 #     3.84e-3 / 25, 
@@ -169,7 +171,7 @@ hP.vicreg_invariance_on_Y = None
 hP.ready(globals())
 GROUPS.append(MyExpGroup(hP))
 
-hP = deepcopy(template)
-hP.nickname = 'vanilla'
-hP.ready(globals())
-GROUPS.append(MyExpGroup(hP))
+# hP = deepcopy(template)
+# hP.nickname = 'vanilla'
+# hP.ready(globals())
+# GROUPS.append(MyExpGroup(hP))

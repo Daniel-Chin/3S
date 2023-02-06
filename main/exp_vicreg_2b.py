@@ -122,8 +122,8 @@ vicreg.variational_rnn = False
 # modify vicreg from vanilla
 vicreg.lossWeightTree['vicreg']['variance'].weight = 35
 vicreg.lossWeightTree['vicreg']['invariance'].weight = 25
-vicreg.vicreg_expander_identity = True
-vicreg.vicreg_expander_widths = None
+# vicreg.vicreg_expander_identity = True
+# vicreg.vicreg_expander_widths = None
 vicreg.train_set_size = 512
 vicreg.batch_size = 512
 vicreg.max_epoch = 32000

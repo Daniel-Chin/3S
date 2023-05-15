@@ -26,7 +26,7 @@ pip install -U scikit-learn
 - `torchWork` from https://github.com/Daniel-Chin/torchWork
   - I didn't make it installable. Manually add the parent dir of `torchWork` to `$PYTHONPATH`. 
 - `midi2audio` from https://github.com/daniel-chin/midi2audio
-  - I didn't make it installable. Manually add the parent dir of `torchWork` to `$PYTHONPATH`, and rename the package as `midi2audio_fork`.  
+  - I didn't make it installable. Manually add the parent dir of `midi2audio` to `$PYTHONPATH`, and rename the package as `midi2audio_fork`.  
 - `python_lib` from https://github.com/daniel-chin/python_lib
   - I didn't make it installable. Manually add the entire `python_lib` to `$PYTHONPATH`. 
 - `ffmpeg`. 

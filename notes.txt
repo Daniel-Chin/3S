@@ -1310,9 +1310,21 @@ next {
         ...
 }
 todo {
-    revert "make bass low", because maybe spec too dense. 
+    db check rnn_size effect result
+    For vicreg exps that achieves linear proj. MSE~=0, plot coord against z (each dim), and see if we have a line. 
+    ball height: 缩放对称
+    ionian scale: 2D z. velocity 搞点规律
+    chord ~= root_scale * chord_type * inversion
+        aug: pitch-dim flip
+        aug: n_note_in_chord (thickness) +-1
+    闪烁颜色小球 + 2dz, VICReg
+    vicreg+cycle
+        z_style (Yann's latent)
+        GAN
+    
     refactor K
         see 2023_m01_d24@19_40_53_K notes. 
+        Gus's concern of how many distinct real samples seen. 
     vicreg on 2Body. motivation: 2023_m02_d01@07_53_02_vicreg_2d_z
     music 3D z, T(3)
         linear w/ pitch? 

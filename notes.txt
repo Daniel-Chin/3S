@@ -1305,11 +1305,22 @@ next {
             rnn prediction can be identity. 
         xuanjie replied. fix self-recon first. 
 }
+6/19 {
+    computational definition of 语法 and 语义。
+        done
+    read
+        generative agent
+        blip 2
+}
 next {
     arxiv paper:
         ...
 }
 todo {
+    read
+        learned tpmorp ensemble
+        Maigo's post on evolved color vocab
+
     db check rnn_size effect result
     For vicreg exps that achieves linear proj. MSE~=0, plot coord against z (each dim), and see if we have a line. 
     ball height: 缩放对称
